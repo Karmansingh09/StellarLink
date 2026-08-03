@@ -1,3 +1,13 @@
+import Navbar from '../../components/landing/Navbar';
+import Hero from '../../components/landing/Hero';
+
 export default function Landing() {
-  return <h1>Landing</h1>;
+  return (
+    <div className="min-h-screen bg-white text-[#0F172A]">
+      <Navbar />
+      <main>
+        <Hero />
+      </main>
+    </div>
+  );
 }
