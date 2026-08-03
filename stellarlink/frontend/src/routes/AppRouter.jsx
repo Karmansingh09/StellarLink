@@ -1,0 +1,36 @@
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LandingLayout from '../layouts/LandingLayout';
+import DashboardLayout from '../layouts/DashboardLayout';
+
+const Landing = lazy(() => import('../pages/Landing/Landing'));
+const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
+const Devices = lazy(() => import('../pages/Devices/Devices'));
+const Transactions = lazy(() => import('../pages/Transactions/Transactions'));
+const Analytics = lazy(() => import('../pages/Analytics/Analytics'));
+const Wallet = lazy(() => import('../pages/Wallet/Wallet'));
+const Settings = lazy(() => import('../pages/Settings/Settings'));
+const NotFound = lazy(() => import('../pages/NotFound'));
+
+export default function AppRouter() {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route element={<LandingLayout />}>
+            <Route path="/" element={<Landing />} />
+          </Route>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/devices" element={<Devices />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
+}
