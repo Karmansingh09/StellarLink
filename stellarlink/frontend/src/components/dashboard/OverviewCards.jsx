@@ -1,32 +1,32 @@
-import { Activity, ShieldCheck, Wallet, Zap } from 'lucide-react';
+import { Activity, ShieldCheck, Wallet, Zap, FileCode, Lock } from 'lucide-react';
 import OverviewCard from './OverviewCard';
 
 const defaultCards = [
   {
-    title: 'Total settlement value',
-    value: '$12.48M',
-    change: { label: '+18.4%', tone: 'success', description: 'vs. last 30 days' },
-    icon: Wallet,
+    title: 'Soroban Active Contracts',
+    value: '4 Contracts',
+    change: { label: 'Active', tone: 'success', description: 'Device & Escrow WASM' },
+    icon: FileCode,
     tone: 'primary',
   },
   {
-    title: 'Active endpoints',
-    value: '1,284',
-    change: { label: '+64', tone: 'success', description: 'new devices onboarded' },
-    icon: Activity,
+    title: 'Successful Settlements',
+    value: '12,840',
+    change: { label: '+18.4%', tone: 'success', description: 'On-chain auto-settled' },
+    icon: Wallet,
     tone: 'neutral',
   },
   {
-    title: 'Live throughput',
-    value: '8.2k/min',
-    change: { label: '+7.1%', tone: 'success', description: 'network burst rate' },
-    icon: Zap,
+    title: 'Pending Escrows Locked',
+    value: '12 Locked',
+    change: { label: 'Escrow Safe', tone: 'warning', description: '12,500 XLM in escrow' },
+    icon: Lock,
     tone: 'warning',
   },
   {
-    title: 'Operational SLA',
-    value: '99.98%',
-    change: { label: 'Stable', tone: 'primary', description: 'no incidents today' },
+    title: 'Smart Contract Health',
+    value: '100% SLA',
+    change: { label: 'Optimal', tone: 'success', description: 'Soroban RPC v21.1' },
     icon: ShieldCheck,
     tone: 'success',
   },

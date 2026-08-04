@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Copy, Check, ExternalLink, Zap, ArrowUpDown, Battery, Wifi, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Copy, Check, ExternalLink, Zap, ArrowUpDown, Battery, Wifi, ChevronLeft, ChevronRight, FileCode } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import StatusBadge from '../dashboard/StatusBadge';
 import Badge from '../ui/Badge';
@@ -65,7 +65,7 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
           </div>
           <div className="self-start sm:self-auto">
             <Badge variant="primary" dot size="sm">
-              Live Fleet Stream
+              Soroban Registry Active
             </Badge>
           </div>
         </div>
@@ -86,7 +86,7 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
               const healthScore = device.health || (device.status === 'active' ? 98 : device.status === 'monitoring' ? 85 : device.status === 'pending' ? 70 : 0);
               const heartbeat = device.heartbeat || '12s ago';
               const battery = device.battery || '94%';
-              const signal = device.signal || '92 dBm';
+              const contractId = 'CC7X3M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O';
 
               return (
                 <div
@@ -113,56 +113,13 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
                     <StatusBadge status={device.status}>{device.status}</StatusBadge>
                   </div>
 
-                  {/* Health Bar */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-[#64748B]">Node Health</span>
-                      <span className="font-semibold text-[#0F766E]">{healthScore}%</span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-slate-200 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${healthScore > 80 ? 'bg-[#0F766E]' : healthScore > 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                        style={{ width: `${healthScore}%` }}
-                      />
-                    </div>
-                  </div>
-
                   <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-[#E2E8F0] text-xs">
-                    <span className="text-[#64748B]">Stellar Public Key</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[#0F172A]">
-                        {device.wallet.substring(0, 6)}...{device.wallet.substring(device.wallet.length - 4)}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          copyToClipboard(device.wallet, device.id);
-                        }}
-                        className="text-[#64748B] hover:text-[#0F766E] p-1"
-                      >
-                        {copiedKey === device.id ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 text-xs pt-1 text-center">
-                    <div className="bg-white p-2 rounded-xl border border-[#E2E8F0]">
-                      <p className="text-[10px] uppercase text-[#64748B]">Heartbeat</p>
-                      <p className="font-medium text-[#0F172A]">{heartbeat}</p>
-                    </div>
-                    <div className="bg-white p-2 rounded-xl border border-[#E2E8F0]">
-                      <p className="text-[10px] uppercase text-[#64748B]">Battery</p>
-                      <p className="font-medium text-[#0F172A]">{battery}</p>
-                    </div>
-                    <div className="bg-white p-2 rounded-xl border border-[#E2E8F0]">
-                      <p className="text-[10px] uppercase text-[#64748B]">Balance</p>
-                      <p className="font-mono font-semibold text-[#0F766E]">{device.balance}</p>
-                    </div>
+                    <span className="text-[#64748B] flex items-center gap-1">
+                      <FileCode className="h-3.5 w-3.5 text-teal-600" /> Contract
+                    </span>
+                    <span className="font-mono text-[#0F766E] font-semibold">
+                      {contractId.substring(0, 6)}...{contractId.substring(contractId.length - 4)}
+                    </span>
                   </div>
 
                   <button
@@ -173,7 +130,7 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
                     }}
                     className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold text-[#0F766E] bg-white border border-teal-200 rounded-xl transition-colors active:bg-teal-50"
                   >
-                    Inspect Telemetry & Keys
+                    Inspect On-Chain Contract & Keys
                     <ExternalLink className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -188,10 +145,9 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
                 <tr>
                   {[
                     { label: 'Device & ID', field: 'name' },
+                    { label: 'Soroban Registry Contract', field: 'contract' },
                     { label: 'Stellar Wallet', field: 'wallet' },
                     { label: 'Health & Status', field: 'status' },
-                    { label: 'Telemetry & Latency', field: 'latency' },
-                    { label: 'Power & Signal', field: 'battery' },
                     { label: 'Balance', field: 'balance' },
                   ].map((col) => (
                     <th
@@ -213,8 +169,7 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
               <tbody className="divide-y divide-[#E2E8F0] bg-white">
                 {paginatedDevices.map((device) => {
                   const healthScore = device.health || (device.status === 'active' ? 98 : device.status === 'monitoring' ? 85 : device.status === 'pending' ? 70 : 0);
-                  const heartbeat = device.heartbeat || '12s ago';
-                  const battery = device.battery || '94%';
+                  const contractId = 'CC7X3M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O';
 
                   return (
                     <tr
@@ -239,6 +194,15 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
                             </p>
                             <p className="text-xs font-mono text-[#64748B]">{device.id}</p>
                           </div>
+                        </div>
+                      </td>
+
+                      <td className="px-4 py-4 sm:px-6">
+                        <div className="flex items-center gap-1.5">
+                          <FileCode className="h-3.5 w-3.5 text-teal-600" />
+                          <span className="font-mono text-xs text-[#0F766E] bg-teal-50 border border-teal-100 px-2 py-0.5 rounded font-medium">
+                            {contractId.substring(0, 8)}...{contractId.substring(contractId.length - 4)}
+                          </span>
                         </div>
                       </td>
 
@@ -276,26 +240,6 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
                               className={`h-full rounded-full ${healthScore > 80 ? 'bg-[#0F766E]' : healthScore > 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
                               style={{ width: `${healthScore}%` }}
                             />
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="px-4 py-4 sm:px-6">
-                        <div>
-                          <p className="text-sm font-semibold text-[#0F172A]">{device.latency}</p>
-                          <p className="text-xs text-[#64748B]">Sync: {heartbeat}</p>
-                        </div>
-                      </td>
-
-                      <td className="px-4 py-4 sm:px-6">
-                        <div className="flex items-center gap-3 text-xs text-[#475569]">
-                          <div className="flex items-center gap-1" title="Battery Level">
-                            <Battery className="h-3.5 w-3.5 text-[#0F766E]" />
-                            <span>{battery}</span>
-                          </div>
-                          <div className="flex items-center gap-1" title="Cellular/IoT Signal">
-                            <Wifi className="h-3.5 w-3.5 text-emerald-600" />
-                            <span>5G</span>
                           </div>
                         </div>
                       </td>

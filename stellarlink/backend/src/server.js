@@ -10,6 +10,7 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import stellarRoutes from './routes/stellarRoutes.js';
+import sorobanRoutes from './routes/sorobanRoutes.js';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/stellar', stellarRoutes);
+app.use('/api/soroban', sorobanRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

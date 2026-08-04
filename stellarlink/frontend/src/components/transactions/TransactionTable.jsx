@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Copy, Check, ExternalLink, MoreVertical, ArrowDownLeft, ArrowUpRight, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Copy, Check, ExternalLink, ArrowUpDown, ChevronLeft, ChevronRight, FileCode } from 'lucide-react';
 import StatusBadge from '../dashboard/StatusBadge';
 import TransactionCard from './TransactionCard';
-import Button from '../ui/Button';
 import EmptyState from '../ui/EmptyState';
 import { useToast } from '../../context/ToastContext';
 
@@ -79,13 +78,11 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
               <tr>
                 {[
                   { label: 'Transaction ID', field: 'txId' },
+                  { label: 'Soroban Contract ID', field: 'contractId' },
                   { label: 'Device', field: 'device' },
-                  { label: 'Wallet', field: 'wallet' },
                   { label: 'Amount', field: 'amount' },
-                  { label: 'Asset', field: 'asset' },
                   { label: 'Status', field: 'status' },
                   { label: 'Settlement Time', field: 'timestamp' },
-                  { label: 'Network', field: 'network' },
                 ].map((col) => (
                   <th
                     key={col.field}
@@ -104,106 +101,85 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E2E8F0] bg-white">
-              {paginatedTransactions.map((tx) => (
-                <tr
-                  key={tx.txId}
-                  onClick={() => onViewDetails(tx)}
-                  className="cursor-pointer transition-colors hover:bg-[#FAF8FF]"
-                >
-                  {/* Transaction ID */}
-                  <td className="px-4 py-4 sm:px-6">
-                    <div className="flex items-center gap-1.5 font-mono text-xs font-semibold text-[#0F766E]">
-                      <span>{tx.txId}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          copyText(tx.txId, `tx-${tx.txId}`, 'Transaction ID');
-                        }}
-                        className="text-[#64748B] hover:text-[#0F766E] p-1"
-                        title="Copy Transaction ID"
-                      >
-                        {copiedKey === `tx-${tx.txId}` ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" />
-                        )}
-                      </button>
-                    </div>
-                  </td>
+              {paginatedTransactions.map((tx) => {
+                const contractId = tx.contractId || 'CC7X3M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O';
+                return (
+                  <tr
+                    key={tx.txId}
+                    onClick={() => onViewDetails(tx)}
+                    className="cursor-pointer transition-colors hover:bg-[#FAF8FF]"
+                  >
+                    {/* Transaction ID */}
+                    <td className="px-4 py-4 sm:px-6">
+                      <div className="flex items-center gap-1.5 font-mono text-xs font-semibold text-[#0F766E]">
+                        <span>{tx.txId}</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyText(tx.txId, `tx-${tx.txId}`, 'Transaction ID');
+                          }}
+                          className="text-[#64748B] hover:text-[#0F766E] p-1"
+                          title="Copy Transaction ID"
+                        >
+                          {copiedKey === `tx-${tx.txId}` ? (
+                            <Check className="h-3.5 w-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    </td>
 
-                  {/* Device */}
-                  <td className="px-4 py-4 text-sm font-semibold text-[#0F172A] sm:px-6">
-                    {tx.device}
-                  </td>
+                    {/* Soroban Contract ID */}
+                    <td className="px-4 py-4 sm:px-6">
+                      <div className="flex items-center gap-1.5">
+                        <FileCode className="h-3.5 w-3.5 text-teal-600 shrink-0" />
+                        <span className="font-mono text-xs text-[#0F172A] bg-teal-50 border border-teal-100 px-2 py-0.5 rounded">
+                          {contractId.substring(0, 8)}...{contractId.substring(contractId.length - 4)}
+                        </span>
+                      </div>
+                    </td>
 
-                  {/* Wallet */}
-                  <td className="px-4 py-4 sm:px-6">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-xs text-[#0F172A] bg-slate-50 border border-[#E2E8F0] px-2 py-0.5 rounded">
-                        {tx.wallet}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          copyText(tx.fullWallet || tx.wallet, `w-${tx.txId}`, 'Stellar Wallet Address');
-                        }}
-                        className="text-[#64748B] hover:text-[#0F766E] p-1"
-                        title="Copy Wallet Address"
-                      >
-                        {copiedKey === `w-${tx.txId}` ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" />
-                        )}
-                      </button>
-                    </div>
-                  </td>
+                    {/* Device */}
+                    <td className="px-4 py-4 text-sm font-semibold text-[#0F172A] sm:px-6">
+                      {tx.device}
+                    </td>
 
-                  {/* Amount */}
-                  <td className="px-4 py-4 font-mono text-sm font-bold text-[#0F172A] sm:px-6">
-                    {tx.amount}
-                  </td>
+                    {/* Amount */}
+                    <td className="px-4 py-4 font-mono text-sm font-bold text-[#0F172A] sm:px-6">
+                      {tx.amount}
+                    </td>
 
-                  {/* Asset */}
-                  <td className="px-4 py-4 text-xs font-semibold text-[#475569] sm:px-6">
-                    {tx.asset}
-                  </td>
+                    {/* Status */}
+                    <td className="px-4 py-4 sm:px-6">
+                      <StatusBadge status={tx.status}>{tx.status}</StatusBadge>
+                    </td>
 
-                  {/* Status */}
-                  <td className="px-4 py-4 sm:px-6">
-                    <StatusBadge status={tx.status}>{tx.status}</StatusBadge>
-                  </td>
+                    {/* Settlement Time */}
+                    <td className="px-4 py-4 text-xs text-[#64748B] sm:px-6">
+                      {tx.timestamp}
+                    </td>
 
-                  {/* Settlement Time */}
-                  <td className="px-4 py-4 text-xs text-[#64748B] sm:px-6">
-                    {tx.timestamp}
-                  </td>
-
-                  {/* Network */}
-                  <td className="px-4 py-4 text-xs font-medium text-[#0F172A] sm:px-6">
-                    {tx.network}
-                  </td>
-
-                  {/* Actions */}
-                  <td className="px-4 py-4 sm:px-6 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onViewDetails(tx);
-                        }}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F766E] hover:text-[#115E59] bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-xl transition-colors"
-                      >
-                        View
-                        <ExternalLink className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    {/* Actions */}
+                    <td className="px-4 py-4 sm:px-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onViewDetails(tx);
+                          }}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F766E] hover:text-[#115E59] bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-xl transition-colors"
+                        >
+                          View
+                          <ExternalLink className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

@@ -1,13 +1,13 @@
-import { ShieldCheck, Lock, HardDrive, Cpu, Globe } from 'lucide-react';
+import { ShieldCheck, Lock, HardDrive, Cpu, Globe, FileCode } from 'lucide-react';
 import Card, { CardHeader, CardTitle } from '../ui/Card';
 import Badge from '../ui/Badge';
 
 const sidebarItems = [
-  { label: 'Wallet Health', value: '100% Multisig (3/5)', icon: ShieldCheck, status: 'Healthy' },
-  { label: 'Security Status', value: 'HSM Key Enclave', icon: Lock, status: 'Verified' },
-  { label: 'Last Key Backup', value: 'Today, 04:00 UTC', icon: HardDrive, status: 'Encrypted' },
+  { label: 'Connected Contracts', value: '4 Soroban Contracts', icon: FileCode, status: 'Deployed' },
+  { label: 'Contract Escrow Locked', value: '12,500.00 XLM', icon: Lock, status: 'Escrow Safe' },
+  { label: 'Security Status', value: 'HSM Key Enclave', icon: ShieldCheck, status: 'Verified' },
   { label: 'Connected Devices', value: '1,284 Endpoints', icon: Cpu, status: 'Active' },
-  { label: 'Network Environment', value: 'Stellar Mainnet', icon: Globe, status: 'Connected' },
+  { label: 'Network Environment', value: 'Stellar Testnet', icon: Globe, status: 'Connected' },
 ];
 
 export default function WalletRightSidebar() {
@@ -15,7 +15,7 @@ export default function WalletRightSidebar() {
     <Card padding="generous" className="h-full space-y-4">
       <CardHeader className="mb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold text-[#0F172A]">Wallet Audit Panel</CardTitle>
+          <CardTitle className="text-base font-semibold text-[#0F172A]">Soroban Contract Audit</CardTitle>
           <Badge variant="primary" dot size="sm">
             Live Guard
           </Badge>
