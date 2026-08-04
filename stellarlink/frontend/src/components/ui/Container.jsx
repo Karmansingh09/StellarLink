@@ -11,7 +11,7 @@ export default function Container({
     md: 'max-w-5xl',
     lg: 'max-w-7xl',
     xl: 'max-w-[90rem]',
-    full: 'max-w-full',
+    full: 'max-w-360',
   };
 
   return (

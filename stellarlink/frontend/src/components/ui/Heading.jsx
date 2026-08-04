@@ -11,12 +11,12 @@ export default function Heading({
   const Tag = `h${level}`;
 
   const styles = {
-    1: 'text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#0F172A]',
-    2: 'text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]',
-    3: 'text-xl sm:text-2xl font-bold text-[#0F172A]',
-    4: 'text-lg font-semibold text-[#0F172A]',
-    5: 'text-base font-semibold text-[#0F172A]',
-    6: 'text-sm font-semibold uppercase tracking-wider text-[#475569]',
+    1: "font-['Space_Grotesk'] text-4xl leading-tight sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#0F172A]",
+    2: "font-['Space_Grotesk'] text-3xl sm:text-4xl font-semibold tracking-tight text-[#0F172A]",
+    3: "font-['Space_Grotesk'] text-2xl sm:text-3xl font-semibold tracking-tight text-[#0F172A]",
+    4: "font-['Space_Grotesk'] text-xl font-semibold tracking-tight text-[#0F172A]",
+    5: "font-['Space_Grotesk'] text-base font-semibold tracking-tight text-[#0F172A]",
+    6: 'text-sm font-semibold uppercase tracking-[0.18em] text-[#64748B]',
   };
 
   const alignments = {
@@ -31,7 +31,7 @@ export default function Heading({
         <Tag className={styles[level]} {...props}>
           {children}
         </Tag>
-        <p className="text-base text-[#475569] max-w-2xl">{subtitle}</p>
+        <p className="max-w-2xl text-base leading-7 text-[#475569]">{subtitle}</p>
       </div>
     );
   }

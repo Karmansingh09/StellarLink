@@ -11,22 +11,22 @@ export default function Badge({
   const baseStyles = 'inline-flex items-center gap-1.5 font-medium rounded-full select-none';
 
   const variants = {
-    primary: 'bg-teal-50 text-[#0F766E] border border-teal-200/60',
-    secondary: 'bg-slate-100 text-[#475569] border border-slate-200/60',
-    accent: 'bg-teal-500/10 text-[#0F766E] border border-teal-500/20',
-    success: 'bg-emerald-50 text-emerald-700 border border-emerald-200/60',
-    warning: 'bg-amber-50 text-amber-700 border border-amber-200/60',
-    error: 'bg-rose-50 text-rose-700 border border-rose-200/60',
-    outline: 'bg-white border border-[#E2E8F0] text-[#475569]',
+    primary: 'bg-[#EAF8F6] text-[#0F766E] border border-[#CBE9E3]',
+    secondary: 'bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]',
+    accent: 'bg-[#DDF6F0] text-[#0F766E] border border-[#BDE9DE]',
+    success: 'bg-[#EAF7EE] text-[#166534] border border-[#CDECCD]',
+    warning: 'bg-[#FFF7E6] text-[#92400E] border border-[#F6E2B5]',
+    error: 'bg-[#FEF2F2] text-[#B42318] border border-[#FECACA]',
+    outline: 'bg-white border border-[#D9E2E1] text-[#475569]',
   };
 
   const dotColors = {
     primary: 'bg-[#0F766E]',
     secondary: 'bg-[#475569]',
-    accent: 'bg-[#14B8A6]',
-    success: 'bg-emerald-500',
-    warning: 'bg-amber-500',
-    error: 'bg-rose-500',
+    accent: 'bg-[#0F766E]',
+    success: 'bg-emerald-600',
+    warning: 'bg-amber-600',
+    error: 'bg-rose-600',
     outline: 'bg-[#475569]',
   };
 

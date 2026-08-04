@@ -44,7 +44,7 @@ export default function Logo({
         </svg>
       </div>
       {variant === 'full' && (
-        <span className={clsx('tracking-tight text-[#0F172A]', textSizes[size])}>
+        <span className={clsx("font-['Space_Grotesk'] tracking-tight text-[#0F172A]", textSizes[size])}>
           Stellar<span className="text-[#0F766E]">Link</span>
         </span>
       )}

@@ -15,66 +15,63 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#E2E8F0]">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <div className="flex items-center">
-            <a href="/" className="focus:outline-none focus:ring-2 focus:ring-[#0F766E] rounded-xl p-1">
-              <Logo size="md" />
-            </a>
-          </div>
+    <header className="sticky top-0 z-50 border-b border-[#E2E8F0]/80 bg-white/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-20 w-full max-w-360 items-center justify-between px-4 sm:px-6 lg:px-8">
+        <a href="/" className="rounded-2xl p-1 transition-colors hover:bg-[#F1F5F9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30">
+          <Logo size="md" />
+        </a>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-sm font-medium text-[#475569] hover:text-[#0F172A] transition-colors duration-150"
-              >
-                {link.name}
-              </a>
-            ))}
-          </nav>
-
-          {/* Desktop CTA Button */}
-          <div className="hidden md:flex items-center">
-            <Button variant="primary" size="md">
-              Launch Platform
-            </Button>
-          </div>
-
-          {/* Mobile Hamburger Button */}
-          <div className="flex md:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-2xl text-[#475569] hover:text-[#0F172A] hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-              aria-label="Toggle Navigation Menu"
+        <nav className="hidden items-center gap-8 md:flex">
+          {navLinks.map((link) => (
+            <a
+              key={link.name}
+              href={link.href}
+              className="text-sm font-medium text-[#475569] transition-colors duration-150 hover:text-[#0F172A]"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+              {link.name}
+            </a>
+          ))}
+        </nav>
+
+        <div className="hidden items-center gap-3 md:flex">
+          <Button variant="outline" size="md">
+            Read Docs
+          </Button>
+          <Button variant="primary" size="md">
+            Launch Platform
+          </Button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen((open) => !open)}
+          className="inline-flex items-center justify-center rounded-2xl p-2 text-[#475569] transition-colors hover:bg-[#F1F5F9] hover:text-[#0F172A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30 md:hidden"
+          aria-label="Toggle navigation menu"
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
       </div>
 
-      {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-[#E2E8F0] bg-white px-4 pt-4 pb-6 space-y-4">
-          <nav className="flex flex-col gap-3">
+        <div className="border-t border-[#E2E8F0] bg-white px-4 pb-6 pt-4 md:hidden">
+          <nav className="flex flex-col gap-2">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 text-base font-medium text-[#475569] hover:text-[#0F172A] hover:bg-slate-50 rounded-xl transition-colors duration-150"
+                className="rounded-2xl px-3 py-2 text-base font-medium text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#0F172A]"
               >
                 {link.name}
               </a>
             ))}
           </nav>
-          <div className="pt-2">
+
+          <div className="mt-4 grid gap-3">
+            <Button variant="outline" size="md" fullWidth>
+              Read Docs
+            </Button>
             <Button variant="primary" size="md" fullWidth>
               Launch Platform
             </Button>

@@ -18,8 +18,8 @@ export default function Section({
 
   const backgrounds = {
     white: 'bg-white text-[#0F172A]',
-    slate: 'bg-slate-50 text-[#0F172A]',
-    muted: 'bg-slate-100/60 text-[#0F172A]',
+    slate: 'bg-[#F8FAFC] text-[#0F172A]',
+    muted: 'bg-[#EEF2F7] text-[#0F172A]',
     dark: 'bg-[#0F172A] text-white',
     transparent: 'bg-transparent',
   };

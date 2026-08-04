@@ -8,9 +8,9 @@ export default function Card({
   ...props
 }) {
   const variants = {
-    default: 'bg-white border border-[#E2E8F0] shadow-sm shadow-slate-100/50',
-    flat: 'bg-slate-50 border border-[#E2E8F0]',
-    bordered: 'bg-white border-2 border-[#E2E8F0]',
+    default: 'bg-white border border-[#E2E8F0] shadow-[0_1px_2px_rgba(15,23,42,0.04)]',
+    flat: 'bg-[#F8FAFC] border border-[#E2E8F0]',
+    bordered: 'bg-white border-2 border-[#D9E2E1]',
   };
 
   const paddings = {
@@ -23,7 +23,7 @@ export default function Card({
   return (
     <div
       className={clsx(
-        'rounded-2xl transition-colors duration-150',
+        'rounded-[16px] transition-colors duration-150',
         variants[variant],
         paddings[padding],
         className
@@ -37,7 +37,7 @@ export default function Card({
 
 export function CardHeader({ children, className = '', ...props }) {
   return (
-    <div className={clsx('flex flex-col gap-1 mb-4', className)} {...props}>
+    <div className={clsx('flex flex-col gap-1.5 mb-4', className)} {...props}>
       {children}
     </div>
   );
@@ -46,7 +46,7 @@ export function CardHeader({ children, className = '', ...props }) {
 export function CardTitle({ children, className = '', ...props }) {
   return (
     <h3
-      className={clsx('text-lg font-semibold text-[#0F172A] tracking-tight', className)}
+      className={clsx("font-['Space_Grotesk'] text-lg font-semibold tracking-tight text-[#0F172A]", className)}
       {...props}
     >
       {children}
@@ -56,7 +56,7 @@ export function CardTitle({ children, className = '', ...props }) {
 
 export function CardDescription({ children, className = '', ...props }) {
   return (
-    <p className={clsx('text-sm text-[#475569]', className)} {...props}>
+    <p className={clsx('text-sm leading-6 text-[#475569]', className)} {...props}>
       {children}
     </p>
   );
