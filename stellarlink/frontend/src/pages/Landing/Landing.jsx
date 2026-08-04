@@ -1,6 +1,8 @@
 import Navbar from '../../components/landing/Navbar';
 import Hero from '../../components/landing/Hero';
-import Features from '../../components/landing/Features';
+import IndustrySolutions from '../../components/landing/IndustrySolutions';
+import EnterpriseCTA from '../../components/landing/EnterpriseCTA';
+import Footer from '../../components/landing/Footer';
 
 export default function Landing() {
   return (
@@ -8,8 +10,10 @@ export default function Landing() {
       <Navbar />
       <main>
         <Hero />
-        <Features />
+        <IndustrySolutions />
+        <EnterpriseCTA />
       </main>
+      <Footer />
     </div>
   );
 }
