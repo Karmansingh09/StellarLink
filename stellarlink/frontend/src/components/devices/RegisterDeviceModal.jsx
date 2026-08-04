@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { X, Cpu, Key, Shield, Globe } from 'lucide-react';
 import Button from '../ui/Button';
-import Card from '../ui/Card';
+import { useToast } from '../../context/ToastContext';
 
 export default function RegisterDeviceModal({ isOpen, onClose, onRegister }) {
+  const { addToast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     type: 'EV Charger',
@@ -17,24 +19,30 @@ export default function RegisterDeviceModal({ isOpen, onClose, onRegister }) {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
-    // Generate mock Stellar key
-    const mockWallet = 'G' + Math.random().toString(36).substring(2, 12).toUpperCase() + '8943FL';
-    const mockId = 'DEV-' + Math.floor(1000 + Math.random() * 9000) + '-X1';
+    setIsSubmitting(true);
 
-    onRegister({
-      id: mockId,
-      name: formData.name,
-      type: formData.type,
-      region: formData.region,
-      wallet: mockWallet,
-      status: 'active',
-      latency: '390 ms',
-      volume: '0 tx',
-      balance: `${formData.initialFunding}.00 XLM`,
-    });
+    setTimeout(() => {
+      // Generate mock Stellar key
+      const mockWallet = 'G' + Math.random().toString(36).substring(2, 12).toUpperCase() + '8943FL';
+      const mockId = 'DEV-' + Math.floor(1000 + Math.random() * 9000) + '-X1';
 
-    setFormData({ name: '', type: 'EV Charger', region: 'Europe West', initialFunding: '500' });
-    onClose();
+      onRegister({
+        id: mockId,
+        name: formData.name,
+        type: formData.type,
+        region: formData.region,
+        wallet: mockWallet,
+        status: 'active',
+        latency: '390 ms',
+        volume: '0 tx',
+        balance: `${formData.initialFunding}.00 XLM`,
+      });
+
+      addToast(`Device "${formData.name}" successfully provisioned on Stellar`, 'success');
+      setFormData({ name: '', type: 'EV Charger', region: 'Europe West', initialFunding: '500' });
+      setIsSubmitting(false);
+      onClose();
+    }, 600);
   };
 
   return (
@@ -131,11 +139,11 @@ export default function RegisterDeviceModal({ isOpen, onClose, onRegister }) {
           </div>
 
           <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-end gap-3">
-            <Button variant="outline" size="md" type="button" onClick={onClose}>
+            <Button variant="outline" size="md" type="button" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button variant="primary" size="md" type="submit">
-              Provision Device
+            <Button variant="primary" size="md" type="submit" isLoading={isSubmitting}>
+              {isSubmitting ? 'Provisioning...' : 'Provision Device'}
             </Button>
           </div>
         </form>
