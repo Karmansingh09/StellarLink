@@ -1,68 +1,107 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, ArrowUpRight, ArrowDownLeft, Search, Filter, Download, Copy, Check, ExternalLink, RefreshCw } from 'lucide-react';
+import { Download } from 'lucide-react';
 import Container from '../../components/ui/Container';
 import Card, { CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
-import StatusBadge from '../../components/dashboard/StatusBadge';
+import TransactionKPIs from '../../components/transactions/TransactionKPIs';
+import TransactionFilterBar from '../../components/transactions/TransactionFilterBar';
+import TransactionTable from '../../components/transactions/TransactionTable';
+import RecentActivityPanel from '../../components/transactions/RecentActivityPanel';
+import TransactionAnalytics from '../../components/transactions/TransactionAnalytics';
+import TransactionDetailModal from '../../components/transactions/TransactionDetailModal';
 
 const initialTransactions = [
   {
-    txId: 'TX-9842-8812',
+    txId: 'TX-938472',
     hash: '8f7a9d3e4b1c0a9e8f7a9d3e4b1c0a9e8f7a9d3e4b1c0a9e8f7a9d3e4b1c0a9e',
-    amount: '+ 128.50 XLM',
-    type: 'Incoming',
-    status: 'settled',
-    device: 'EV Charging Node 04',
-    wallet: 'GAK8...39FL',
-    timestamp: '10s ago (14:28:02)',
+    amount: '125.40 XLM',
+    asset: 'XLM Native',
+    status: 'completed',
+    device: 'EV Charger #04',
+    wallet: 'GB7M...P2L',
+    fullWallet: 'GB7M2N3B4V5C6X7Z8L9K0J1H2G3F4D5S6A7Q8W9E0R1T2Y3U4I5O6P7L8K9J0H1G',
+    timestamp: '2 min ago',
+    network: 'Mainnet',
     fee: '0.00001 XLM',
+    memo: 'EV-CHARGE-SETTLE-04',
+    latency: '412 ms',
   },
   {
-    txId: 'TX-8711-4431',
+    txId: 'TX-871144',
     hash: '1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b',
-    amount: '- 45.00 USDC',
-    type: 'Micro-settlement',
-    status: 'active',
+    amount: '45.00 USDC',
+    asset: 'USDC Anchored',
+    status: 'processing',
     device: 'Autonomous Fleet 11',
     wallet: 'GB7M...0H1G',
-    timestamp: '45s ago (14:27:27)',
+    fullWallet: 'GB7M2N3B4V5C6X7Z8L9K0J1H2G3F4D5S6A7Q8W9E0R1T2Y3U4I5O6P7L8K9J0H1G',
+    timestamp: '45s ago',
+    network: 'Mainnet',
     fee: '0.00001 XLM',
+    memo: 'FLEET-PAYMENT-AUTOPAY',
+    latency: '478 ms',
   },
   {
-    txId: 'TX-6520-2219',
+    txId: 'TX-652022',
     hash: '9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f',
-    amount: '+ 890.00 XLM',
-    type: 'Relay Payout',
-    status: 'settled',
-    latency: '389 ms',
+    amount: '890.00 XLM',
+    asset: 'XLM Native',
+    status: 'completed',
     device: 'Microgrid Relay 02',
     wallet: 'GC98...90K9',
-    timestamp: '2m ago (14:26:00)',
+    fullWallet: 'GC984K12J34H56G78F90D12S34A56Q78W90E12R34T56Y78U90I12O34P56L78K90',
+    timestamp: '12 min ago',
+    network: 'Mainnet',
     fee: '0.00001 XLM',
+    memo: 'GRID-RELAY-REWARD',
+    latency: '389 ms',
   },
   {
-    txId: 'TX-4310-9901',
+    txId: 'TX-431099',
     hash: '0f1e2d3c4b5a698778695a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d',
-    amount: '- 12.00 XLM',
-    type: 'Device Gas Reserve',
+    amount: '12.00 XLM',
+    asset: 'XLM Native',
     status: 'pending',
     device: 'Logistics Hub 07',
     wallet: 'GD12...ABCD',
-    timestamp: '5m ago (14:23:12)',
+    fullWallet: 'GD1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCD',
+    timestamp: '25 min ago',
+    network: 'Mainnet',
     fee: '0.00001 XLM',
+    memo: 'GAS-RESERVE-REFILL',
+    latency: '603 ms',
   },
   {
-    txId: 'TX-3209-1142',
+    txId: 'TX-320911',
     hash: '7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b',
-    amount: '+ 340.20 XLM',
-    type: 'Telemetry Payment',
-    status: 'settled',
+    amount: '340.20 XLM',
+    asset: 'XLM Native',
+    status: 'completed',
     device: 'Smart Sensor Ring',
     wallet: 'GE98...FEDC',
-    timestamp: '12m ago (14:16:40)',
+    fullWallet: 'GE9876543210FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210FEDC',
+    timestamp: '1 hour ago',
+    network: 'Mainnet',
     fee: '0.00001 XLM',
+    memo: 'SENSOR-TELEMETRY-PAY',
+    latency: '389 ms',
+  },
+  {
+    txId: 'TX-110299',
+    hash: '4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c',
+    amount: '0.00 XLM',
+    asset: 'XLM Native',
+    status: 'failed',
+    device: 'Warehouse AI Cluster',
+    wallet: 'GF11...DDEE',
+    fullWallet: 'GF11223344556677889900AABBCCDDEEFF11223344556677889900AABBCCDDEE',
+    timestamp: '2 hours ago',
+    network: 'Mainnet',
+    fee: '0.00001 XLM',
+    memo: 'TIMEOUT-RETRY-EXCEEDED',
+    latency: '—',
   },
 ];
 
@@ -83,32 +122,41 @@ const itemVariants = {
 };
 
 export default function Transactions() {
+  const [transactions, setTransactions] = useState(initialTransactions);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [copiedTx, setCopiedTx] = useState(null);
+  const [deviceFilter, setDeviceFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+  const [selectedTx, setSelectedTx] = useState(null);
 
-  const copyToClipboard = (text, id) => {
-    navigator.clipboard.writeText(text);
-    setCopiedTx(id);
-    setTimeout(() => setCopiedTx(null), 2000);
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((tx) => {
+      const matchesSearch =
+        searchQuery === '' ||
+        tx.txId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tx.device.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tx.wallet.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === 'all' || tx.status.toLowerCase() === statusFilter.toLowerCase();
+
+      const matchesDevice =
+        deviceFilter === 'all' || tx.device.toLowerCase() === deviceFilter.toLowerCase();
+
+      return matchesSearch && matchesStatus && matchesDevice;
+    });
+  }, [transactions, searchQuery, statusFilter, deviceFilter]);
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setStatusFilter('all');
+    setDeviceFilter('all');
+    setDateFilter('all');
   };
-
-  const filteredTxs = initialTransactions.filter((tx) => {
-    const matchesSearch =
-      searchQuery === '' ||
-      tx.txId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.device.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.wallet.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === 'all' || tx.status.toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesSearch && matchesStatus;
-  });
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
-      {/* Header Banner */}
+      {/* Page Title Banner */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
           <div className="flex flex-col gap-4 rounded-[20px] border border-[#E2E8F0] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-6 lg:flex-row lg:items-end lg:justify-between">
@@ -124,173 +172,89 @@ export default function Transactions() {
 
               <div className="space-y-2">
                 <h2 className="font-['Space_Grotesk'] text-3xl font-semibold tracking-tight text-[#0F172A] sm:text-4xl">
-                  M2M Transactions
+                  Transactions
                 </h2>
                 <p className="max-w-3xl text-sm leading-6 text-[#64748B] sm:text-base">
-                  Real-time cryptographic audit trail of machine-to-machine settlements, automated gas funding, and Soroban contract executions.
+                  Monitor every machine-to-machine payment, settlement, wallet transfer, and transaction status across the StellarLink network.
                 </p>
               </div>
             </div>
 
-            <Button variant="outline" size="md" className="gap-2 self-start lg:self-auto">
+            <Button variant="outline" size="md" className="gap-2 self-start lg:self-auto min-h-[44px]">
               <Download className="h-4 w-4" />
-              <span>Export Ledger</span>
+              <span>Export Ledger CSV</span>
             </Button>
           </div>
         </Container>
       </motion.section>
 
-      {/* Filter Toolbar */}
+      {/* Top KPI Cards */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-[20px] border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-            <div className="relative flex-1 min-w-[240px]">
-              <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search TX ID, Device, or Wallet..."
-                className="h-11 w-full rounded-[14px] border border-[#D9E2E1] bg-[#F8FAFC] pl-10 pr-4 text-sm text-[#0F172A] outline-none placeholder:text-[#94A3B8] focus:border-[#0F766E] focus:bg-white"
-              />
+          <TransactionKPIs />
+        </Container>
+      </motion.section>
+
+      {/* Filter Bar */}
+      <motion.section variants={itemVariants}>
+        <Container size="full" className="px-0">
+          <TransactionFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            statusFilter={statusFilter}
+            onStatusChange={setStatusFilter}
+            deviceFilter={deviceFilter}
+            onDeviceChange={setDeviceFilter}
+            dateFilter={dateFilter}
+            onDateChange={setDateFilter}
+            onRefresh={handleResetFilters}
+          />
+        </Container>
+      </motion.section>
+
+      {/* Main Ledger Table & Recent Activity Grid */}
+      <motion.section variants={itemVariants}>
+        <Container size="full" className="px-0">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left: Main Transaction Table (8 cols on desktop) */}
+            <div className="lg:col-span-8">
+              <Card padding="generous" className="h-full">
+                <CardHeader className="mb-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base sm:text-lg font-semibold text-[#0F172A]">
+                      Ledger Stream ({filteredTransactions.length})
+                    </CardTitle>
+                    <Badge variant="primary" dot size="sm">
+                      Live Stream
+                    </Badge>
+                  </div>
+                </CardHeader>
+
+                <TransactionTable
+                  transactions={filteredTransactions}
+                  onViewDetails={setSelectedTx}
+                  onRefresh={handleResetFilters}
+                />
+              </Card>
             </div>
 
-            <div className="flex items-center gap-3">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="h-11 appearance-none rounded-[14px] border border-[#D9E2E1] bg-white px-4 text-xs font-semibold text-[#0F172A] outline-none cursor-pointer hover:border-[#CBE9E3]"
-              >
-                <option value="all">All Statuses</option>
-                <option value="settled">Settled</option>
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-              </select>
-
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] hover:bg-[#F8FAFC]"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </button>
+            {/* Right: Recent Activity Panel (4 cols on desktop, moves below on mobile) */}
+            <div className="lg:col-span-4">
+              <RecentActivityPanel onSelectTx={setSelectedTx} />
             </div>
           </div>
         </Container>
       </motion.section>
 
-      {/* Transactions Container */}
+      {/* Analytics Section (3 Cards Below Table) */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
-          <Card padding="generous">
-            <CardHeader className="mb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base sm:text-lg font-semibold text-[#0F172A]">
-                  Ledger Transactions ({filteredTxs.length})
-                </CardTitle>
-                <Badge variant="primary" dot size="sm">
-                  Live Stream
-                </Badge>
-              </div>
-            </CardHeader>
-
-            {/* Mobile View: Cards (< md) */}
-            <div className="grid gap-3 md:hidden">
-              {filteredTxs.map((tx) => (
-                <div
-                  key={tx.txId}
-                  className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-3"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${tx.amount.startsWith('+') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-[#0F172A] border-[#E2E8F0]'}`}>
-                        {tx.amount.startsWith('+') ? <ArrowDownLeft className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
-                      </div>
-                      <div>
-                        <p className="text-base font-bold font-mono text-[#0F172A]">{tx.amount}</p>
-                        <p className="text-xs text-[#64748B]">{tx.type}</p>
-                      </div>
-                    </div>
-                    <StatusBadge status={tx.status}>{tx.status}</StatusBadge>
-                  </div>
-
-                  <div className="space-y-1.5 pt-2 border-t border-[#E2E8F0] text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#64748B]">Device</span>
-                      <span className="font-semibold text-[#0F172A]">{tx.device}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#64748B]">Wallet</span>
-                      <span className="font-mono text-[#0F172A]">{tx.wallet}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#64748B]">Timestamp</span>
-                      <span className="text-[#64748B]">{tx.timestamp}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#64748B]">TX Hash</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-[#0F766E]">{tx.txId}</span>
-                        <button
-                          type="button"
-                          onClick={() => copyToClipboard(tx.hash, tx.txId)}
-                          className="text-[#64748B] hover:text-[#0F766E] p-1"
-                        >
-                          {copiedTx === tx.txId ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop View: Table (>= md) */}
-            <div className="hidden md:block overflow-hidden rounded-[16px] border border-[#E2E8F0]">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-[#E2E8F0] text-left">
-                  <thead className="bg-[#F8FAFC]">
-                    <tr>
-                      {['Amount & Type', 'Device', 'Wallet', 'Status', 'Timestamp', 'TX ID'].map((heading) => (
-                        <th
-                          key={heading}
-                          className="px-4 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B] sm:px-6"
-                        >
-                          {heading}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E2E8F0] bg-white">
-                    {filteredTxs.map((tx) => (
-                      <tr key={tx.txId} className="transition-colors hover:bg-[#FAF8FF]">
-                        <td className="px-4 py-4 sm:px-6">
-                          <div className="flex items-center gap-3">
-                            <div className={`flex h-9 w-9 items-center justify-center rounded-xl border ${tx.amount.startsWith('+') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-[#0F172A] border-[#E2E8F0]'}`}>
-                              {tx.amount.startsWith('+') ? <ArrowDownLeft className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
-                            </div>
-                            <div>
-                              <p className="text-sm font-bold font-mono text-[#0F172A]">{tx.amount}</p>
-                              <p className="text-xs text-[#64748B]">{tx.type}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 text-sm font-semibold text-[#0F172A] sm:px-6">{tx.device}</td>
-                        <td className="px-4 py-4 text-xs font-mono text-[#475569] sm:px-6">{tx.wallet}</td>
-                        <td className="px-4 py-4 sm:px-6">
-                          <StatusBadge status={tx.status}>{tx.status}</StatusBadge>
-                        </td>
-                        <td className="px-4 py-4 text-xs text-[#64748B] sm:px-6">{tx.timestamp}</td>
-                        <td className="px-4 py-4 text-xs font-mono text-[#0F766E] sm:px-6">{tx.txId}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </Card>
+          <TransactionAnalytics />
         </Container>
       </motion.section>
+
+      {/* Details Modal */}
+      <TransactionDetailModal tx={selectedTx} onClose={() => setSelectedTx(null)} />
     </motion.div>
   );
 }
