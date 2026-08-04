@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Cpu, Globe, ShieldCheck, Zap } from 'lucide-react';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
@@ -42,9 +43,11 @@ export default function Hero() {
             </p>
 
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-              <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
-                Launch Platform
-              </Button>
+              <Link to="/dashboard">
+                <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
+                  Launch Platform
+                </Button>
+              </Link>
               <Button variant="outline" size="lg" icon={BookOpen} iconPosition="left">
                 Read Documentation
               </Button>

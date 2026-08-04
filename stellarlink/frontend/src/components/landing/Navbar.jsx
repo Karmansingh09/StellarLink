@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import Logo from '../ui/Logo';
 import Button from '../ui/Button';
@@ -17,9 +18,9 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#E2E8F0]/80 bg-white/90 backdrop-blur-xl">
       <div className="mx-auto flex h-20 w-full max-w-360 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <a href="/" className="rounded-2xl p-1 transition-colors hover:bg-[#F1F5F9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30">
+        <Link to="/" className="rounded-2xl p-1 transition-colors hover:bg-[#F1F5F9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30">
           <Logo size="md" />
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
@@ -37,9 +38,11 @@ export default function Navbar() {
           <Button variant="outline" size="md">
             Read Docs
           </Button>
-          <Button variant="primary" size="md">
-            Launch Platform
-          </Button>
+          <Link to="/dashboard">
+            <Button variant="primary" size="md">
+              Launch Platform
+            </Button>
+          </Link>
         </div>
 
         <button
@@ -72,9 +75,11 @@ export default function Navbar() {
             <Button variant="outline" size="md" fullWidth>
               Read Docs
             </Button>
-            <Button variant="primary" size="md" fullWidth>
-              Launch Platform
-            </Button>
+            <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="primary" size="md" fullWidth>
+                Launch Platform
+              </Button>
+            </Link>
           </div>
         </div>
       )}
