@@ -2,7 +2,8 @@ import { motion } from 'framer-motion';
 import { Bell, Search, ArrowUpRight } from 'lucide-react';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
-import { useLocation } from 'react-router-dom';
+import Logo from '../ui/Logo';
+import { useLocation, Link } from 'react-router-dom';
 
 const pageLabels = {
   '/dashboard': 'Executive Dashboard',
@@ -22,9 +23,25 @@ export default function Topbar({ navItems }) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-[#E2E8F0]/80 bg-white/90 backdrop-blur-xl">
-      <div className="flex flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8 xl:flex-row xl:items-center xl:justify-between">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-3">
+      {/* Mobile Top Header Bar with Brand Logo */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E8F0]/60 lg:hidden">
+        <Link to="/" className="flex items-center gap-2">
+          <Logo size="sm" />
+        </Link>
+        <div className="flex items-center gap-2">
+          <Badge variant="success" dot size="sm">
+            Live
+          </Badge>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0F766E] text-xs font-semibold text-white">
+            SL
+          </div>
+        </div>
+      </div>
+
+      {/* Main Topbar Content */}
+      <div className="flex flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8 lg:py-4 xl:flex-row xl:items-center xl:justify-between">
+        <div className="space-y-1 sm:space-y-2">
+          <div className="hidden sm:flex flex-wrap items-center gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
               StellarLink Control Plane
             </p>
@@ -33,18 +50,18 @@ export default function Topbar({ navItems }) {
             </Badge>
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-            <h1 className="font-['Space_Grotesk'] text-2xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+            <h1 className="font-['Space_Grotesk'] text-xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl">
               {title}
             </h1>
             <span className="hidden h-1.5 w-1.5 rounded-full bg-[#CBD5E1] sm:block" />
-            <p className="max-w-2xl text-sm leading-6 text-[#64748B]">
+            <p className="hidden sm:block max-w-2xl text-xs sm:text-sm leading-6 text-[#64748B]">
               Monitor settlement health, network throughput, and operational readiness across the StellarLink estate.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex items-center justify-between sm:justify-end gap-3">
           <label className="relative hidden w-full min-w-65 items-center lg:flex">
             <Search className="pointer-events-none absolute left-4 h-4 w-4 text-[#94A3B8]" />
             <input
@@ -54,7 +71,7 @@ export default function Topbar({ navItems }) {
             />
           </label>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <Button variant="outline" size="md" className="hidden sm:inline-flex">
               Export report
               <ArrowUpRight className="h-4 w-4" />
@@ -64,18 +81,18 @@ export default function Topbar({ navItems }) {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               type="button"
-              className="relative inline-flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] transition-colors hover:border-[#CBE9E3] hover:text-[#0F766E]"
+              className="relative inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] transition-colors hover:border-[#CBE9E3] hover:text-[#0F766E]"
               aria-label="Notifications"
             >
               <Bell className="h-4 w-4" />
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#0F766E]" />
             </motion.button>
 
-            <div className="flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2">
+            <div className="hidden sm:flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F766E] text-sm font-semibold text-white">
                 SL
               </div>
-              <div className="hidden sm:block">
+              <div>
                 <p className="text-sm font-medium text-[#0F172A]">StellarLink Ops</p>
                 <p className="text-xs text-[#64748B]">Executive workspace</p>
               </div>

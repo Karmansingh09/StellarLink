@@ -34,7 +34,7 @@ const defaultCards = [
 
 export default function OverviewCards({ cards = defaultCards, className = '' }) {
   return (
-    <div className={`grid gap-4 xl:grid-cols-4 ${className}`}>
+    <div className={`grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 ${className}`}>
       {cards.map((card) => (
         <OverviewCard
           key={card.title}
