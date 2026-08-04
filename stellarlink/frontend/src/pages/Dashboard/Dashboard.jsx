@@ -8,6 +8,7 @@ import DeviceHealthChart from '../../components/dashboard/DeviceHealthChart';
 import LiveNetworkTable from '../../components/dashboard/LiveNetworkTable';
 import DashboardSkeleton from '../../components/dashboard/DashboardSkeleton';
 import useDashboard from '../../hooks/useDashboard';
+import { useStellarNetwork } from '../../hooks/useStellar';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -27,6 +28,7 @@ const itemVariants = {
 
 export default function Dashboard() {
   const { data: dashboardData, isLoading } = useDashboard();
+  const { data: networkStatus } = useStellarNetwork();
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -41,10 +43,10 @@ export default function Dashboard() {
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-3">
                 <Badge variant="success" dot size="sm">
-                  Real-time executive view
+                  {networkStatus?.network || 'Stellar Testnet'} • Ledger #{networkStatus?.ledgerSequence || '52894101'}
                 </Badge>
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-                  Stellar Control Plane
+                  Stellar Core Control Plane
                 </span>
               </div>
 
@@ -60,8 +62,8 @@ export default function Dashboard() {
 
             <div className="flex items-center gap-3">
               <div className="hidden rounded-[16px] border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-right sm:block">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">Priority route</p>
-                <p className="mt-1 text-sm font-semibold text-[#0F766E]">Settlement queue normal</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">Consensus Speed</p>
+                <p className="mt-1 text-sm font-semibold text-[#0F766E]">{networkStatus?.avgConfirmationTimeMs || 482}ms Avg Finality</p>
               </div>
 
               <button

@@ -1,17 +1,27 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, ArrowDownLeft, ArrowUpRight, Copy, Check, QrCode, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Wallet, ArrowDownLeft, ArrowUpRight, Copy, Check, QrCode, ExternalLink, ShieldCheck, Coins } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 
-export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR }) {
+export default function MainBalanceCard({
+  walletData,
+  onOpenSend,
+  onOpenReceive,
+  onToggleQR,
+  onFundFriendbot,
+  isFunding,
+}) {
   const { addToast } = useToast();
   const [copied, setCopied] = useState(false);
-  const walletAddress = 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
+
+  const walletAddress = walletData?.publicKey || 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
+  const totalXLM = walletData?.totalXLM || '10,000.00';
+  const usdVal = walletData?.usdEquivalent || '$1,200.00 USD';
 
   const copyAddress = () => {
     navigator.clipboard.writeText(walletAddress);
     setCopied(true);
-    addToast('Master Vault address copied to clipboard', 'success');
+    addToast('Vault address copied to clipboard', 'success');
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -29,7 +39,7 @@ export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR 
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-200">
-              Primary Master Vault
+              Primary Stellar Testnet Vault
             </p>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="font-mono text-xs text-white/90 font-medium">
@@ -49,7 +59,7 @@ export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR 
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold backdrop-blur-xs text-teal-100 border border-teal-400/20">
-            <ShieldCheck className="h-3.5 w-3.5 text-teal-300" /> Multisig 3/5 Active
+            <ShieldCheck className="h-3.5 w-3.5 text-teal-300" /> Stellar Testnet Active
           </span>
         </div>
       </div>
@@ -63,21 +73,21 @@ export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR 
           transition={{ duration: 0.3 }}
           className="text-3xl sm:text-5xl font-extrabold font-['Space_Grotesk'] tracking-tight mt-1"
         >
-          482,910.00 <span className="text-xl sm:text-3xl font-medium text-teal-200">XLM</span>
+          {totalXLM} <span className="text-xl sm:text-3xl font-medium text-teal-200">XLM</span>
         </motion.h1>
         <p className="text-xs sm:text-sm text-teal-200/90 mt-1.5">
-          ≈ $57,949.20 USD • Reserve Locked: 12,500.00 XLM
+          ≈ {usdVal} • Reserve Base: 1.00 XLM
         </p>
       </div>
 
       {/* Action Buttons */}
-      <div className="grid grid-cols-1 sm:flex sm:items-center gap-3 pt-2">
+      <div className="flex flex-wrap items-center gap-3 pt-2">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           type="button"
           onClick={onOpenReceive}
-          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white text-[#0F766E] font-bold text-sm hover:bg-teal-50 transition-colors shadow-xs cursor-pointer"
+          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-white text-[#0F766E] font-bold text-sm hover:bg-teal-50 transition-colors shadow-xs cursor-pointer"
         >
           <ArrowDownLeft className="h-4 w-4" />
           Receive
@@ -88,10 +98,22 @@ export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR 
           whileTap={{ scale: 0.98 }}
           type="button"
           onClick={onOpenSend}
-          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-teal-800/80 border border-teal-400/40 text-white font-bold text-sm hover:bg-teal-800 transition-colors cursor-pointer"
+          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-teal-800/80 border border-teal-400/40 text-white font-bold text-sm hover:bg-teal-800 transition-colors cursor-pointer"
         >
           <ArrowUpRight className="h-4 w-4" />
-          Send
+          Send XLM
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          type="button"
+          onClick={onFundFriendbot}
+          disabled={isFunding}
+          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-emerald-700/80 border border-emerald-400/40 text-white font-bold text-sm hover:bg-emerald-700 transition-colors cursor-pointer disabled:opacity-50"
+        >
+          <Coins className="h-4 w-4 text-emerald-200" />
+          {isFunding ? 'Funding...' : 'Fund Friendbot'}
         </motion.button>
 
         <motion.button
@@ -99,20 +121,20 @@ export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR 
           whileTap={{ scale: 0.98 }}
           type="button"
           onClick={onToggleQR}
-          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-teal-800/40 border border-teal-400/20 text-white font-semibold text-sm hover:bg-teal-800/60 transition-colors cursor-pointer"
+          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-teal-800/40 border border-teal-400/20 text-white font-semibold text-sm hover:bg-teal-800/60 transition-colors cursor-pointer"
         >
           <QrCode className="h-4 w-4" />
           QR Code
         </motion.button>
 
         <a
-          href={`https://stellar.expert/explorer/public/account/${walletAddress}`}
+          href={`https://stellar.expert/explorer/testnet/account/${walletAddress}`}
           target="_blank"
           rel="noreferrer"
-          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-teal-900/40 border border-teal-400/20 text-teal-100 font-medium text-sm hover:bg-teal-900/60 transition-colors"
+          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-teal-900/40 border border-teal-400/20 text-teal-100 font-medium text-sm hover:bg-teal-900/60 transition-colors"
         >
           <ExternalLink className="h-4 w-4" />
-          Stellar Explorer
+          Stellar Expert
         </a>
       </div>
     </motion.div>

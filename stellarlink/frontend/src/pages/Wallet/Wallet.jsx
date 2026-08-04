@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Key, PlusCircle, RefreshCw } from 'lucide-react';
 import Container from '../../components/ui/Container';
 import Badge from '../../components/ui/Badge';
+import Button from '../../components/ui/Button';
 import WalletKPICards from '../../components/wallet/WalletKPICards';
 import MainBalanceCard from '../../components/wallet/MainBalanceCard';
 import AssetHoldings from '../../components/wallet/AssetHoldings';
@@ -13,7 +15,9 @@ import WalletRightSidebar from '../../components/wallet/WalletRightSidebar';
 import SendReceiveModal from '../../components/wallet/SendReceiveModal';
 import { CardSkeleton } from '../../components/ui/Skeleton';
 import { useToast } from '../../context/ToastContext';
-import useWallet from '../../hooks/useWallet';
+import { useStellarWallet, useCreateWallet, useFundWallet } from '../../hooks/useStellar';
+
+const defaultTestnetPublicKey = 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,12 +38,37 @@ const itemVariants = {
 export default function Wallet() {
   const { addToast } = useToast();
   const [modalMode, setModalMode] = useState(null); // 'send' | 'receive' | 'qr' | null
+  const [activePublicKey, setActivePublicKey] = useState(defaultTestnetPublicKey);
+  const [activeSecretKey, setActiveSecretKey] = useState('');
+  const [showSecret, setShowSecret] = useState(false);
 
-  const { data: walletData, isLoading } = useWallet();
+  const { data: walletData, isLoading, refetch } = useStellarWallet(activePublicKey);
+  const createWalletMutation = useCreateWallet();
+  const fundWalletMutation = useFundWallet();
+
+  const handleGenerateWallet = async () => {
+    try {
+      const newWallet = await createWalletMutation.mutateAsync();
+      setActivePublicKey(newWallet.publicKey);
+      setActiveSecretKey(newWallet.secretKey);
+      addToast('New Stellar Testnet keypair generated!', 'success');
+    } catch (err) {
+      addToast(err.message || 'Keypair generation failed', 'error');
+    }
+  };
+
+  const handleFundFriendbot = async () => {
+    try {
+      await fundWalletMutation.mutateAsync(activePublicKey);
+      addToast('Account funded with 10,000 Testnet XLM via Friendbot!', 'success');
+      refetch();
+    } catch (err) {
+      addToast(err.message || 'Friendbot funding failed', 'error');
+    }
+  };
 
   const handleCopyAddress = () => {
-    const addr = walletData?.address || 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
-    navigator.clipboard.writeText(addr);
+    navigator.clipboard.writeText(activePublicKey);
     addToast('Vault address copied to clipboard', 'success');
   };
 
@@ -55,7 +84,7 @@ export default function Wallet() {
                   Stellar Vault Infrastructure
                 </Badge>
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-                  Soroban Key Manager
+                  Testnet SDK v12.4
                 </span>
               </div>
 
@@ -68,7 +97,51 @@ export default function Wallet() {
                 </p>
               </div>
             </div>
+
+            <div className="flex items-center gap-2 self-start lg:self-auto">
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() => refetch()}
+                className="gap-2 min-h-[44px]"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Refresh Balance</span>
+              </Button>
+
+              <Button
+                variant="primary"
+                size="md"
+                onClick={handleGenerateWallet}
+                isLoading={createWalletMutation.isPending}
+                className="gap-2 min-h-[44px]"
+              >
+                <PlusCircle className="h-4 w-4" />
+                <span>Generate Testnet Keypair</span>
+              </Button>
+            </div>
           </div>
+
+          {/* Dev Mode Keypair Info Banner if generated */}
+          {activeSecretKey && (
+            <div className="mt-3 p-4 rounded-2xl border border-[#CBE9E3] bg-[#EAF8F6] text-xs font-mono text-[#0F766E] space-y-1">
+              <p className="font-semibold flex items-center gap-1.5">
+                <Key className="h-4 w-4" /> Dev Mode Stellar Testnet Keypair Generated:
+              </p>
+              <p><strong className="text-[#0F172A]">Public:</strong> {activePublicKey}</p>
+              <p className="flex items-center gap-2">
+                <strong className="text-[#0F172A]">Secret:</strong>
+                {showSecret ? activeSecretKey : '•••••••••••••••••••••••••••••••••••••••••••••••••••••••• font-mono'}
+                <button
+                  type="button"
+                  onClick={() => setShowSecret(!showSecret)}
+                  className="underline cursor-pointer text-[#0F766E] font-sans font-semibold ml-2"
+                >
+                  {showSecret ? 'Hide Secret' : 'Reveal Secret'}
+                </button>
+              </p>
+            </div>
+          )}
         </Container>
       </motion.section>
 
@@ -93,6 +166,8 @@ export default function Wallet() {
                   onOpenSend={() => setModalMode('send')}
                   onOpenReceive={() => setModalMode('receive')}
                   onToggleQR={() => setModalMode('qr')}
+                  onFundFriendbot={handleFundFriendbot}
+                  isFunding={fundWalletMutation.isPending}
                 />
               )}
             </div>
@@ -127,7 +202,7 @@ export default function Wallet() {
       {/* Recent Transactions Table */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
-          <WalletTransactionsTable />
+          <WalletTransactionsTable publicKey={activePublicKey} />
         </Container>
       </motion.section>
 
@@ -146,7 +221,11 @@ export default function Wallet() {
       </motion.section>
 
       {/* Send / Receive / QR Modal */}
-      <SendReceiveModal mode={modalMode} onClose={() => setModalMode(null)} />
+      <SendReceiveModal
+        mode={modalMode}
+        onClose={() => setModalMode(null)}
+        walletData={walletData}
+      />
     </motion.div>
   );
 }

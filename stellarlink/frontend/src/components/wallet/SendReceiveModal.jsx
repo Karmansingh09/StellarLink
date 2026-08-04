@@ -3,18 +3,21 @@ import { motion } from 'framer-motion';
 import { X, ArrowUpRight, ArrowDownLeft, QrCode, Copy, Check, ShieldCheck } from 'lucide-react';
 import Button from '../ui/Button';
 import { useToast } from '../../context/ToastContext';
+import { useSendStellarPayment } from '../../hooks/useStellar';
 
-export default function SendReceiveModal({ mode, onClose }) {
+export default function SendReceiveModal({ mode, onClose, walletData }) {
   const { addToast } = useToast();
   const [copied, setCopied] = useState(false);
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
-  const [asset, setAsset] = useState('XLM');
-  const [submitted, setSubmitted] = useState(false);
+  const [memoText, setMemoText] = useState('');
+  const [senderSecret, setSenderSecret] = useState('');
+
+  const sendPaymentMutation = useSendStellarPayment();
 
   if (!mode) return null;
 
-  const walletAddress = 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
+  const walletAddress = walletData?.publicKey || 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
 
   const copyAddress = () => {
     navigator.clipboard.writeText(walletAddress);
@@ -23,14 +26,21 @@ export default function SendReceiveModal({ mode, onClose }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      addToast(`Successfully transferred ${amount} ${asset} on Stellar Mainnet`, 'success');
+    try {
+      const res = await sendPaymentMutation.mutateAsync({
+        senderSecret: senderSecret || 'SD4Z...MOCK_SECRET',
+        destinationPublic: recipient,
+        amount,
+        memoText,
+      });
+
+      addToast(`Payment submitted! Hash: ${res.hash?.substring(0, 10)}...`, 'success');
       onClose();
-    }, 1200);
+    } catch (err) {
+      addToast(err.message || 'Payment submission failed', 'error');
+    }
   };
 
   return (
@@ -49,9 +59,9 @@ export default function SendReceiveModal({ mode, onClose }) {
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-[#0F172A]">
-                {mode === 'send' ? 'Send Payments' : mode === 'receive' ? 'Receive Payments' : 'Stellar QR Address'}
+                {mode === 'send' ? 'Send XLM Payment' : mode === 'receive' ? 'Receive XLM' : 'Stellar QR Address'}
               </h3>
-              <p className="text-xs text-[#64748B]">Stellar Mainnet M2M Vault</p>
+              <p className="text-xs text-[#64748B]">Stellar Testnet Network</p>
             </div>
           </div>
           <button type="button" onClick={onClose} className="p-2 rounded-xl text-[#64748B] hover:text-[#0F172A] hover:bg-slate-200/60">
@@ -65,12 +75,12 @@ export default function SendReceiveModal({ mode, onClose }) {
             <form onSubmit={handleSend} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
-                  Destination Address or Federated ID
+                  Destination Public Key (G...)
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="G... or user*stellarlink.io"
+                  placeholder="GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A..."
                   value={recipient}
                   onChange={(e) => setRecipient(e.target.value)}
                   className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
@@ -80,13 +90,14 @@ export default function SendReceiveModal({ mode, onClose }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
-                    Amount
+                    Amount (XLM)
                   </label>
                   <input
                     type="number"
                     required
-                    min="1"
-                    placeholder="100.00"
+                    step="0.01"
+                    min="0.1"
+                    placeholder="10.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-sm font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
@@ -95,33 +106,44 @@ export default function SendReceiveModal({ mode, onClose }) {
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
-                    Asset
+                    Memo (Optional)
                   </label>
-                  <select
-                    value={asset}
-                    onChange={(e) => setAsset(e.target.value)}
+                  <input
+                    type="text"
+                    placeholder="M2M-SETTLE-01"
+                    value={memoText}
+                    onChange={(e) => setMemoText(e.target.value)}
                     className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-3 text-xs font-semibold text-[#0F172A] outline-none focus:border-[#0F766E]"
-                  >
-                    <option value="XLM">XLM Native</option>
-                    <option value="USDC">USDC Anchored</option>
-                    <option value="SLK">SLK Token</option>
-                  </select>
+                  />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
+                  Sender Secret Key (S...) - Dev Mode
+                </label>
+                <input
+                  type="password"
+                  placeholder="S..."
+                  value={senderSecret}
+                  onChange={(e) => setSenderSecret(e.target.value)}
+                  className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
+                />
               </div>
 
               <div className="p-3.5 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-between text-xs text-[#0F766E]">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="h-4 w-4" />
-                  <span>Fee: 0.00001 XLM (Sub-second Finality)</span>
+                  <span>Fee: 0.00001 XLM • Testnet Instant Consensus</span>
                 </div>
               </div>
 
               <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-end gap-3">
-                <Button variant="outline" size="md" type="button" onClick={onClose} disabled={submitted}>
+                <Button variant="outline" size="md" type="button" onClick={onClose} disabled={sendPaymentMutation.isPending}>
                   Cancel
                 </Button>
-                <Button variant="primary" size="md" type="submit" isLoading={submitted}>
-                  {submitted ? 'Signing on Stellar...' : 'Confirm Payment'}
+                <Button variant="primary" size="md" type="submit" isLoading={sendPaymentMutation.isPending}>
+                  {sendPaymentMutation.isPending ? 'Signing on Stellar...' : 'Confirm Stellar Payment'}
                 </Button>
               </div>
             </form>
@@ -129,7 +151,7 @@ export default function SendReceiveModal({ mode, onClose }) {
             <div className="text-center space-y-4">
               <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl inline-block shadow-xs">
                 <div className="w-48 h-48 bg-slate-900 rounded-xl flex items-center justify-center text-white font-mono text-xs text-center p-4">
-                  [ STELLAR QR CODE ]
+                  [ STELLAR TESTNET QR ]
                   <br />
                   {walletAddress.substring(0, 12)}...
                 </div>

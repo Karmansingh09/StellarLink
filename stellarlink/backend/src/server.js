@@ -9,6 +9,7 @@ import walletRoutes from './routes/walletRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import stellarRoutes from './routes/stellarRoutes.js';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/stellar', stellarRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

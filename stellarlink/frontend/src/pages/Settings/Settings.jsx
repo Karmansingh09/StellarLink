@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings as SettingsIcon, Bell, Lock, ShieldCheck, Key, Globe, Cpu, Save, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Settings as SettingsIcon, Bell, Lock, ShieldCheck, Key, Globe, Cpu, Save, RotateCcw, AlertTriangle, Network } from 'lucide-react';
 import Container from '../../components/ui/Container';
 import Card, { CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
@@ -28,7 +28,10 @@ const defaultState = {
   autoSettle: true,
   notifications: true,
   sorobanFailover: true,
-  networkPassphrase: 'Public Global Stellar Network ; September 2015',
+  networkEnv: 'testnet',
+  rpcEndpoint: 'https://horizon-testnet.stellar.org',
+  explorerUrl: 'https://stellar.expert/explorer/testnet',
+  networkPassphrase: 'Test SDF Network ; September 2015',
   maxFeeLimit: '0.00001',
   alertEmail: 'admin@stellarlink.io',
 };
@@ -48,8 +51,8 @@ export default function Settings() {
 
   const validate = () => {
     const errs = {};
-    if (!settings.networkPassphrase.trim()) {
-      errs.networkPassphrase = 'Network Passphrase cannot be empty.';
+    if (!settings.rpcEndpoint.trim()) {
+      errs.rpcEndpoint = 'RPC Endpoint URL cannot be empty.';
     }
     if (!settings.alertEmail.includes('@')) {
       errs.alertEmail = 'Please enter a valid administrative email.';
@@ -68,7 +71,7 @@ export default function Settings() {
     setTimeout(() => {
       setIsSaving(false);
       setInitialSettings(settings);
-      addToast('StellarLink configuration saved successfully', 'success');
+      addToast('Stellar RPC & Network configuration saved', 'success');
     }, 700);
   };
 
@@ -77,7 +80,7 @@ export default function Settings() {
     setInitialSettings(defaultState);
     setErrors({});
     setIsConfirmOpen(false);
-    addToast('Configuration reset to default enterprise protocol values', 'info');
+    addToast('Configuration reset to Stellar Testnet default values', 'info');
   };
 
   const toggleSetting = (key) => {
@@ -97,7 +100,7 @@ export default function Settings() {
           >
             <div className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold">
               <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />
-              <span>You have unsaved changes to protocol parameters.</span>
+              <span>You have unsaved changes to Stellar RPC parameters.</span>
             </div>
             <div className="flex items-center gap-2 self-start sm:self-auto">
               <Button
@@ -128,19 +131,19 @@ export default function Settings() {
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-3">
                 <Badge variant="success" dot size="sm">
-                  System Configuration
+                  Stellar Horizon Connected
                 </Badge>
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-                  StellarLink Protocol v2.4
+                  Stellar SDK v12.4
                 </span>
               </div>
 
               <div className="space-y-2">
                 <h2 className="font-['Space_Grotesk'] text-3xl font-semibold tracking-tight text-[#0F172A] sm:text-4xl">
-                  Platform Settings
+                  Platform & Stellar Settings
                 </h2>
                 <p className="max-w-3xl text-sm leading-6 text-[#64748B] sm:text-base">
-                  Manage Soroban smart contract parameters, device authorization policies, and automated settlement rules.
+                  Manage Stellar Horizon RPC endpoints, Testnet/Mainnet environments, block explorer selection, and settlement rules.
                 </p>
               </div>
             </div>
@@ -175,7 +178,69 @@ export default function Settings() {
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Group 1: Autonomous Settlement Settings */}
+            {/* Group 1: Stellar RPC & Network Environment */}
+            <Card padding="generous" className="space-y-6">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-100 text-[#0F766E] flex items-center justify-center">
+                    <Network className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base font-semibold text-[#0F172A]">Stellar Horizon RPC</CardTitle>
+                    <CardDescription className="text-xs">Network selection & RPC endpoints</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <div className="space-y-4">
+                {/* Network Selection */}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
+                    Network Selection
+                  </label>
+                  <select
+                    value={settings.networkEnv}
+                    onChange={(e) => setSettings({ ...settings, networkEnv: e.target.value })}
+                    className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-semibold text-[#0F172A] outline-none focus:border-[#0F766E]"
+                  >
+                    <option value="testnet">Stellar Testnet (Active)</option>
+                    <option value="mainnet">Stellar Public Mainnet</option>
+                    <option value="soroban">Soroban Local Sandbox</option>
+                  </select>
+                </div>
+
+                {/* RPC Endpoint */}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
+                    Horizon RPC Endpoint
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.rpcEndpoint}
+                    onChange={(e) => setSettings({ ...settings, rpcEndpoint: e.target.value })}
+                    className={`h-12 w-full rounded-2xl border bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] ${errors.rpcEndpoint ? 'border-rose-500' : 'border-[#D9E2E1]'}`}
+                  />
+                  {errors.rpcEndpoint && <p className="mt-1 text-xs text-rose-600">{errors.rpcEndpoint}</p>}
+                </div>
+
+                {/* Explorer Selection */}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
+                    Block Explorer Provider
+                  </label>
+                  <select
+                    value={settings.explorerUrl}
+                    onChange={(e) => setSettings({ ...settings, explorerUrl: e.target.value })}
+                    className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-semibold text-[#0F172A] outline-none focus:border-[#0F766E]"
+                  >
+                    <option value="https://stellar.expert/explorer/testnet">Stellar Expert (Testnet)</option>
+                    <option value="https://laboratory.stellar.org">Stellar Laboratory</option>
+                  </select>
+                </div>
+              </div>
+            </Card>
+
+            {/* Group 2: Autonomous Settlement Rules */}
             <Card padding="generous" className="space-y-6">
               <CardHeader>
                 <div className="flex items-center gap-3">
@@ -232,91 +297,6 @@ export default function Settings() {
                       layout
                       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                       className={`inline-block h-5 w-5 rounded-full bg-white shadow-md mt-1 ml-1 ${settings.sorobanFailover ? 'translate-x-5' : 'translate-x-0'}`}
-                    />
-                  </button>
-                </div>
-
-                {/* Input: Max Fee Limit */}
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
-                    Max Gas Fee Limit (XLM)
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.maxFeeLimit}
-                    onChange={(e) => setSettings({ ...settings, maxFeeLimit: e.target.value })}
-                    className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
-                  />
-                </div>
-              </div>
-            </Card>
-
-            {/* Group 2: Security & Network Credentials */}
-            <Card padding="generous" className="space-y-6">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-100 text-[#0F766E] flex items-center justify-center">
-                    <ShieldCheck className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base font-semibold text-[#0F172A]">Stellar Network Standard</CardTitle>
-                    <CardDescription className="text-xs">Ledger network passphrase & cryptographic keys</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <div className="space-y-4">
-                {/* Input: Network Passphrase */}
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
-                    Network Passphrase
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.networkPassphrase}
-                    onChange={(e) => setSettings({ ...settings, networkPassphrase: e.target.value })}
-                    className={`h-12 w-full rounded-2xl border bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15 ${errors.networkPassphrase ? 'border-rose-500' : 'border-[#D9E2E1]'}`}
-                  />
-                  {errors.networkPassphrase && (
-                    <p className="mt-1 text-xs text-rose-600">{errors.networkPassphrase}</p>
-                  )}
-                </div>
-
-                {/* Input: Alert Email */}
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
-                    Admin Notification Email
-                  </label>
-                  <input
-                    type="email"
-                    value={settings.alertEmail}
-                    onChange={(e) => setSettings({ ...settings, alertEmail: e.target.value })}
-                    className={`h-12 w-full rounded-2xl border bg-white px-4 text-xs text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15 ${errors.alertEmail ? 'border-rose-500' : 'border-[#D9E2E1]'}`}
-                  />
-                  {errors.alertEmail && (
-                    <p className="mt-1 text-xs text-rose-600">{errors.alertEmail}</p>
-                  )}
-                </div>
-
-                {/* Switch 3: Hardware Alerts */}
-                <div className="flex items-center justify-between p-4 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC]">
-                  <div>
-                    <p className="text-sm font-semibold text-[#0F172A]">Hardware Push Alerts</p>
-                    <p className="text-xs text-[#64748B]">Send immediate mobile push when device balance drops below 50 XLM</p>
-                  </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={settings.notifications}
-                    tabIndex={0}
-                    onClick={() => toggleSetting('notifications')}
-                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleSetting('notifications')}
-                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/40 focus-visible:ring-offset-2 ${settings.notifications ? 'bg-[#0F766E]' : 'bg-slate-300'}`}
-                  >
-                    <motion.span
-                      layout
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                      className={`inline-block h-5 w-5 rounded-full bg-white shadow-md mt-1 ml-1 ${settings.notifications ? 'translate-x-5' : 'translate-x-0'}`}
                     />
                   </button>
                 </div>
