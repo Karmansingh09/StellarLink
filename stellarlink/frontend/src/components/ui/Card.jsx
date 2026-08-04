@@ -5,6 +5,7 @@ export default function Card({
   variant = 'default',
   className = '',
   padding = 'normal',
+  interactive = false,
   ...props
 }) {
   const variants = {
@@ -15,17 +16,18 @@ export default function Card({
 
   const paddings = {
     none: 'p-0',
-    compact: 'p-4',
-    normal: 'p-6',
-    generous: 'p-8',
+    compact: 'p-4 sm:p-5',
+    normal: 'p-5 sm:p-6',
+    generous: 'p-6 sm:p-8',
   };
 
   return (
     <div
       className={clsx(
-        'rounded-[16px] transition-colors duration-150',
+        'rounded-[16px] transition-all duration-200',
         variants[variant],
         paddings[padding],
+        interactive && 'hover:border-[#CBE9E3] hover:shadow-[0_4px_16px_rgba(15,23,42,0.06)] hover:-translate-y-0.5 cursor-pointer',
         className
       )}
       {...props}

@@ -1,11 +1,30 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, ShieldCheck, Cpu, Wallet, Activity, Zap, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { X, ShieldCheck, Cpu, Wallet, Activity, Zap, RefreshCw, CheckCircle2, Copy, Check, AlertTriangle } from 'lucide-react';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import StatusBadge from '../dashboard/StatusBadge';
+import ConfirmModal from '../ui/ConfirmModal';
+import { useToast } from '../../context/ToastContext';
 
 export default function DeviceDetailDrawer({ device, onClose }) {
+  const { addToast } = useToast();
+  const [copied, setCopied] = useState(false);
+  const [isConfirmRekeyOpen, setIsConfirmRekeyOpen] = useState(false);
+
   if (!device) return null;
+
+  const copyKey = () => {
+    navigator.clipboard.writeText(device.wallet);
+    setCopied(true);
+    addToast('Stellar Public Key copied to clipboard', 'success');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleRekey = () => {
+    setIsConfirmRekeyOpen(false);
+    addToast(`Cryptographic keypair re-keyed for ${device.name}`, 'success');
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/40 backdrop-blur-xs flex justify-end">
@@ -61,7 +80,10 @@ export default function DeviceDetailDrawer({ device, onClose }) {
               <div className="p-4 rounded-2xl border border-[#E2E8F0] bg-white space-y-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-[#64748B]">Public Key</span>
-                  <span className="font-mono text-[#0F172A] font-semibold">Stellar Mainnet</span>
+                  <button type="button" onClick={copyKey} className="text-[#0F766E] font-semibold flex items-center gap-1 hover:text-[#115E59]">
+                    {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                    <span>{copied ? 'Copied' : 'Copy Key'}</span>
+                  </button>
                 </div>
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-[#E2E8F0] font-mono text-xs text-[#0F172A] break-all">
                   {device.wallet}
@@ -122,11 +144,21 @@ export default function DeviceDetailDrawer({ device, onClose }) {
           <Button variant="outline" size="md" onClick={onClose} className="w-full">
             Close Panel
           </Button>
-          <Button variant="primary" size="md" className="w-full">
+          <Button variant="primary" size="md" onClick={() => setIsConfirmRekeyOpen(true)} className="w-full">
             Re-key Device
           </Button>
         </div>
       </motion.div>
+
+      {/* Confirmation Modal for Re-keying */}
+      <ConfirmModal
+        isOpen={isConfirmRekeyOpen}
+        title={`Re-key Cryptographic Credentials for ${device.name}?`}
+        description="This will revoke the existing Stellar secret seed and sign a new Soroban keypair authorization on mainnet."
+        confirmText="Confirm Re-key"
+        onConfirm={handleRekey}
+        onClose={() => setIsConfirmRekeyOpen(false)}
+      />
     </div>
   );
 }

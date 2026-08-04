@@ -13,6 +13,7 @@ import TopDevicesLeaderboard from '../../components/analytics/TopDevicesLeaderbo
 import LiveTelemetryFeed from '../../components/analytics/LiveTelemetryFeed';
 import SystemHealthCards from '../../components/analytics/SystemHealthCards';
 import AutomatedInsights from '../../components/analytics/AutomatedInsights';
+import useAnalytics from '../../hooks/useAnalytics';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -35,10 +36,13 @@ export default function Analytics() {
   const [deviceType, setDeviceType] = useState('all');
   const [network, setNetwork] = useState('all');
 
+  const { data: analyticsData, isLoading, refetch } = useAnalytics();
+
   const handleReset = () => {
     setDateRange('30d');
     setDeviceType('all');
     setNetwork('all');
+    refetch();
   };
 
   return (
@@ -73,7 +77,7 @@ export default function Analytics() {
       {/* Top 4 KPI Cards */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
-          <AnalyticsKPICards />
+          <AnalyticsKPICards metrics={analyticsData} />
         </Container>
       </motion.section>
 

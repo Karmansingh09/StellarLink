@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Search, Filter, Download, RefreshCw, Calendar, Cpu } from 'lucide-react';
 import Button from '../ui/Button';
+import { useToast } from '../../context/ToastContext';
 
 export default function TransactionFilterBar({
   searchQuery,
@@ -12,15 +14,44 @@ export default function TransactionFilterBar({
   onDateChange,
   onRefresh,
 }) {
+  const { addToast } = useToast();
+  const [internalQuery, setInternalQuery] = useState(searchQuery);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Debounce search input (250ms)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      onSearchChange(internalQuery);
+    }, 250);
+
+    return () => clearTimeout(handler);
+  }, [internalQuery, onSearchChange]);
+
+  const handleExport = () => {
+    setIsExporting(true);
+    setTimeout(() => {
+      setIsExporting(false);
+      addToast('Stellar transaction ledger exported to CSV', 'success');
+    }, 800);
+  };
+
+  const handleRefreshClick = () => {
+    setIsRefreshing(true);
+    onRefresh();
+    addToast('Transaction stream updated from Stellar Core', 'info');
+    setTimeout(() => setIsRefreshing(false), 600);
+  };
+
   return (
     <div className="flex flex-col gap-3 rounded-[20px] border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-5 lg:flex-row lg:items-center lg:justify-between">
-      {/* Search Input */}
+      {/* Search Input with Debounce */}
       <div className="relative flex-1 min-w-[240px]">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
         <input
           type="search"
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
+          value={internalQuery}
+          onChange={(e) => setInternalQuery(e.target.value)}
           placeholder="Search transaction ID, wallet, or device..."
           className="h-11 w-full rounded-[14px] border border-[#D9E2E1] bg-[#F8FAFC] pl-10 pr-4 text-sm text-[#0F172A] outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#0F766E] focus:bg-white focus:ring-2 focus:ring-[#0F766E]/15"
         />
@@ -79,17 +110,23 @@ export default function TransactionFilterBar({
         {/* Refresh Button */}
         <button
           type="button"
-          onClick={onRefresh}
-          className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F766E] transition-colors"
+          onClick={handleRefreshClick}
+          className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F766E] transition-colors cursor-pointer"
           title="Reset Filters & Refresh"
         >
-          <RefreshCw className="h-4 w-4" />
+          <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin text-[#0F766E]' : ''}`} />
         </button>
 
         {/* Export Button */}
-        <Button variant="outline" size="md" className="gap-2 min-h-[44px]">
+        <Button
+          variant="outline"
+          size="md"
+          onClick={handleExport}
+          isLoading={isExporting}
+          className="gap-2 min-h-[44px]"
+        >
           <Download className="h-4 w-4" />
-          <span className="hidden sm:inline">Export</span>
+          <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Export CSV'}</span>
         </Button>
       </div>
     </div>

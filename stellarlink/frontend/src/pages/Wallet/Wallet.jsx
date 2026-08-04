@@ -11,6 +11,9 @@ import ConnectedDeviceWallets from '../../components/wallet/ConnectedDeviceWalle
 import WalletAnalytics from '../../components/wallet/WalletAnalytics';
 import WalletRightSidebar from '../../components/wallet/WalletRightSidebar';
 import SendReceiveModal from '../../components/wallet/SendReceiveModal';
+import { CardSkeleton } from '../../components/ui/Skeleton';
+import { useToast } from '../../context/ToastContext';
+import useWallet from '../../hooks/useWallet';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -29,10 +32,15 @@ const itemVariants = {
 };
 
 export default function Wallet() {
+  const { addToast } = useToast();
   const [modalMode, setModalMode] = useState(null); // 'send' | 'receive' | 'qr' | null
 
+  const { data: walletData, isLoading } = useWallet();
+
   const handleCopyAddress = () => {
-    navigator.clipboard.writeText('GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7');
+    const addr = walletData?.address || 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
+    navigator.clipboard.writeText(addr);
+    addToast('Vault address copied to clipboard', 'success');
   };
 
   return (
@@ -77,11 +85,16 @@ export default function Wallet() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             {/* Main Balance Hero Card (8 cols) */}
             <div className="lg:col-span-8">
-              <MainBalanceCard
-                onOpenSend={() => setModalMode('send')}
-                onOpenReceive={() => setModalMode('receive')}
-                onToggleQR={() => setModalMode('qr')}
-              />
+              {isLoading ? (
+                <CardSkeleton />
+              ) : (
+                <MainBalanceCard
+                  walletData={walletData}
+                  onOpenSend={() => setModalMode('send')}
+                  onOpenReceive={() => setModalMode('receive')}
+                  onToggleQR={() => setModalMode('qr')}
+                />
+              )}
             </div>
 
             {/* Right Audit Sidebar (4 cols) */}

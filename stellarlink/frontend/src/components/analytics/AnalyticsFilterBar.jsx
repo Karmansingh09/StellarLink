@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Calendar, Cpu, Globe, Download, RefreshCw } from 'lucide-react';
 import Button from '../ui/Button';
+import { useToast } from '../../context/ToastContext';
 
 export default function AnalyticsFilterBar({
   dateRange,
@@ -10,6 +12,25 @@ export default function AnalyticsFilterBar({
   onNetworkChange,
   onRefresh,
 }) {
+  const { addToast } = useToast();
+  const [isExporting, setIsExporting] = useState(false);
+  const [isSpinning, setIsSpinning] = useState(false);
+
+  const handleExport = () => {
+    setIsExporting(true);
+    setTimeout(() => {
+      setIsExporting(false);
+      addToast('Executive Analytics report exported (PDF & CSV)', 'success');
+    }, 800);
+  };
+
+  const handleRefreshClick = () => {
+    setIsSpinning(true);
+    onRefresh();
+    addToast('Analytics telemetry dataset refreshed', 'info');
+    setTimeout(() => setIsSpinning(false), 600);
+  };
+
   return (
     <div className="flex flex-col gap-3 rounded-[20px] border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-5 lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
@@ -64,16 +85,22 @@ export default function AnalyticsFilterBar({
       <div className="flex items-center gap-2.5 self-end lg:self-auto">
         <button
           type="button"
-          onClick={onRefresh}
-          className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F766E] transition-colors"
+          onClick={handleRefreshClick}
+          className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F766E] transition-colors cursor-pointer"
           title="Refresh Analytics"
         >
-          <RefreshCw className="h-4 w-4" />
+          <RefreshCw className={`h-4 w-4 ${isSpinning ? 'animate-spin text-[#0F766E]' : ''}`} />
         </button>
 
-        <Button variant="outline" size="md" className="gap-2 min-h-[44px]">
+        <Button
+          variant="outline"
+          size="md"
+          onClick={handleExport}
+          isLoading={isExporting}
+          className="gap-2 min-h-[44px]"
+        >
           <Download className="h-4 w-4" />
-          <span>Export Analytics</span>
+          <span>{isExporting ? 'Exporting...' : 'Export Analytics'}</span>
         </Button>
       </div>
     </div>

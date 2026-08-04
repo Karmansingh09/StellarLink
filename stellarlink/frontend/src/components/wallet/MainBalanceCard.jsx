@@ -1,19 +1,26 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Wallet, ArrowDownLeft, ArrowUpRight, Copy, Check, QrCode, ExternalLink, ShieldCheck } from 'lucide-react';
-import Button from '../ui/Button';
+import { useToast } from '../../context/ToastContext';
 
 export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR }) {
+  const { addToast } = useToast();
   const [copied, setCopied] = useState(false);
   const walletAddress = 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
 
   const copyAddress = () => {
     navigator.clipboard.writeText(walletAddress);
     setCopied(true);
+    addToast('Master Vault address copied to clipboard', 'success');
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="rounded-3xl border border-[#CBE9E3] bg-gradient-to-br from-[#0F766E] to-[#115E59] p-6 sm:p-8 text-white shadow-xl space-y-6">
+    <motion.div
+      whileHover={{ y: -2 }}
+      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+      className="rounded-3xl border border-[#CBE9E3] bg-gradient-to-br from-[#0F766E] to-[#115E59] p-6 sm:p-8 text-white shadow-xl space-y-6"
+    >
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -31,7 +38,7 @@ export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR 
               <button
                 type="button"
                 onClick={copyAddress}
-                className="text-teal-200 hover:text-white transition-colors p-1"
+                className="text-teal-200 hover:text-white transition-colors p-1 cursor-pointer"
                 title="Copy Address"
               >
                 {copied ? <Check className="h-3.5 w-3.5 text-emerald-300" /> : <Copy className="h-3.5 w-3.5" />}
@@ -50,9 +57,14 @@ export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR 
       {/* Main Balance Display */}
       <div>
         <p className="text-xs text-teal-200 font-medium">Total XLM Balance</p>
-        <h1 className="text-3xl sm:text-5xl font-extrabold font-['Space_Grotesk'] tracking-tight mt-1">
+        <motion.h1
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="text-3xl sm:text-5xl font-extrabold font-['Space_Grotesk'] tracking-tight mt-1"
+        >
           482,910.00 <span className="text-xl sm:text-3xl font-medium text-teal-200">XLM</span>
-        </h1>
+        </motion.h1>
         <p className="text-xs sm:text-sm text-teal-200/90 mt-1.5">
           ≈ $57,949.20 USD • Reserve Locked: 12,500.00 XLM
         </p>
@@ -60,32 +72,38 @@ export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR 
 
       {/* Action Buttons */}
       <div className="grid grid-cols-1 sm:flex sm:items-center gap-3 pt-2">
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           type="button"
           onClick={onOpenReceive}
-          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white text-[#0F766E] font-bold text-sm hover:bg-teal-50 transition-colors shadow-sm cursor-pointer"
+          className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white text-[#0F766E] font-bold text-sm hover:bg-teal-50 transition-colors shadow-xs cursor-pointer"
         >
           <ArrowDownLeft className="h-4 w-4" />
           Receive
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           type="button"
           onClick={onOpenSend}
           className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-teal-800/80 border border-teal-400/40 text-white font-bold text-sm hover:bg-teal-800 transition-colors cursor-pointer"
         >
           <ArrowUpRight className="h-4 w-4" />
           Send
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           type="button"
           onClick={onToggleQR}
           className="flex min-h-[48px] items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-teal-800/40 border border-teal-400/20 text-white font-semibold text-sm hover:bg-teal-800/60 transition-colors cursor-pointer"
         >
           <QrCode className="h-4 w-4" />
           QR Code
-        </button>
+        </motion.button>
 
         <a
           href={`https://stellar.expert/explorer/public/account/${walletAddress}`}
@@ -97,6 +115,6 @@ export default function MainBalanceCard({ onOpenSend, onOpenReceive, onToggleQR 
           Stellar Explorer
         </a>
       </div>
-    </div>
+    </motion.div>
   );
 }

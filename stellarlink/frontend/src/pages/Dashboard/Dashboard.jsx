@@ -7,6 +7,7 @@ import AnalyticsChart from '../../components/dashboard/AnalyticsChart';
 import DeviceHealthChart from '../../components/dashboard/DeviceHealthChart';
 import LiveNetworkTable from '../../components/dashboard/LiveNetworkTable';
 import DashboardSkeleton from '../../components/dashboard/DashboardSkeleton';
+import useDashboard from '../../hooks/useDashboard';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -25,7 +26,7 @@ const itemVariants = {
 };
 
 export default function Dashboard() {
-  const isLoading = false;
+  const { data: dashboardData, isLoading } = useDashboard();
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -43,7 +44,7 @@ export default function Dashboard() {
                   Real-time executive view
                 </Badge>
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-                  August 2026
+                  Stellar Control Plane
                 </span>
               </div>
 
@@ -60,12 +61,12 @@ export default function Dashboard() {
             <div className="flex items-center gap-3">
               <div className="hidden rounded-[16px] border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-right sm:block">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">Priority route</p>
-                <p className="mt-1 text-sm font-semibold text-[#0F172A]">Settlement queue normal</p>
+                <p className="mt-1 text-sm font-semibold text-[#0F766E]">Settlement queue normal</p>
               </div>
 
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-[14px] border border-[#D9E2E1] bg-white px-4 py-3 text-sm font-medium text-[#0F172A] transition-colors hover:border-[#CBE9E3] hover:text-[#0F766E]"
+                className="inline-flex items-center gap-2 rounded-[14px] border border-[#D9E2E1] bg-white px-4 py-3 text-sm font-medium text-[#0F172A] transition-colors hover:border-[#CBE9E3] hover:text-[#0F766E] cursor-pointer"
               >
                 Export snapshot
                 <ArrowUpRight className="h-4 w-4" />
@@ -78,7 +79,7 @@ export default function Dashboard() {
       {/* 4 Metric Overview Cards */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
-          <OverviewCards />
+          <OverviewCards metrics={dashboardData} />
         </Container>
       </motion.section>
 

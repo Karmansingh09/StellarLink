@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Settings as SettingsIcon, Bell, Lock, ShieldCheck, Key, Globe, Cpu, Save, RotateCcw } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Settings as SettingsIcon, Bell, Lock, ShieldCheck, Key, Globe, Cpu, Save, RotateCcw, AlertTriangle } from 'lucide-react';
 import Container from '../../components/ui/Container';
 import Card, { CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
@@ -24,34 +24,103 @@ const itemVariants = {
   show: { opacity: 1, y: 0 },
 };
 
+const defaultState = {
+  autoSettle: true,
+  notifications: true,
+  sorobanFailover: true,
+  networkPassphrase: 'Public Global Stellar Network ; September 2015',
+  maxFeeLimit: '0.00001',
+  alertEmail: 'admin@stellarlink.io',
+};
+
 export default function Settings() {
   const { addToast } = useToast();
-  const [autoSettle, setAutoSettle] = useState(true);
-  const [notifications, setNotifications] = useState(true);
-  const [sorobanFailover, setSorobanFailover] = useState(true);
-  const [networkPassphrase, setNetworkPassphrase] = useState('Public Global Stellar Network ; September 2015');
+  const [settings, setSettings] = useState(defaultState);
+  const [initialSettings, setInitialSettings] = useState(defaultState);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  // Check if form is dirty (unsaved changes)
+  const isDirty = useMemo(() => {
+    return JSON.stringify(settings) !== JSON.stringify(initialSettings);
+  }, [settings, initialSettings]);
+
+  const validate = () => {
+    const errs = {};
+    if (!settings.networkPassphrase.trim()) {
+      errs.networkPassphrase = 'Network Passphrase cannot be empty.';
+    }
+    if (!settings.alertEmail.includes('@')) {
+      errs.alertEmail = 'Please enter a valid administrative email.';
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
   const handleSave = () => {
+    if (!validate()) {
+      addToast('Please correct validation errors before saving', 'error');
+      return;
+    }
+
     setIsSaving(true);
     setTimeout(() => {
       setIsSaving(false);
+      setInitialSettings(settings);
       addToast('StellarLink configuration saved successfully', 'success');
     }, 700);
   };
 
   const handleResetDefaults = () => {
-    setAutoSettle(true);
-    setNotifications(true);
-    setSorobanFailover(true);
-    setNetworkPassphrase('Public Global Stellar Network ; September 2015');
+    setSettings(defaultState);
+    setInitialSettings(defaultState);
+    setErrors({});
     setIsConfirmOpen(false);
     addToast('Configuration reset to default enterprise protocol values', 'info');
   };
 
+  const toggleSetting = (key) => {
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
+      {/* Unsaved Changes Banner */}
+      <AnimatePresence>
+        {isDirty && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-amber-900"
+          >
+            <div className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold">
+              <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />
+              <span>You have unsaved changes to protocol parameters.</span>
+            </div>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSettings(initialSettings)}
+                className="text-amber-800 hover:bg-amber-100"
+              >
+                Discard
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSave}
+                isLoading={isSaving}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header Banner */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
@@ -121,6 +190,7 @@ export default function Settings() {
               </CardHeader>
 
               <div className="space-y-4">
+                {/* Switch 1: Auto-settle */}
                 <div className="flex items-center justify-between p-4 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC]">
                   <div>
                     <p className="text-sm font-semibold text-[#0F172A]">Auto-settle Micro-payments</p>
@@ -128,14 +198,22 @@ export default function Settings() {
                   </div>
                   <button
                     type="button"
-                    aria-label="Toggle Auto-settle Micro-payments"
-                    onClick={() => setAutoSettle(!autoSettle)}
-                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30 ${autoSettle ? 'bg-[#0F766E]' : 'bg-slate-300'}`}
+                    role="switch"
+                    aria-checked={settings.autoSettle}
+                    tabIndex={0}
+                    onClick={() => toggleSetting('autoSettle')}
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleSetting('autoSettle')}
+                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/40 focus-visible:ring-offset-2 ${settings.autoSettle ? 'bg-[#0F766E]' : 'bg-slate-300'}`}
                   >
-                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 ease-in-out mt-1 ml-1 ${autoSettle ? 'translate-x-5' : 'translate-x-0'}`} />
+                    <motion.span
+                      layout
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      className={`inline-block h-5 w-5 rounded-full bg-white shadow-md mt-1 ml-1 ${settings.autoSettle ? 'translate-x-5' : 'translate-x-0'}`}
+                    />
                   </button>
                 </div>
 
+                {/* Switch 2: Soroban Failover */}
                 <div className="flex items-center justify-between p-4 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC]">
                   <div>
                     <p className="text-sm font-semibold text-[#0F172A]">Soroban Failover Protection</p>
@@ -143,12 +221,32 @@ export default function Settings() {
                   </div>
                   <button
                     type="button"
-                    aria-label="Toggle Soroban Failover Protection"
-                    onClick={() => setSorobanFailover(!sorobanFailover)}
-                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30 ${sorobanFailover ? 'bg-[#0F766E]' : 'bg-slate-300'}`}
+                    role="switch"
+                    aria-checked={settings.sorobanFailover}
+                    tabIndex={0}
+                    onClick={() => toggleSetting('sorobanFailover')}
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleSetting('sorobanFailover')}
+                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/40 focus-visible:ring-offset-2 ${settings.sorobanFailover ? 'bg-[#0F766E]' : 'bg-slate-300'}`}
                   >
-                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 ease-in-out mt-1 ml-1 ${sorobanFailover ? 'translate-x-5' : 'translate-x-0'}`} />
+                    <motion.span
+                      layout
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      className={`inline-block h-5 w-5 rounded-full bg-white shadow-md mt-1 ml-1 ${settings.sorobanFailover ? 'translate-x-5' : 'translate-x-0'}`}
+                    />
                   </button>
+                </div>
+
+                {/* Input: Max Fee Limit */}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
+                    Max Gas Fee Limit (XLM)
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.maxFeeLimit}
+                    onChange={(e) => setSettings({ ...settings, maxFeeLimit: e.target.value })}
+                    className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
+                  />
                 </div>
               </div>
             </Card>
@@ -168,30 +266,58 @@ export default function Settings() {
               </CardHeader>
 
               <div className="space-y-4">
+                {/* Input: Network Passphrase */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
                     Network Passphrase
                   </label>
                   <input
                     type="text"
-                    value={networkPassphrase}
-                    onChange={(e) => setNetworkPassphrase(e.target.value)}
-                    className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
+                    value={settings.networkPassphrase}
+                    onChange={(e) => setSettings({ ...settings, networkPassphrase: e.target.value })}
+                    className={`h-12 w-full rounded-2xl border bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15 ${errors.networkPassphrase ? 'border-rose-500' : 'border-[#D9E2E1]'}`}
                   />
+                  {errors.networkPassphrase && (
+                    <p className="mt-1 text-xs text-rose-600">{errors.networkPassphrase}</p>
+                  )}
                 </div>
 
+                {/* Input: Alert Email */}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
+                    Admin Notification Email
+                  </label>
+                  <input
+                    type="email"
+                    value={settings.alertEmail}
+                    onChange={(e) => setSettings({ ...settings, alertEmail: e.target.value })}
+                    className={`h-12 w-full rounded-2xl border bg-white px-4 text-xs text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15 ${errors.alertEmail ? 'border-rose-500' : 'border-[#D9E2E1]'}`}
+                  />
+                  {errors.alertEmail && (
+                    <p className="mt-1 text-xs text-rose-600">{errors.alertEmail}</p>
+                  )}
+                </div>
+
+                {/* Switch 3: Hardware Alerts */}
                 <div className="flex items-center justify-between p-4 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC]">
                   <div>
-                    <p className="text-sm font-semibold text-[#0F172A]">Hardware Alerts</p>
+                    <p className="text-sm font-semibold text-[#0F172A]">Hardware Push Alerts</p>
                     <p className="text-xs text-[#64748B]">Send immediate mobile push when device balance drops below 50 XLM</p>
                   </div>
                   <button
                     type="button"
-                    aria-label="Toggle Hardware Alerts"
-                    onClick={() => setNotifications(!notifications)}
-                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30 ${notifications ? 'bg-[#0F766E]' : 'bg-slate-300'}`}
+                    role="switch"
+                    aria-checked={settings.notifications}
+                    tabIndex={0}
+                    onClick={() => toggleSetting('notifications')}
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleSetting('notifications')}
+                    className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/40 focus-visible:ring-offset-2 ${settings.notifications ? 'bg-[#0F766E]' : 'bg-slate-300'}`}
                   >
-                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 ease-in-out mt-1 ml-1 ${notifications ? 'translate-x-5' : 'translate-x-0'}`} />
+                    <motion.span
+                      layout
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      className={`inline-block h-5 w-5 rounded-full bg-white shadow-md mt-1 ml-1 ${settings.notifications ? 'translate-x-5' : 'translate-x-0'}`}
+                    />
                   </button>
                 </div>
               </div>

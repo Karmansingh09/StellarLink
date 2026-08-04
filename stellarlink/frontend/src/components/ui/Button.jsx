@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { motion } from 'framer-motion';
 
 export default function Button({
   children,
@@ -14,7 +15,7 @@ export default function Button({
   onClick,
   ...props
 }) {
-  const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium rounded-[14px] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none select-none';
+  const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium rounded-[14px] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none select-none active:outline-none cursor-pointer';
 
   const variants = {
     primary: 'bg-[#0F766E] hover:bg-[#115E59] text-white shadow-[0_1px_2px_rgba(15,23,42,0.06)]',
@@ -31,7 +32,9 @@ export default function Button({
   };
 
   return (
-    <button
+    <motion.button
+      whileHover={disabled || isLoading ? undefined : { scale: 1.015 }}
+      whileTap={disabled || isLoading ? undefined : { scale: 0.98 }}
       type={type}
       disabled={disabled || isLoading}
       onClick={onClick}
@@ -72,6 +75,6 @@ export default function Button({
           {Icon && iconPosition === 'right' && <Icon className="w-4 h-4 shrink-0" />}
         </>
       )}
-    </button>
+    </motion.button>
   );
 }

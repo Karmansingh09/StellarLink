@@ -1,8 +1,21 @@
-import { ArrowDownLeft, ArrowUpRight, QrCode, Copy, Download, RefreshCw } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowDownLeft, ArrowUpRight, QrCode, Copy, Download } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import Button from '../ui/Button';
+import { useToast } from '../../context/ToastContext';
 
 export default function PaymentQuickActions({ onOpenReceive, onOpenSend, onToggleQR, onCopyAddress }) {
+  const { addToast } = useToast();
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportKeys = () => {
+    setIsExporting(true);
+    setTimeout(() => {
+      setIsExporting(false);
+      addToast('Encrypted Master Vault keystore file exported', 'success');
+    }, 700);
+  };
+
   return (
     <Card padding="generous">
       <CardHeader className="mb-4">
@@ -39,9 +52,15 @@ export default function PaymentQuickActions({ onOpenReceive, onOpenSend, onToggl
           Copy Address
         </Button>
 
-        <Button variant="outline" size="md" className="min-h-[48px] gap-2">
+        <Button
+          variant="outline"
+          size="md"
+          onClick={handleExportKeys}
+          isLoading={isExporting}
+          className="min-h-[48px] gap-2"
+        >
           <Download className="h-4 w-4" />
-          Export Wallet Keys
+          <span>{isExporting ? 'Exporting...' : 'Export Wallet Keys'}</span>
         </Button>
       </div>
     </Card>

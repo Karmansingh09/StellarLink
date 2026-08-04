@@ -4,8 +4,10 @@ import { X, Copy, Check, ExternalLink, ShieldCheck, Zap, ArrowDownLeft, ArrowUpR
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import StatusBadge from '../dashboard/StatusBadge';
+import { useToast } from '../../context/ToastContext';
 
 export default function TransactionDetailModal({ tx, onClose }) {
+  const { addToast } = useToast();
   const [copied, setCopied] = useState(false);
 
   if (!tx) return null;
@@ -13,6 +15,7 @@ export default function TransactionDetailModal({ tx, onClose }) {
   const copyId = () => {
     navigator.clipboard.writeText(tx.hash || tx.txId);
     setCopied(true);
+    addToast('Transaction hash copied to clipboard', 'success');
     setTimeout(() => setCopied(false), 2000);
   };
 

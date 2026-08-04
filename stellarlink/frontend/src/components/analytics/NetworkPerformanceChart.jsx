@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import Badge from '../ui/Badge';
 
@@ -34,8 +34,29 @@ export default function NetworkPerformanceChart() {
             <XAxis dataKey="day" stroke="#64748B" fontSize={11} tickLine={false} />
             <YAxis stroke="#64748B" fontSize={11} tickLine={false} />
             <Tooltip contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }} />
-            <Line type="monotone" dataKey="tps" name="Standard Throughput" stroke="#0F766E" strokeWidth={2.5} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="burst" name="Burst Capacity" stroke="#14B8A6" strokeWidth={2} strokeDasharray="4 4" dot={false} />
+            <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '12px', color: '#475569' }} />
+            <Line
+              type="monotone"
+              dataKey="tps"
+              name="Standard Throughput (tx/min)"
+              stroke="#0F766E"
+              strokeWidth={2.5}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
+              isAnimationActive={true}
+              animationDuration={1200}
+            />
+            <Line
+              type="monotone"
+              dataKey="burst"
+              name="Burst Capacity (tx/min)"
+              stroke="#14B8A6"
+              strokeWidth={2}
+              strokeDasharray="4 4"
+              dot={false}
+              isAnimationActive={true}
+              animationDuration={1200}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>

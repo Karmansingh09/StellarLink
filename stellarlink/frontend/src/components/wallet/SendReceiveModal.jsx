@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, ArrowUpRight, ArrowDownLeft, QrCode, Copy, Check, ShieldCheck } from 'lucide-react';
 import Button from '../ui/Button';
+import { useToast } from '../../context/ToastContext';
 
 export default function SendReceiveModal({ mode, onClose }) {
+  const { addToast } = useToast();
   const [copied, setCopied] = useState(false);
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
@@ -17,6 +19,7 @@ export default function SendReceiveModal({ mode, onClose }) {
   const copyAddress = () => {
     navigator.clipboard.writeText(walletAddress);
     setCopied(true);
+    addToast('Vault Address copied to clipboard', 'success');
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -25,8 +28,9 @@ export default function SendReceiveModal({ mode, onClose }) {
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);
+      addToast(`Successfully transferred ${amount} ${asset} on Stellar Mainnet`, 'success');
       onClose();
-    }, 1500);
+    }, 1200);
   };
 
   return (
@@ -69,7 +73,7 @@ export default function SendReceiveModal({ mode, onClose }) {
                   placeholder="G... or user*stellarlink.io"
                   value={recipient}
                   onChange={(e) => setRecipient(e.target.value)}
-                  className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E]"
+                  className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
                 />
               </div>
 
@@ -85,7 +89,7 @@ export default function SendReceiveModal({ mode, onClose }) {
                     placeholder="100.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-sm font-mono text-[#0F172A] outline-none focus:border-[#0F766E]"
+                    className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-sm font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
                   />
                 </div>
 
@@ -108,15 +112,15 @@ export default function SendReceiveModal({ mode, onClose }) {
               <div className="p-3.5 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-between text-xs text-[#0F766E]">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="h-4 w-4" />
-                  <span>Fee: 0.00001 XLM (Instant Finality)</span>
+                  <span>Fee: 0.00001 XLM (Sub-second Finality)</span>
                 </div>
               </div>
 
               <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-end gap-3">
-                <Button variant="outline" size="md" type="button" onClick={onClose}>
+                <Button variant="outline" size="md" type="button" onClick={onClose} disabled={submitted}>
                   Cancel
                 </Button>
-                <Button variant="primary" size="md" type="submit" disabled={submitted}>
+                <Button variant="primary" size="md" type="submit" isLoading={submitted}>
                   {submitted ? 'Signing on Stellar...' : 'Confirm Payment'}
                 </Button>
               </div>
@@ -133,7 +137,7 @@ export default function SendReceiveModal({ mode, onClose }) {
 
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-[#E2E8F0] font-mono text-xs text-[#0F172A]">
                 <span className="truncate pr-2">{walletAddress}</span>
-                <button type="button" onClick={copyAddress} className="text-[#0F766E] shrink-0 p-1">
+                <button type="button" onClick={copyAddress} className="text-[#0F766E] shrink-0 p-1 cursor-pointer">
                   {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
                 </button>
               </div>
