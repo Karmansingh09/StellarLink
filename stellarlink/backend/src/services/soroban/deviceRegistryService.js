@@ -8,7 +8,7 @@ export const registerDeviceOnChain = async ({ deviceId, name, type, region, owne
     name: name || 'EV Charger Node',
     type: type || 'EV Charger',
     region: region || 'Europe West',
-    ownerWallet: ownerWallet || 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7',
+    ownerWallet: ownerWallet || 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6',
     contractId: CONTRACT_ADDRESSES.deviceRegistry,
     onChainStatus: 'Active',
     registeredAt: new Date().toISOString(),
@@ -28,7 +28,7 @@ export const getOnChainDevice = async (deviceId) => {
     deviceId,
     contractId: CONTRACT_ADDRESSES.deviceRegistry,
     onChainStatus: 'Active',
-    ownerWallet: 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7',
+    ownerWallet: 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6',
     metadataHash: '9f8e7d6c5b4a392810',
     authorizedRoles: ['M2M_PAYMENT_INITIATOR', 'TELEMETRY_PUBLISHER'],
   };

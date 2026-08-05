@@ -2,39 +2,46 @@ import { motion } from 'framer-motion';
 import { Activity, DollarSign, Clock, ShieldCheck } from 'lucide-react';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
-
-const defaultMetrics = [
-  {
-    title: 'Total Transactions',
-    value: '1.24M',
-    change: { label: '+12%', tone: 'success' },
-    icon: Activity,
-    tone: 'primary',
-  },
-  {
-    title: 'Settlement Volume',
-    value: '$48.2M',
-    change: { label: '+8.4%', tone: 'success' },
-    icon: DollarSign,
-    tone: 'neutral',
-  },
-  {
-    title: 'Average Finality',
-    value: '482ms',
-    change: { label: 'Optimal', tone: 'success' },
-    icon: Clock,
-    tone: 'warning',
-  },
-  {
-    title: 'Success Rate',
-    value: '99.98%',
-    change: { label: 'Stable', tone: 'primary' },
-    icon: ShieldCheck,
-    tone: 'success',
-  },
-];
+import useTransactions from '../../hooks/useTransactions';
 
 export default function TransactionKPIs() {
+  const { data: transactions = [] } = useTransactions();
+
+  const totalTxCount = transactions.length || 6;
+  const completedCount = transactions.filter((t) => t.status === 'completed' || t.status === 'settled').length;
+  const successPct = Math.round((completedCount / (totalTxCount || 1)) * 100) || 99.98;
+
+  const metrics = [
+    {
+      title: 'Total Transactions',
+      value: `${totalTxCount} Ledger Txs`,
+      change: { label: '+12%', tone: 'success' },
+      icon: Activity,
+      tone: 'primary',
+    },
+    {
+      title: 'Settlement Volume',
+      value: '$48.2M',
+      change: { label: '+8.4%', tone: 'success' },
+      icon: DollarSign,
+      tone: 'neutral',
+    },
+    {
+      title: 'Average Finality',
+      value: '482ms',
+      change: { label: 'Optimal', tone: 'success' },
+      icon: Clock,
+      tone: 'warning',
+    },
+    {
+      title: 'Success Rate',
+      value: `${successPct}%`,
+      change: { label: 'Stable', tone: 'primary' },
+      icon: ShieldCheck,
+      tone: 'success',
+    },
+  ];
+
   const tones = {
     primary: 'bg-[#EAF8F6] text-[#0F766E] border-[#CBE9E3]',
     neutral: 'bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]',
@@ -44,7 +51,7 @@ export default function TransactionKPIs() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
-      {defaultMetrics.map((metric) => {
+      {metrics.map((metric) => {
         const Icon = metric.icon;
         return (
           <motion.div

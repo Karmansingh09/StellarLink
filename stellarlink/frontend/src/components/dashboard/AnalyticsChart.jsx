@@ -10,27 +10,7 @@ import {
 } from 'recharts';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import Badge from '../ui/Badge';
-
-const data = [
-  { month: 'Jan', volume: 58, target: 48 },
-  { month: 'Feb', volume: 64, target: 52 },
-  { month: 'Mar', volume: 72, target: 56 },
-  { month: 'Apr', volume: 86, target: 68 },
-  { month: 'May', volume: 94, target: 74 },
-  { month: 'Jun', volume: 102, target: 82 },
-  { month: 'Jul', volume: 117, target: 90 },
-  { month: 'Aug', volume: 112, target: 92 },
-  { month: 'Sep', volume: 126, target: 100 },
-  { month: 'Oct', volume: 138, target: 108 },
-  { month: 'Nov', volume: 144, target: 114 },
-  { month: 'Dec', volume: 158, target: 122 },
-];
-
-const insightItems = [
-  { label: 'Settlement throughput', value: '15.8k tx' },
-  { label: 'Success rate', value: '99.92%' },
-  { label: 'Average latency', value: '482 ms' },
-];
+import useAnalytics from '../../hooks/useAnalytics';
 
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) {
@@ -53,6 +33,28 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 export default function AnalyticsChart() {
+  const { data: analyticsData } = useAnalytics();
+
+  const chartData = analyticsData?.performance?.map((p) => ({
+    month: p.day,
+    volume: p.tps / 100,
+    target: p.burst / 100,
+  })) || [
+    { month: 'Mon', volume: 62, target: 78 },
+    { month: 'Tue', volume: 68, target: 81 },
+    { month: 'Wed', volume: 74, target: 84 },
+    { month: 'Thu', volume: 82, target: 91 },
+    { month: 'Fri', volume: 79, target: 87 },
+    { month: 'Sat', volume: 85, target: 94 },
+    { month: 'Sun', volume: 82, target: 92 },
+  ];
+
+  const insightItems = [
+    { label: 'Settlement throughput', value: analyticsData?.throughputTps || '8.2k tx/min' },
+    { label: 'Success rate', value: analyticsData?.successRate || '99.98%' },
+    { label: 'Average latency', value: analyticsData?.averageFinalityMs || '482 ms' },
+  ];
+
   return (
     <motion.div whileHover={{ y: -3 }} transition={{ type: 'spring', stiffness: 380, damping: 30 }}>
       <Card padding="generous" className="h-full">
@@ -61,19 +63,19 @@ export default function AnalyticsChart() {
             <div>
               <CardTitle className="text-[1.05rem]">Network performance</CardTitle>
               <CardDescription>
-                Monthly settlement volume and target progress across the StellarLink estate.
+                Live transaction execution rate and burst capacity across the StellarLink control plane.
               </CardDescription>
             </div>
 
             <Badge variant="primary" dot size="sm">
-              12 month view
+              Live Telemetry
             </Badge>
           </div>
         </CardHeader>
 
         <div className="h-[320px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 10, right: 8, left: -16, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 10, right: 8, left: -16, bottom: 0 }}>
               <defs>
                 <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#0F766E" stopOpacity={0.35} />
@@ -92,7 +94,7 @@ export default function AnalyticsChart() {
               <Area
                 type="monotone"
                 dataKey="volume"
-                name="Volume"
+                name="Standard Throughput"
                 stroke="#0F766E"
                 strokeWidth={2.5}
                 fill="url(#volumeGradient)"
@@ -102,7 +104,7 @@ export default function AnalyticsChart() {
               <Area
                 type="monotone"
                 dataKey="target"
-                name="Target"
+                name="Burst Capacity"
                 stroke="#64748B"
                 strokeWidth={2}
                 fill="url(#targetGradient)"

@@ -1,16 +1,19 @@
 import { motion } from 'framer-motion';
-import { Activity, Zap, CheckCircle2 } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import Badge from '../ui/Badge';
-
-const liveEvents = [
-  { id: 'EV-8842', text: 'Soroban contract executed settlement for EV-Charging-Node-04', amount: '125.40 XLM', time: '5s ago' },
-  { id: 'EV-8841', text: 'Telemetry pulse received from Autonomous-Fleet-11', amount: '412ms', time: '18s ago' },
-  { id: 'EV-8840', text: 'Stellar Core validated consensus on Ledger #52894101', amount: 'Mainnet', time: '35s ago' },
-  { id: 'EV-8839', text: 'Gas reserve top-up completed for Logistics-Hub-07', amount: '50.00 XLM', time: '1m ago' },
-];
+import useTransactions from '../../hooks/useTransactions';
 
 export default function LiveTelemetryFeed() {
+  const { data: transactions = [] } = useTransactions();
+
+  const liveEvents = transactions.slice(0, 4).map((tx) => ({
+    id: tx.txId || tx.id,
+    text: `Soroban contract settlement executed for ${tx.device}`,
+    amount: tx.amount || '125.40 XLM',
+    time: tx.timestamp || 'Just now',
+  }));
+
   return (
     <Card padding="generous" className="h-full">
       <CardHeader className="mb-4">

@@ -2,39 +2,46 @@ import { motion } from 'framer-motion';
 import { Cpu, ShieldCheck, Wallet, Zap } from 'lucide-react';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
-
-const stats = [
-  {
-    title: 'Total Connected Fleet',
-    value: '1,284',
-    change: { label: '1,210 Active', tone: 'success' },
-    icon: Cpu,
-    tone: 'primary',
-  },
-  {
-    title: 'Settlement Wallets',
-    value: '1,280 Funded',
-    change: { label: '4 Low Balance', tone: 'warning' },
-    icon: Wallet,
-    tone: 'neutral',
-  },
-  {
-    title: 'Avg Network Latency',
-    value: '412 ms',
-    change: { label: 'Optimal', tone: 'success' },
-    icon: Zap,
-    tone: 'warning',
-  },
-  {
-    title: 'Consensus Rate',
-    value: '99.98%',
-    change: { label: 'Zero Dropouts', tone: 'primary' },
-    icon: ShieldCheck,
-    tone: 'success',
-  },
-];
+import useDevices from '../../hooks/useDevices';
 
 export default function DeviceStatsCards() {
+  const { data: devices = [] } = useDevices();
+
+  const totalDevices = devices.length;
+  const activeCount = devices.filter((d) => d.status === 'active' || d.status === 'settled').length;
+  const lowBalCount = devices.filter((d) => parseFloat(d.balance || 0) < 100).length;
+
+  const stats = [
+    {
+      title: 'Total Connected Fleet',
+      value: totalDevices.toLocaleString(),
+      change: { label: `${activeCount} Active`, tone: 'success' },
+      icon: Cpu,
+      tone: 'primary',
+    },
+    {
+      title: 'Settlement Wallets',
+      value: `${totalDevices} Funded`,
+      change: { label: `${lowBalCount} Low Balance`, tone: lowBalCount > 0 ? 'warning' : 'success' },
+      icon: Wallet,
+      tone: 'neutral',
+    },
+    {
+      title: 'Avg Network Latency',
+      value: '412 ms',
+      change: { label: 'Optimal', tone: 'success' },
+      icon: Zap,
+      tone: 'warning',
+    },
+    {
+      title: 'Consensus Rate',
+      value: '99.98%',
+      change: { label: 'Zero Dropouts', tone: 'primary' },
+      icon: ShieldCheck,
+      tone: 'success',
+    },
+  ];
+
   const tones = {
     primary: 'bg-[#EAF8F6] text-[#0F766E] border-[#CBE9E3]',
     neutral: 'bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]',

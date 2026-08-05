@@ -6,8 +6,8 @@ export function useStellarWallet(publicKey) {
     queryKey: ['stellarWallet', publicKey],
     queryFn: () => (publicKey ? stellarService.getBalance(publicKey) : null),
     enabled: Boolean(publicKey),
-    staleTime: 10000,
-    refetchInterval: 12000,
+    staleTime: 5000,
+    refetchInterval: 10000,
   });
 }
 
@@ -16,8 +16,8 @@ export function useStellarTransactions(publicKey) {
     queryKey: ['stellarTransactions', publicKey],
     queryFn: () => (publicKey ? stellarService.getTransactions(publicKey) : []),
     enabled: Boolean(publicKey),
-    staleTime: 15000,
-    refetchInterval: 15000,
+    staleTime: 10000,
+    refetchInterval: 12000,
   });
 }
 
@@ -25,7 +25,7 @@ export function useStellarNetwork() {
   return useQuery({
     queryKey: ['stellarNetwork'],
     queryFn: stellarService.getNetworkStatus,
-    staleTime: 20000,
+    staleTime: 15000,
     refetchInterval: 10000,
   });
 }
@@ -36,7 +36,9 @@ export function useCreateWallet() {
     mutationFn: stellarService.createWallet,
     onSuccess: (data) => {
       if (data?.publicKey) {
-        queryClient.invalidateQueries({ queryKey: ['stellarWallet', data.publicKey] });
+        queryClient.invalidateQueries({ queryKey: ['stellarWallet'] });
+        queryClient.invalidateQueries({ queryKey: ['wallet'] });
+        queryClient.invalidateQueries({ queryKey: ['stellarTransactions'] });
       }
     },
   });
@@ -48,6 +50,11 @@ export function useFundWallet() {
     mutationFn: (publicKey) => stellarService.fundWallet(publicKey),
     onSuccess: (_, publicKey) => {
       queryClient.invalidateQueries({ queryKey: ['stellarWallet', publicKey] });
+      queryClient.invalidateQueries({ queryKey: ['wallet', publicKey] });
+      queryClient.invalidateQueries({ queryKey: ['stellarTransactions', publicKey] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
   });
 }
@@ -56,9 +63,11 @@ export function useSendStellarPayment() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: stellarService.sendPayment,
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stellarWallet'] });
+      queryClient.invalidateQueries({ queryKey: ['wallet'] });
       queryClient.invalidateQueries({ queryKey: ['stellarTransactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
     },
   });
 }

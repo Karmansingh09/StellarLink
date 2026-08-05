@@ -1,47 +1,9 @@
-export const getWalletService = async () => {
-  return {
-    address: 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7',
-    balance: '482,910.00 XLM',
-    usdValue: '$57,949.20 USD',
-    totalBalanceXLM: 482910,
-    availableBalanceXLM: 450000,
-    todayVolumeUSD: 124500,
-    activeWalletsCount: 1280,
-    assets: [
-      {
-        symbol: 'XLM',
-        name: 'Stellar Lumens',
-        balance: '482,910.00 XLM',
-        usdValue: '$57,949.20',
-        change: '+2.4%',
-        isPositive: true,
-      },
-      {
-        symbol: 'USDC',
-        name: 'Circle USD Coin',
-        balance: '12,500.00 USDC',
-        usdValue: '$12,500.00',
-        change: '+0.0%',
-        isPositive: true,
-      },
-      {
-        symbol: 'AQUA',
-        name: 'Aquarius Protocol',
-        balance: '250,000.00 AQUA',
-        usdValue: '$1,250.00',
-        change: '+5.8%',
-        isPositive: true,
-      },
-      {
-        symbol: 'SLK',
-        name: 'StellarLink Token',
-        balance: '1,000,000.00 SLK',
-        usdValue: '$10,000.00',
-        change: '+12.1%',
-        isPositive: true,
-      },
-    ],
-  };
+import { getWalletDetails } from './stellar/walletService.js';
+
+const DEFAULT_VAULT_PUBLIC_KEY = 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6';
+
+export const getWalletService = async (publicKey = DEFAULT_VAULT_PUBLIC_KEY) => {
+  return await getWalletDetails(publicKey);
 };
 
 export const sendPaymentService = async (paymentData) => {

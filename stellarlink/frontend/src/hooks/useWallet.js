@@ -1,13 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import walletService from '../services/api/walletService';
 
-export function useWallet() {
+export function useWallet(publicKey) {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['wallet'],
-    queryFn: walletService.getWallet,
-    staleTime: 30000,
+    queryKey: ['wallet', publicKey],
+    queryFn: () => walletService.getWallet(publicKey),
+    staleTime: 10000,
+    refetchInterval: 12000,
   });
 
   const sendPaymentMutation = useMutation({
@@ -15,6 +16,7 @@ export function useWallet() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallet'] });
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarWallet'] });
     },
   });
 

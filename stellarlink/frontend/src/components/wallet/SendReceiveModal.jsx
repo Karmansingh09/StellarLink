@@ -17,7 +17,7 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
 
   if (!mode) return null;
 
-  const walletAddress = walletData?.publicKey || 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
+  const walletAddress = walletData?.publicKey || 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6';
 
   const copyAddress = () => {
     navigator.clipboard.writeText(walletAddress);
@@ -64,7 +64,7 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
               <p className="text-xs text-[#64748B]">Stellar Testnet Network</p>
             </div>
           </div>
-          <button type="button" onClick={onClose} className="p-2 rounded-xl text-[#64748B] hover:text-[#0F172A] hover:bg-slate-200/60">
+          <button type="button" onClick={onClose} className="p-2 rounded-xl text-[#64748B] hover:text-[#0F172A] hover:bg-slate-200/60 cursor-pointer">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -80,7 +80,7 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
                 <input
                   type="text"
                   required
-                  placeholder="GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A..."
+                  placeholder="GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4..."
                   value={recipient}
                   onChange={(e) => setRecipient(e.target.value)}
                   className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"

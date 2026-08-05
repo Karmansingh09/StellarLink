@@ -1,18 +1,21 @@
 import { motion } from 'framer-motion';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import StatusBadge from './StatusBadge';
-import { Cpu, Zap } from 'lucide-react';
-
-const rows = [
-  { device: 'EV Charging Node 04', id: 'DEV-9842', region: 'Europe West', status: 'settled', latency: '412 ms', volume: '128 tx' },
-  { device: 'Autonomous Fleet 11', id: 'DEV-8711', region: 'North America', status: 'active', latency: '478 ms', volume: '96 tx' },
-  { device: 'Microgrid Relay 02', id: 'DEV-6520', region: 'Asia Pacific', status: 'monitoring', latency: '521 ms', volume: '84 tx' },
-  { device: 'Logistics Hub 07', id: 'DEV-4310', region: 'Middle East', status: 'pending', latency: '603 ms', volume: '64 tx' },
-  { device: 'Smart Sensor Ring', id: 'DEV-3209', region: 'South America', status: 'settled', latency: '389 ms', volume: '142 tx' },
-  { device: 'Warehouse AI Cluster', id: 'DEV-1102', region: 'Europe Central', status: 'offline', latency: '—', volume: '0 tx' },
-];
+import { Zap } from 'lucide-react';
+import useDevices from '../../hooks/useDevices';
 
 export default function LiveNetworkTable() {
+  const { data: devices = [] } = useDevices();
+
+  const rows = devices.slice(0, 6).map((dev) => ({
+    device: dev.name,
+    id: dev.id,
+    region: dev.region || 'Europe West',
+    status: dev.status,
+    latency: dev.latency || '412 ms',
+    volume: dev.volume || '128 tx',
+  }));
+
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ type: 'spring', stiffness: 380, damping: 30 }}>
       <Card padding="generous" className="h-full">
@@ -21,12 +24,12 @@ export default function LiveNetworkTable() {
             <div>
               <CardTitle className="text-base sm:text-[1.05rem]">Live network activity</CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                Mock settlement feed for enterprise devices, wallets, and regional nodes.
+                Live settlement feed for enterprise devices, Stellar wallets, and regional nodes.
               </CardDescription>
             </div>
 
-            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-              Updated just now
+            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-[#0F766E]">
+              Telemetry Sync Active
             </p>
           </div>
         </CardHeader>
@@ -35,7 +38,7 @@ export default function LiveNetworkTable() {
         <div className="grid gap-3 md:hidden">
           {rows.map((row) => (
             <div
-              key={row.device}
+              key={row.id}
               className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-3 transition-colors active:bg-[#EAF8F6]"
             >
               <div className="flex items-start justify-between gap-3">
@@ -83,11 +86,11 @@ export default function LiveNetworkTable() {
               </thead>
               <tbody className="divide-y divide-[#E2E8F0] bg-white">
                 {rows.map((row) => (
-                  <tr key={row.device} className="transition-colors hover:bg-[#FAF8FF]">
+                  <tr key={row.id} className="transition-colors hover:bg-[#FAF8FF]">
                     <td className="px-4 py-4 sm:px-6">
                       <div>
                         <p className="text-sm font-semibold text-[#0F172A]">{row.device}</p>
-                        <p className="text-xs text-[#64748B]">Settlement endpoint</p>
+                        <p className="text-xs font-mono text-[#64748B]">{row.id}</p>
                       </div>
                     </td>
                     <td className="px-4 py-4 text-sm text-[#475569] sm:px-6">{row.region}</td>

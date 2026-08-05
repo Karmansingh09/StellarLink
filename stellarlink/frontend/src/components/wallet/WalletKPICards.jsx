@@ -2,39 +2,47 @@ import { motion } from 'framer-motion';
 import { Wallet, ShieldCheck, TrendingUp, Cpu } from 'lucide-react';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
+import useDevices from '../../hooks/useDevices';
 
-const kpis = [
-  {
-    title: 'Total Balance',
-    value: '482,910.00 XLM',
-    change: { label: '+14.2%', tone: 'success' },
-    icon: Wallet,
-    tone: 'primary',
-  },
-  {
-    title: 'Available Balance',
-    value: '450,000.00 XLM',
-    change: { label: 'Available', tone: 'primary' },
-    icon: ShieldCheck,
-    tone: 'neutral',
-  },
-  {
-    title: "Today's Volume",
-    value: '$124,500.00',
-    change: { label: '+8.1%', tone: 'success' },
-    icon: TrendingUp,
-    tone: 'warning',
-  },
-  {
-    title: 'Active Wallets',
-    value: '1,280',
-    change: { label: '99.8% Active', tone: 'success' },
-    icon: Cpu,
-    tone: 'success',
-  },
-];
+export default function WalletKPICards({ walletData }) {
+  const { data: devices = [] } = useDevices();
 
-export default function WalletKPICards() {
+  const totalBal = walletData?.totalXLM ? (walletData.totalXLM.includes('XLM') ? walletData.totalXLM : `${walletData.totalXLM} XLM`) : walletData?.balance || '0.00 XLM';
+  const availableBal = walletData?.availableXLM ? (walletData.availableXLM.includes('XLM') ? walletData.availableXLM : `${walletData.availableXLM} XLM`) : walletData?.availableBalance || '0.00 XLM';
+  const todayVol = walletData?.usdEquivalent || walletData?.usdValue || '$0.00 USD';
+  const activeCount = devices.length;
+
+  const kpis = [
+    {
+      title: 'Total Balance',
+      value: totalBal,
+      change: { label: walletData?.unfunded ? 'Unfunded Keypair' : 'Stellar Testnet', tone: walletData?.unfunded ? 'warning' : 'success' },
+      icon: Wallet,
+      tone: 'primary',
+    },
+    {
+      title: 'Available Balance',
+      value: availableBal,
+      change: { label: 'Minus Base Reserve', tone: 'primary' },
+      icon: ShieldCheck,
+      tone: 'neutral',
+    },
+    {
+      title: 'Est. Vault USD Value',
+      value: todayVol,
+      change: { label: 'Live Rate', tone: 'success' },
+      icon: TrendingUp,
+      tone: 'warning',
+    },
+    {
+      title: 'Active Fleet Wallets',
+      value: `${activeCount.toLocaleString()}`,
+      change: { label: 'Simulated Metric', tone: 'neutral' },
+      icon: Cpu,
+      tone: 'success',
+    },
+  ];
+
   const tones = {
     primary: 'bg-[#EAF8F6] text-[#0F766E] border-[#CBE9E3]',
     neutral: 'bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]',

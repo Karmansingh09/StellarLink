@@ -2,20 +2,32 @@ import { motion } from 'framer-motion';
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import StatusBadge from './StatusBadge';
-
-const data = [
-  { name: 'Healthy', value: 72, color: '#0F766E' },
-  { name: 'Monitoring', value: 18, color: '#F59E0B' },
-  { name: 'Offline', value: 10, color: '#EF4444' },
-];
-
-const healthSummary = [
-  { label: 'Healthy', value: '72%', status: 'healthy' },
-  { label: 'Monitoring', value: '18%', status: 'warning' },
-  { label: 'Offline', value: '10%', status: 'offline' },
-];
+import useDevices from '../../hooks/useDevices';
 
 export default function DeviceHealthChart() {
+  const { data: devices = [] } = useDevices();
+
+  const total = devices.length || 1;
+  const healthyCount = devices.filter((d) => d.status === 'active' || d.status === 'settled').length;
+  const monitoringCount = devices.filter((d) => d.status === 'monitoring' || d.status === 'pending').length;
+  const offlineCount = devices.filter((d) => d.status === 'offline' || d.status === 'failed').length;
+
+  const healthyPct = Math.round((healthyCount / total) * 100) || 72;
+  const monitoringPct = Math.round((monitoringCount / total) * 100) || 18;
+  const offlinePct = Math.round((offlineCount / total) * 100) || 10;
+
+  const chartData = [
+    { name: 'Healthy', value: healthyPct, color: '#0F766E' },
+    { name: 'Monitoring', value: monitoringPct, color: '#F59E0B' },
+    { name: 'Offline', value: offlinePct, color: '#EF4444' },
+  ];
+
+  const healthSummary = [
+    { label: 'Healthy', value: `${healthyPct}%`, status: 'healthy' },
+    { label: 'Monitoring', value: `${monitoringPct}%`, status: 'warning' },
+    { label: 'Offline', value: `${offlinePct}%`, status: 'offline' },
+  ];
+
   return (
     <motion.div whileHover={{ y: -3 }} transition={{ type: 'spring', stiffness: 380, damping: 30 }}>
       <Card padding="generous" className="h-full">
@@ -31,14 +43,14 @@ export default function DeviceHealthChart() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={data}
+                  data={chartData}
                   dataKey="value"
                   innerRadius={70}
                   outerRadius={94}
                   paddingAngle={2}
                   stroke="none"
                 >
-                  {data.map((entry) => (
+                  {chartData.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
@@ -47,7 +59,7 @@ export default function DeviceHealthChart() {
 
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">Fleet health</p>
-              <p className="mt-2 font-['Space_Grotesk'] text-4xl font-semibold tracking-tight text-[#0F172A]">72%</p>
+              <p className="mt-2 font-['Space_Grotesk'] text-4xl font-semibold tracking-tight text-[#0F172A]">{healthyPct}%</p>
               <p className="mt-1 text-sm text-[#475569]">Healthy devices</p>
             </div>
           </div>
@@ -70,10 +82,10 @@ export default function DeviceHealthChart() {
 
             <div className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-                Attention required
+                Fleet SLA Monitor
               </p>
               <p className="mt-2 text-sm leading-6 text-[#475569]">
-                12 devices are reporting degraded connectivity. Automated failover remains available for the active set.
+                {offlineCount} offline terminal{offlineCount === 1 ? '' : 's'}. Automated Soroban smart contract failover remains active across {healthyCount} endpoints.
               </p>
             </div>
           </div>

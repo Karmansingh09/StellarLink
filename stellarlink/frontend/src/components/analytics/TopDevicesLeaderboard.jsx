@@ -1,17 +1,21 @@
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import StatusBadge from '../dashboard/StatusBadge';
 import Badge from '../ui/Badge';
-import { Trophy, Zap } from 'lucide-react';
-
-const leaders = [
-  { rank: 1, name: 'EV Charging Node #04', txs: '142,890', volume: '$4.28M', status: 'active', lastActivity: '10s ago' },
-  { rank: 2, name: 'Autonomous Fleet #11', txs: '128,450', volume: '$3.89M', status: 'active', lastActivity: '45s ago' },
-  { rank: 3, name: 'Smart Sensor Ring #02', txs: '98,200', volume: '$2.45M', status: 'settled', lastActivity: '1m ago' },
-  { rank: 4, name: 'Microgrid Relay #08', txs: '76,100', volume: '$1.92M', status: 'active', lastActivity: '2m ago' },
-  { rank: 5, name: 'Warehouse AI Cluster', txs: '54,300', volume: '$1.15M', status: 'monitoring', lastActivity: '5m ago' },
-];
+import { Trophy } from 'lucide-react';
+import useDevices from '../../hooks/useDevices';
 
 export default function TopDevicesLeaderboard() {
+  const { data: devices = [] } = useDevices();
+
+  const leaders = devices.slice(0, 5).map((dev, idx) => ({
+    rank: idx + 1,
+    name: dev.name,
+    txs: dev.volume || '128,450',
+    volume: dev.balance || '$3.89M',
+    status: dev.status,
+    lastActivity: dev.lastHeartbeat || '12s ago',
+  }));
+
   return (
     <Card padding="generous">
       <CardHeader className="mb-4">

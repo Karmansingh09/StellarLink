@@ -4,7 +4,7 @@ const devicesData = [
     name: 'EV Charging Node 04',
     type: 'EV Charger',
     region: 'Europe West',
-    wallet: 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7J6H5F3S21Q',
+    wallet: 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6',
     status: 'settled',
     battery: '94%',
     network: '5G LTE',

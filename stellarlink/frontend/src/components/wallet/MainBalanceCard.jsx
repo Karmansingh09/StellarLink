@@ -4,6 +4,7 @@ import { Wallet, ArrowDownLeft, ArrowUpRight, Copy, Check, QrCode, ExternalLink,
 import { useToast } from '../../context/ToastContext';
 
 export default function MainBalanceCard({
+  activePublicKey,
   walletData,
   onOpenSend,
   onOpenReceive,
@@ -14,9 +15,9 @@ export default function MainBalanceCard({
   const { addToast } = useToast();
   const [copied, setCopied] = useState(false);
 
-  const walletAddress = walletData?.publicKey || 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7';
-  const totalXLM = walletData?.totalXLM || '10,000.00';
-  const usdVal = walletData?.usdEquivalent || '$1,200.00 USD';
+  const walletAddress = activePublicKey || walletData?.publicKey || 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6';
+  const totalXLM = walletData?.totalXLM || walletData?.balance || '0.00';
+  const usdVal = walletData?.usdEquivalent || walletData?.usdValue || '$0.00 USD';
 
   const copyAddress = () => {
     navigator.clipboard.writeText(walletAddress);
@@ -73,7 +74,7 @@ export default function MainBalanceCard({
           transition={{ duration: 0.3 }}
           className="text-3xl sm:text-5xl font-extrabold font-['Space_Grotesk'] tracking-tight mt-1"
         >
-          {totalXLM} <span className="text-xl sm:text-3xl font-medium text-teal-200">XLM</span>
+          {totalXLM.includes('XLM') ? totalXLM : `${totalXLM} XLM`}
         </motion.h1>
         <p className="text-xs sm:text-sm text-teal-200/90 mt-1.5">
           ≈ {usdVal} • Reserve Base: 1.00 XLM

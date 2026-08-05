@@ -1,13 +1,13 @@
-import { ShieldCheck, Lock, HardDrive, Cpu, Globe, FileCode } from 'lucide-react';
+import { ShieldCheck, Lock, Cpu, Globe, FileCode } from 'lucide-react';
 import Card, { CardHeader, CardTitle } from '../ui/Card';
 import Badge from '../ui/Badge';
 
 const sidebarItems = [
-  { label: 'Connected Contracts', value: '4 Soroban Contracts', icon: FileCode, status: 'Deployed' },
-  { label: 'Contract Escrow Locked', value: '12,500.00 XLM', icon: Lock, status: 'Escrow Safe' },
-  { label: 'Security Status', value: 'HSM Key Enclave', icon: ShieldCheck, status: 'Verified' },
-  { label: 'Connected Devices', value: '1,284 Endpoints', icon: Cpu, status: 'Active' },
-  { label: 'Network Environment', value: 'Stellar Testnet', icon: Globe, status: 'Connected' },
+  { label: 'Connected Contracts', value: '4 Soroban Contracts', icon: FileCode, status: 'Simulated Metric', badgeVariant: 'neutral' },
+  { label: 'Contract Escrow Locked', value: '12,500.00 XLM', icon: Lock, status: 'Simulated Metric', badgeVariant: 'neutral' },
+  { label: 'Security Status', value: 'HSM Key Enclave', icon: ShieldCheck, status: 'Verified', badgeVariant: 'success' },
+  { label: 'Connected Devices', value: '1,284 Endpoints', icon: Cpu, status: 'Simulated Metric', badgeVariant: 'neutral' },
+  { label: 'Network Environment', value: 'Stellar Testnet', icon: Globe, status: 'Live RPC', badgeVariant: 'success' },
 ];
 
 export default function WalletRightSidebar() {
@@ -32,7 +32,7 @@ export default function WalletRightSidebar() {
                   <Icon className="h-3.5 w-3.5 text-[#0F766E]" />
                   <span>{item.label}</span>
                 </div>
-                <Badge variant="success" size="sm">
+                <Badge variant={item.badgeVariant || 'success'} size="sm">
                   {item.status}
                 </Badge>
               </div>

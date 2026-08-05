@@ -1,21 +1,37 @@
 import { motion } from 'framer-motion';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import StatusBadge from '../dashboard/StatusBadge';
+import Badge from '../ui/Badge';
 import { Cpu, Zap, Radio, BatteryCharging } from 'lucide-react';
-
-const deviceWallets = [
-  { name: 'EV Charger Node #04', type: 'EV Charger', wallet: 'GAK8...39FL', balance: '1,250.00 XLM', status: 'active', lastSync: '12s ago', icon: Zap },
-  { name: 'Autonomous Fleet 11', type: 'Robot', wallet: 'GB7M...0H1G', balance: '2,400.50 XLM', status: 'active', lastSync: '45s ago', icon: Cpu },
-  { name: 'Microgrid Relay 02', type: 'Smart Meter', wallet: 'GC98...90K9', balance: '890.00 XLM', status: 'active', lastSync: '2m ago', icon: Radio },
-  { name: 'Autonomous Drone 07', type: 'Drone', wallet: 'GE98...FEDC', balance: '3,100.00 XLM', status: 'active', lastSync: '5m ago', icon: BatteryCharging },
-];
+import useDevices from '../../hooks/useDevices';
 
 export default function ConnectedDeviceWallets() {
+  const { data: devices = [] } = useDevices();
+
+  const iconMap = { 'EV Charger': Zap, 'Autonomous Robot': Cpu, 'Microgrid Relay': Radio, 'Smart Sensor': BatteryCharging };
+
+  const deviceWallets = devices.slice(0, 4).map((d) => ({
+    name: d.name,
+    type: d.type || 'Terminal',
+    wallet: `${d.wallet.substring(0, 4)}...${d.wallet.substring(d.wallet.length - 4)}`,
+    balance: d.balance || '1,000.00 XLM',
+    status: d.status,
+    lastSync: d.lastHeartbeat || '12s ago',
+    icon: iconMap[d.type] || Zap,
+  }));
+
   return (
     <Card padding="generous">
       <CardHeader className="mb-4">
-        <CardTitle className="text-base sm:text-lg font-semibold text-[#0F172A]">Connected Device Wallets</CardTitle>
-        <CardDescription className="text-xs sm:text-sm">Machine endpoint wallets authorized for Soroban micro-settlements</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-base sm:text-lg font-semibold text-[#0F172A]">Connected Device Wallets</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Machine endpoint wallets authorized for Soroban micro-settlements</CardDescription>
+          </div>
+          <Badge variant="neutral" size="sm">
+            Simulated Enterprise Fleet
+          </Badge>
+        </div>
       </CardHeader>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

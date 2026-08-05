@@ -1,17 +1,21 @@
 import { motion } from 'framer-motion';
-import { Activity, ArrowDownLeft, ArrowUpRight, Zap } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import Badge from '../ui/Badge';
-
-const recentItems = [
-  { id: 'RC-101', device: 'EV Charger #04', amount: '+125.40 XLM', type: 'Payment Settled', time: '10s ago' },
-  { id: 'RC-102', device: 'Autonomous Fleet 11', amount: '-45.00 USDC', type: 'Contract Call', time: '30s ago' },
-  { id: 'RC-103', device: 'Microgrid Relay 02', amount: '+890.00 XLM', type: 'Relay Reward', time: '1m ago' },
-  { id: 'RC-104', device: 'Smart Sensor Ring', amount: '+340.20 XLM', type: 'Telemetry Feed', time: '3m ago' },
-  { id: 'RC-105', device: 'Logistics Hub 07', amount: '-12.00 XLM', type: 'Gas Reserve', time: '5m ago' },
-];
+import useTransactions from '../../hooks/useTransactions';
 
 export default function RecentActivityPanel({ onSelectTx }) {
+  const { data: transactions = [] } = useTransactions();
+
+  const items = transactions.slice(0, 5).map((tx) => ({
+    id: tx.txId || tx.id,
+    device: tx.device || 'Stellar Terminal',
+    amount: tx.amount || '0.00 XLM',
+    type: tx.asset || 'Stellar Payment',
+    time: tx.timestamp || 'Just now',
+    rawTx: tx,
+  }));
+
   return (
     <Card padding="generous" className="h-full">
       <CardHeader className="mb-4">
@@ -31,23 +35,24 @@ export default function RecentActivityPanel({ onSelectTx }) {
       </CardHeader>
 
       <div className="space-y-3">
-        {recentItems.map((item, idx) => (
+        {items.map((item, idx) => (
           <motion.div
             key={item.id}
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.05 }}
+            onClick={() => onSelectTx && onSelectTx(item.rawTx)}
             className="flex items-center justify-between p-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:bg-white transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
               <div
                 className={`h-8 w-8 rounded-lg flex items-center justify-center border text-xs font-bold ${
-                  item.amount.startsWith('+')
+                  item.amount.startsWith('+') || !item.amount.startsWith('-')
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                     : 'bg-slate-100 text-[#0F172A] border-[#E2E8F0]'
                 }`}
               >
-                {item.amount.startsWith('+') ? (
+                {item.amount.startsWith('+') || !item.amount.startsWith('-') ? (
                   <ArrowDownLeft className="h-4 w-4" />
                 ) : (
                   <ArrowUpRight className="h-4 w-4" />
@@ -61,7 +66,7 @@ export default function RecentActivityPanel({ onSelectTx }) {
             <div className="text-right">
               <p
                 className={`text-xs font-mono font-bold ${
-                  item.amount.startsWith('+') ? 'text-emerald-700' : 'text-[#0F172A]'
+                  item.amount.startsWith('+') || !item.amount.startsWith('-') ? 'text-emerald-700' : 'text-[#0F172A]'
                 }`}
               >
                 {item.amount}

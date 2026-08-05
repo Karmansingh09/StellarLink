@@ -1,14 +1,14 @@
 import apiClient from './apiClient';
 
 export const walletService = {
-  getWallet: async () => {
+  getWallet: async (publicKey) => {
     try {
-      return await apiClient.get('/wallet');
+      return await apiClient.get('/wallet', { params: { publicKey } });
     } catch (error) {
       return {
-        address: 'GAK8Z3Y7N9M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O1P9L8K7',
-        balance: '482,910.00 XLM',
-        usdValue: '$57,949.20 USD',
+        address: publicKey || 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6',
+        balance: '10,000.00 XLM',
+        usdValue: '$1,200.00 USD',
         assets: [],
       };
     }

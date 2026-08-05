@@ -3,46 +3,15 @@ import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import Badge from '../ui/Badge';
 import { DollarSign, Coins, Zap, Shield } from 'lucide-react';
 
-const assets = [
-  {
-    symbol: 'XLM',
-    name: 'Stellar Lumens',
-    balance: '482,910.00 XLM',
-    usdValue: '$57,949.20',
-    change: '+2.4%',
-    icon: Zap,
-    isPositive: true,
-  },
-  {
-    symbol: 'USDC',
-    name: 'Circle USD Coin',
-    balance: '12,500.00 USDC',
-    usdValue: '$12,500.00',
-    change: '+0.0%',
-    icon: DollarSign,
-    isPositive: true,
-  },
-  {
-    symbol: 'AQUA',
-    name: 'Aquarius Protocol',
-    balance: '250,000.00 AQUA',
-    usdValue: '$1,250.00',
-    change: '+5.8%',
-    icon: Coins,
-    isPositive: true,
-  },
-  {
-    symbol: 'SLK',
-    name: 'StellarLink Token',
-    balance: '1,000,000.00 SLK',
-    usdValue: '$10,000.00',
-    change: '+12.1%',
-    icon: Shield,
-    isPositive: true,
-  },
-];
+export default function AssetHoldings({ walletData }) {
+  const iconMap = { XLM: Zap, USDC: DollarSign, AQUA: Coins, SLK: Shield };
 
-export default function AssetHoldings() {
+  const assetsList = walletData?.assets?.length > 0
+    ? walletData.assets
+    : [
+        { symbol: 'XLM', name: 'Stellar Lumens', balance: walletData?.balance || '0.00 XLM', usdValue: walletData?.usdValue || '$0.00', change: walletData?.unfunded ? 'Unfunded' : 'Active' }
+      ];
+
   return (
     <Card padding="generous">
       <CardHeader className="mb-4">
@@ -52,14 +21,14 @@ export default function AssetHoldings() {
             <CardDescription className="text-xs sm:text-sm">Tokens and anchored assets held in primary vault</CardDescription>
           </div>
           <Badge variant="primary" dot size="sm">
-            4 Trustlines Active
+            {assetsList.length} Trustlines Active
           </Badge>
         </div>
       </CardHeader>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {assets.map((asset) => {
-          const Icon = asset.icon;
+        {assetsList.map((asset) => {
+          const Icon = iconMap[asset.symbol] || Zap;
           return (
             <motion.div
               key={asset.symbol}
@@ -77,7 +46,7 @@ export default function AssetHoldings() {
                   </div>
                 </div>
                 <Badge variant="success" size="sm">
-                  {asset.change}
+                  {asset.change || 'Active'}
                 </Badge>
               </div>
 
