@@ -17,6 +17,7 @@ import { CardSkeleton } from '../../components/ui/Skeleton';
 import { useToast } from '../../context/ToastContext';
 import { useStellarWallet, useCreateWallet, useFundWallet } from '../../hooks/useStellar';
 import freighterService from '../../services/wallet/freighterService';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const defaultTestnetPublicKey = 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6';
 
@@ -37,6 +38,7 @@ const itemVariants = {
 };
 
 export default function Wallet() {
+  useDocumentTitle('Wallet Management', 'Manage Stellar wallets, balances, assets, and machine-to-machine payments securely.');
   const { addToast } = useToast();
   const [modalMode, setModalMode] = useState(null); // 'send' | 'receive' | 'qr' | null
   const [activePublicKey, setActivePublicKey] = useState(defaultTestnetPublicKey);

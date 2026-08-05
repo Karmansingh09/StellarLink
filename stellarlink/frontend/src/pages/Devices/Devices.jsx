@@ -10,6 +10,7 @@ import DeviceTable from '../../components/devices/DeviceTable';
 import DeviceDetailDrawer from '../../components/devices/DeviceDetailDrawer';
 import RegisterDeviceModal from '../../components/devices/RegisterDeviceModal';
 import useDevices from '../../hooks/useDevices';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,6 +29,7 @@ const itemVariants = {
 };
 
 export default function Devices() {
+  useDocumentTitle('Device Fleet Management', 'Provision, monitor, and inspect autonomous IoT terminals and relay nodes connected to Soroban.');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [regionFilter, setRegionFilter] = useState('all');

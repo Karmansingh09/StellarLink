@@ -9,6 +9,7 @@ import LiveNetworkTable from '../../components/dashboard/LiveNetworkTable';
 import DashboardSkeleton from '../../components/dashboard/DashboardSkeleton';
 import useDashboard from '../../hooks/useDashboard';
 import useDevices from '../../hooks/useDevices';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { useStellarNetwork, useStellarWallet } from '../../hooks/useStellar';
 
 const defaultTestnetPublicKey = 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6';
@@ -30,6 +31,7 @@ const itemVariants = {
 };
 
 export default function Dashboard() {
+  useDocumentTitle('Live Network Control Center', 'Real-time consensus telemetry, ledger sequence monitoring, and machine settlement metrics on Stellar.');
   const { data: dashboardData, isLoading } = useDashboard();
   const { data: networkStatus } = useStellarNetwork();
   const { data: walletData } = useStellarWallet(defaultTestnetPublicKey);
