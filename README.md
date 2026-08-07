@@ -53,13 +53,13 @@ By combining low-latency Stellar Horizon RPC APIs with Soroban smart contracts, 
 
 ## Screenshots
 
-| Dashboard Control Center | Fleet Device Management |
+| Dashboard Control Center | Landing Page |
 | :---: | :---: |
-| ![Dashboard Control Center](docs/screenshots/dashboard.png) | ![Fleet Device Management](docs/screenshots/devices.png) |
+| ![Dashboard Control Center](docs/screenshots/dashboard.jpg) | ![Landing Page](docs/screenshots/landing.jpg) |
 
-| Digital Asset Vault | Multi-Stage Payment Flow |
+| Wallet Overview | Transactions & Device Wallets |
 | :---: | :---: |
-| ![Digital Asset Vault](docs/screenshots/wallet.png) | ![Payment Console](docs/screenshots/payment.png) |
+| ![Wallet Overview](docs/screenshots/wallet-top.jpg) | ![Wallet Details](docs/screenshots/wallet-bottom.jpg) |
 
 ---
 
@@ -402,3 +402,51 @@ Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information
 - [Stellar Expert Block Explorer](https://stellar.expert)
 - [Recharts Library](https://recharts.org)
 - [Framer Motion Animation Engine](https://www.framer.com/motion/)
+
+---
+
+# 📷 Project Gallery
+
+## Landing Page
+
+### Hero Section
+![Landing](docs/screenshots/landing.jpg)
+
+### Features Section
+![Landing Features](docs/screenshots/landing-features.jpg)
+
+---
+
+## Executive Dashboard
+
+![Dashboard](docs/screenshots/dashboard.jpg)
+
+---
+
+## Wallet Management
+
+### Wallet Overview
+![Wallet Overview](docs/screenshots/wallet-top.jpg)
+
+### Transactions & Device Wallets
+![Wallet Details](docs/screenshots/wallet-bottom.jpg)
+
+---
+
+## Analytics
+
+![Analytics](docs/screenshots/analytics.jpg)
+
+---
+
+## Mobile Responsive Design
+
+### Wallet
+![Wallet Mobile](docs/screenshots/mobile-wallet.jpg)
+
+### Devices
+![Devices Mobile](docs/screenshots/mobile-devices.jpg)
+
+### Settings
+![Settings Mobile](docs/screenshots/mobile-settings.jpg)
+
