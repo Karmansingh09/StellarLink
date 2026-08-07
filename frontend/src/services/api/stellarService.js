@@ -10,7 +10,7 @@ export const stellarService = {
   },
 
   getBalance: async (publicKey) => {
-    return await apiClient.get(`/stellar/balance/${publicKey}`);
+    return await apiClient.get('/wallet', { params: { publicKey } });
   },
 
   sendPayment: async ({ senderSecret, destinationPublic, amount, memoText }) => {

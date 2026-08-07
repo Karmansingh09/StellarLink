@@ -1,27 +1,30 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import walletService from '../services/api/walletService';
+import { useWalletContext } from '../context/WalletContext';
 
-export function useWallet(publicKey) {
+export function useWallet() {
   const queryClient = useQueryClient();
-
-  const query = useQuery({
-    queryKey: ['wallet', publicKey],
-    queryFn: () => walletService.getWallet(publicKey),
-    staleTime: 10000,
-    refetchInterval: 12000,
-  });
+  const context = useWalletContext();
 
   const sendPaymentMutation = useMutation({
     mutationFn: walletService.sendPayment,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallet'] });
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['stellarWallet'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
     },
   });
 
   return {
-    ...query,
+    data: context.walletData,
+    walletData: context.walletData,
+    publicKey: context.publicKey,
+    isLoading: context.loading,
+    refetch: context.refreshWallet,
+    connectWallet: context.connectWallet,
+    disconnectWallet: context.disconnectWallet,
+    isFreighterConnected: context.isFreighterConnected,
+    freighterAddress: context.freighterAddress,
     sendPayment: sendPaymentMutation.mutateAsync,
     isSending: sendPaymentMutation.isPending,
   };

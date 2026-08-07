@@ -32,8 +32,41 @@ export const fundWalletWithFriendbot = async (publicKey) => {
 };
 
 export const getWalletDetails = async (publicKey) => {
+  const receivedKey = String(publicKey || '');
+  const sanitizedKey = receivedKey
+    .trim()
+    .replace(/^["`\x27]+|["`\x27]+$/g, '')
+    .trim();
+  const isValidKey = StellarSdk.StrKey.isValidEd25519PublicKey(sanitizedKey);
+
+  console.log('[STELLAR WALLET SERVICE LOG]');
+  console.log('  - Received Public Key:', receivedKey);
+  console.log('  - Sanitized Public Key:', sanitizedKey);
+  console.log('  - Validation Result (isValidEd25519PublicKey):', isValidKey);
+
+  if (!sanitizedKey || !isValidKey) {
+    console.warn(`[STELLAR WALLET SERVICE WARNING] Invalid or unformatted public key received: "${receivedKey}"`);
+    return {
+      publicKey: sanitizedKey || receivedKey,
+      address: sanitizedKey || receivedKey,
+      sequence: '0',
+      balances: [{ asset: 'XLM Native', symbol: 'XLM', balance: '0.00 XLM', rawBalance: '0', change: 'Unfunded', isPositive: false }],
+      assets: [{ asset: 'XLM Native', symbol: 'XLM', balance: '0.00 XLM', rawBalance: '0', change: 'Unfunded', isPositive: false }],
+      totalXLM: '0.00',
+      availableXLM: '0.00',
+      balance: '0.00 XLM',
+      availableBalance: '0.00 XLM',
+      rawTotalXLM: 0,
+      rawAvailableXLM: 0,
+      usdEquivalent: '$0.00 USD',
+      usdValue: '$0.00 USD',
+      subentryCount: 0,
+      unfunded: true,
+    };
+  }
+
   try {
-    const account = await server.loadAccount(publicKey);
+    const account = await server.loadAccount(sanitizedKey);
     
     const formattedBalances = account.balances.map((b) => {
       if (b.asset_type === 'native') {
@@ -83,11 +116,19 @@ export const getWalletDetails = async (publicKey) => {
       unfunded: false,
     };
   } catch (error) {
-    // If account not yet funded / not found on ledger
-    if (error.response?.status === 404 || error.name === 'NotFoundError') {
+    console.error('[HORIZON ERROR OBJECT]:', {
+      message: error.message,
+      name: error.name,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+    });
+
+    // If account not yet funded / not found on ledger (404) or invalid request (400)
+    if (error.response?.status === 404 || error.response?.status === 400 || error.name === 'NotFoundError') {
       return {
-        publicKey,
-        address: publicKey,
+        publicKey: sanitizedKey,
+        address: sanitizedKey,
         sequence: '0',
         balances: [{ asset: 'XLM Native', symbol: 'XLM', balance: '0.00 XLM', rawBalance: '0', change: 'Unfunded', isPositive: false }],
         assets: [{ asset: 'XLM Native', symbol: 'XLM', balance: '0.00 XLM', rawBalance: '0', change: 'Unfunded', isPositive: false }],

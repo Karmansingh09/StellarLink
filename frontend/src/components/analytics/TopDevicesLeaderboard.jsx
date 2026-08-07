@@ -10,10 +10,10 @@ export default function TopDevicesLeaderboard() {
   const leaders = devices.slice(0, 5).map((dev, idx) => ({
     rank: idx + 1,
     name: dev.name,
-    txs: dev.volume || '128,450',
-    volume: dev.balance || '$3.89M',
+    txs: dev.volume || '0 tx',
+    volume: dev.balance || '0.00 XLM',
     status: dev.status,
-    lastActivity: dev.lastHeartbeat || '12s ago',
+    lastActivity: dev.lastHeartbeat || '--',
   }));
 
   return (
@@ -60,9 +60,8 @@ export default function TopDevicesLeaderboard() {
       </div>
 
       {/* Desktop Table View (>= md) */}
-      <div className="hidden md:block overflow-hidden rounded-[16px] border border-[#E2E8F0]">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-[#E2E8F0] text-left">
+      <div className="hidden md:block overflow-x-auto rounded-[16px] border border-[#E2E8F0]">
+        <table className="min-w-full divide-y divide-[#E2E8F0] text-left">
             <thead className="bg-[#F8FAFC]">
               <tr>
                 {['Rank & Device', 'Transactions', 'Volume', 'Status', 'Last Activity'].map((heading) => (
@@ -94,7 +93,6 @@ export default function TopDevicesLeaderboard() {
             </tbody>
           </table>
         </div>
-      </div>
-    </Card>
-  );
+      </Card>
+    );
 }

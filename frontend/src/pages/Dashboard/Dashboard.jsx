@@ -10,9 +10,8 @@ import DashboardSkeleton from '../../components/dashboard/DashboardSkeleton';
 import useDashboard from '../../hooks/useDashboard';
 import useDevices from '../../hooks/useDevices';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
-import { useStellarNetwork, useStellarWallet } from '../../hooks/useStellar';
-
-const defaultTestnetPublicKey = 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6';
+import { useStellarNetwork } from '../../hooks/useStellar';
+import { useWalletContext } from '../../context/WalletContext';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,32 +33,38 @@ export default function Dashboard() {
   useDocumentTitle('Live Network Control Center', 'Real-time consensus telemetry, ledger sequence monitoring, and machine settlement metrics on Stellar.');
   const { data: dashboardData, isLoading } = useDashboard();
   const { data: networkStatus } = useStellarNetwork();
-  const { data: walletData } = useStellarWallet(defaultTestnetPublicKey);
+  const { walletData, publicKey } = useWalletContext();
   const { data: devices = [] } = useDevices();
 
   if (isLoading) {
     return <DashboardSkeleton />;
   }
 
-  const activeDeviceCount = devices.length ? devices.filter((d) => d.status === 'active' || d.status === 'settled').length : 1284;
-  const ledgerSequence = networkStatus?.ledgerSequence || 52894105;
+  const activeDeviceCount = devices.length ? devices.filter((d) => d.status === 'active' || d.status === 'settled').length : 0;
+  const ledgerSequence = networkStatus?.ledgerSequence || 0;
   const protocolVersion = networkStatus?.protocolVersion || 21;
   const baseFeeStroops = networkStatus?.baseFee || 100;
   const avgFinality = networkStatus?.avgConfirmationTimeMs || 482;
-  const connectedBalance = walletData?.balance || '10,000.00 XLM';
+  const connectedBalance = walletData?.balance || '0.00 XLM';
+
+  console.log('[Dashboard Page Render] Props & Context:', {
+    publicKey,
+    balance: walletData?.balance,
+    unfunded: walletData?.unfunded,
+  });
 
   const overviewCardsData = [
     {
       title: 'Connected Wallet Balance',
       value: connectedBalance,
-      change: { label: 'Live Testnet', tone: 'success', description: 'Primary Vault Balance' },
+      change: { label: walletData?.unfunded ? 'Unfunded Keypair' : 'Live Testnet', tone: walletData?.unfunded ? 'warning' : 'success', description: 'Primary Vault Balance' },
       icon: Wallet,
       tone: 'primary',
     },
     {
       title: 'Successful Settlements',
-      value: '12,840 Txs',
-      change: { label: '+18.4%', tone: 'success', description: 'Soroban Escrow Settled' },
+      value: dashboardData?.totalSettlement ? `${dashboardData.totalSettlement.toLocaleString()} Txs` : '0 Txs',
+      change: { label: dashboardData?.settlementGrowth || '0.0%', tone: 'neutral', description: 'Soroban Escrow Settled' },
       icon: ShieldCheck,
       tone: 'neutral',
     },

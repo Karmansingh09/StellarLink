@@ -14,9 +14,9 @@ export default function ConnectedDeviceWallets() {
     name: d.name,
     type: d.type || 'Terminal',
     wallet: `${d.wallet.substring(0, 4)}...${d.wallet.substring(d.wallet.length - 4)}`,
-    balance: d.balance || '1,000.00 XLM',
+    balance: d.balance || '0.00 XLM',
     status: d.status,
-    lastSync: d.lastHeartbeat || '12s ago',
+    lastSync: d.lastHeartbeat || '--',
     icon: iconMap[d.type] || Zap,
   }));
 
@@ -29,7 +29,7 @@ export default function ConnectedDeviceWallets() {
             <CardDescription className="text-xs sm:text-sm">Machine endpoint wallets authorized for Soroban micro-settlements</CardDescription>
           </div>
           <Badge variant="neutral" size="sm">
-            Simulated Enterprise Fleet
+            Enterprise Fleet
           </Badge>
         </div>
       </CardHeader>

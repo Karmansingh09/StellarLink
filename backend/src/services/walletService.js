@@ -1,6 +1,6 @@
 import { getWalletDetails } from './stellar/walletService.js';
 
-const DEFAULT_VAULT_PUBLIC_KEY = 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6';
+const DEFAULT_VAULT_PUBLIC_KEY = 'GBHPLJTE52JPNNGRU7W5JCKSV3JYFS5ZNMF27IQDTTPDGSP3XRZYCHFE';
 
 export const getWalletService = async (publicKey = DEFAULT_VAULT_PUBLIC_KEY) => {
   return await getWalletDetails(publicKey);

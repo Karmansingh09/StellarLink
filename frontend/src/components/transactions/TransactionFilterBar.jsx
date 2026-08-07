@@ -44,28 +44,28 @@ export default function TransactionFilterBar({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-[20px] border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-3 rounded-[20px] border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-5 lg:flex-row lg:items-center lg:justify-between min-w-0">
       {/* Search Input with Debounce */}
-      <div className="relative flex-1 min-w-[240px]">
+      <div className="relative flex-1 min-w-0 w-full">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
         <input
           type="search"
           value={internalQuery}
           onChange={(e) => setInternalQuery(e.target.value)}
           placeholder="Search transaction ID, wallet, or device..."
-          className="h-11 w-full rounded-[14px] border border-[#D9E2E1] bg-[#F8FAFC] pl-10 pr-4 text-sm text-[#0F172A] outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#0F766E] focus:bg-white focus:ring-2 focus:ring-[#0F766E]/15"
+          className="h-11 w-full rounded-[14px] border border-[#D9E2E1] bg-[#F8FAFC] pl-10 pr-4 text-xs sm:text-sm text-[#0F172A] outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#0F766E] focus:bg-white focus:ring-2 focus:ring-[#0F766E]/15"
         />
       </div>
 
       {/* Dropdown Filters & Actions Group */}
-      <div className="flex flex-wrap items-center gap-2.5">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 min-w-0">
         {/* Status Dropdown */}
-        <div className="relative flex items-center">
+        <div className="relative flex items-center flex-1 sm:flex-initial min-w-[110px]">
           <Filter className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[#64748B]" />
           <select
             value={statusFilter}
             onChange={(e) => onStatusChange(e.target.value)}
-            className="h-11 appearance-none rounded-[14px] border border-[#D9E2E1] bg-white pl-8 pr-7 text-xs font-semibold text-[#0F172A] outline-none cursor-pointer hover:border-[#CBE9E3] focus:border-[#0F766E]"
+            className="h-11 w-full appearance-none rounded-[14px] border border-[#D9E2E1] bg-white pl-8 pr-7 text-xs font-semibold text-[#0F172A] outline-none cursor-pointer hover:border-[#CBE9E3] focus:border-[#0F766E]"
           >
             <option value="all">All Statuses</option>
             <option value="completed">Completed</option>
@@ -76,12 +76,12 @@ export default function TransactionFilterBar({
         </div>
 
         {/* Device Dropdown */}
-        <div className="relative flex items-center">
+        <div className="relative flex items-center flex-1 sm:flex-initial min-w-[110px]">
           <Cpu className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[#64748B]" />
           <select
             value={deviceFilter}
             onChange={(e) => onDeviceChange(e.target.value)}
-            className="h-11 appearance-none rounded-[14px] border border-[#D9E2E1] bg-white pl-8 pr-7 text-xs font-semibold text-[#0F172A] outline-none cursor-pointer hover:border-[#CBE9E3] focus:border-[#0F766E]"
+            className="h-11 w-full appearance-none rounded-[14px] border border-[#D9E2E1] bg-white pl-8 pr-7 text-xs font-semibold text-[#0F172A] outline-none cursor-pointer hover:border-[#CBE9E3] focus:border-[#0F766E]"
           >
             <option value="all">All Devices</option>
             <option value="EV Charger #04">EV Charger #04</option>
@@ -93,12 +93,12 @@ export default function TransactionFilterBar({
         </div>
 
         {/* Date Range Picker */}
-        <div className="relative flex items-center">
+        <div className="relative flex items-center flex-1 sm:flex-initial min-w-[100px]">
           <Calendar className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[#64748B]" />
           <select
             value={dateFilter}
             onChange={(e) => onDateChange(e.target.value)}
-            className="h-11 appearance-none rounded-[14px] border border-[#D9E2E1] bg-white pl-8 pr-7 text-xs font-semibold text-[#0F172A] outline-none cursor-pointer hover:border-[#CBE9E3] focus:border-[#0F766E]"
+            className="h-11 w-full appearance-none rounded-[14px] border border-[#D9E2E1] bg-white pl-8 pr-7 text-xs font-semibold text-[#0F172A] outline-none cursor-pointer hover:border-[#CBE9E3] focus:border-[#0F766E]"
           >
             <option value="all">All Time</option>
             <option value="today">Today</option>
@@ -111,7 +111,7 @@ export default function TransactionFilterBar({
         <button
           type="button"
           onClick={handleRefreshClick}
-          className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F766E] transition-colors cursor-pointer"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F766E] transition-colors cursor-pointer"
           title="Reset Filters & Refresh"
         >
           <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin text-[#0F766E]' : ''}`} />

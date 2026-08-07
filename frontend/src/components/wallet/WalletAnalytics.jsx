@@ -2,34 +2,38 @@ import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Cart
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 
 export default function WalletAnalytics({ walletData }) {
-  const currentBal = walletData?.rawTotalXLM !== undefined ? walletData.rawTotalXLM : (walletData?.balance ? parseFloat(walletData.balance.replace(/,/g, '')) : 0);
+  const currentBal = walletData?.rawTotalXLM !== undefined
+    ? walletData.rawTotalXLM
+    : (walletData?.balance && !walletData?.unfunded ? parseFloat(walletData.balance.replace(/,/g, '')) : 0);
+
+  const isZeroOrUnfunded = !currentBal || currentBal === 0 || walletData?.unfunded;
 
   const balanceTrendData = [
-    { day: 'Mon', balance: Math.round(currentBal * 0.85) },
-    { day: 'Tue', balance: Math.round(currentBal * 0.88) },
-    { day: 'Wed', balance: Math.round(currentBal * 0.91) },
-    { day: 'Thu', balance: Math.round(currentBal * 0.95) },
-    { day: 'Fri', balance: Math.round(currentBal * 0.98) },
-    { day: 'Sat', balance: Math.round(currentBal) },
+    { day: 'Mon', balance: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.85) },
+    { day: 'Tue', balance: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.88) },
+    { day: 'Wed', balance: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.91) },
+    { day: 'Thu', balance: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.95) },
+    { day: 'Fri', balance: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.98) },
+    { day: 'Sat', balance: isZeroOrUnfunded ? 0 : Math.round(currentBal) },
   ];
 
-  const assetAllocationData = walletData?.assets?.length > 0
+  const assetAllocationData = isZeroOrUnfunded
+    ? [{ name: 'Unfunded', value: 100, color: '#64748B' }]
+    : walletData?.assets?.length > 0
     ? walletData.assets.map((a, i) => ({
         name: a.symbol,
-        value: i === 0 ? 85 : 5,
-        color: i === 0 ? '#0F766E' : i === 1 ? '#14B8A6' : i === 2 ? '#F59E0B' : '#64748B',
+        value: i === 0 ? 100 : 0,
+        color: i === 0 ? '#0F766E' : '#64748B',
       }))
-    : [
-        { name: 'XLM Native', value: 100, color: '#0F766E' },
-      ];
+    : [{ name: 'XLM Native', value: 100, color: '#0F766E' }];
 
   const dailyVolumeData = [
-    { day: 'Mon', volume: Math.round(currentBal * 0.05) },
-    { day: 'Tue', volume: Math.round(currentBal * 0.08) },
-    { day: 'Wed', volume: Math.round(currentBal * 0.12) },
-    { day: 'Thu', volume: Math.round(currentBal * 0.15) },
-    { day: 'Fri', volume: Math.round(currentBal * 0.14) },
-    { day: 'Sat', volume: Math.round(currentBal * 0.18) },
+    { day: 'Mon', volume: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.05) },
+    { day: 'Tue', volume: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.08) },
+    { day: 'Wed', volume: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.12) },
+    { day: 'Thu', volume: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.15) },
+    { day: 'Fri', volume: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.14) },
+    { day: 'Sat', volume: isZeroOrUnfunded ? 0 : Math.round(currentBal * 0.18) },
   ];
 
   return (
@@ -77,8 +81,12 @@ export default function WalletAnalytics({ walletData }) {
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-xl font-bold font-['Space_Grotesk'] text-[#0F172A]">85%</span>
-            <span className="text-[10px] text-[#64748B]">XLM Share</span>
+            <span className="text-xl font-bold font-['Space_Grotesk'] text-[#0F172A]">
+              {isZeroOrUnfunded ? '0.00 XLM' : '100%'}
+            </span>
+            <span className="text-[10px] text-[#64748B]">
+              {isZeroOrUnfunded ? 'Unfunded' : 'XLM Native'}
+            </span>
           </div>
         </div>
       </Card>

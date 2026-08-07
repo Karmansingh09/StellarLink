@@ -1,25 +1,25 @@
-import { Activity, ShieldCheck, Wallet, Zap, FileCode, Lock } from 'lucide-react';
+import { ShieldCheck, Wallet, Lock, FileCode } from 'lucide-react';
 import OverviewCard from './OverviewCard';
 
 const defaultCards = [
   {
     title: 'Soroban Active Contracts',
-    value: '4 Contracts',
+    value: '0 Contracts',
     change: { label: 'Active', tone: 'success', description: 'Device & Escrow WASM' },
     icon: FileCode,
     tone: 'primary',
   },
   {
     title: 'Successful Settlements',
-    value: '12,840',
-    change: { label: '+18.4%', tone: 'success', description: 'On-chain auto-settled' },
+    value: '0',
+    change: { label: '0.0%', tone: 'neutral', description: 'On-chain auto-settled' },
     icon: Wallet,
     tone: 'neutral',
   },
   {
     title: 'Pending Escrows Locked',
-    value: '12 Locked',
-    change: { label: 'Escrow Safe', tone: 'warning', description: '12,500 XLM in escrow' },
+    value: '0 Locked',
+    change: { label: 'Escrow Safe', tone: 'warning', description: '0.00 XLM in escrow' },
     icon: Lock,
     tone: 'warning',
   },

@@ -139,7 +139,7 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
           </div>
 
           {/* Desktop Table View (>= md) with Sticky Headers & Sorting */}
-          <div className="hidden md:block overflow-hidden rounded-[16px] border border-[#E2E8F0]">
+          <div className="hidden md:block overflow-x-auto rounded-[16px] border border-[#E2E8F0]">
             <table className="min-w-full divide-y divide-[#E2E8F0] text-left">
               <thead className="bg-[#F8FAFC] sticky top-0 z-10 shadow-xs">
                 <tr>

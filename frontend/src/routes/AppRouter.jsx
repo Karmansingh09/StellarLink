@@ -6,6 +6,7 @@ import DashboardLayout from '../layouts/DashboardLayout';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorBoundary from '../components/ui/ErrorBoundary';
 import { ToastProvider } from '../context/ToastContext';
+import { WalletProvider } from '../context/WalletContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,7 +30,8 @@ export default function AppRouter() {
   return (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
-        <ErrorBoundary>
+        <WalletProvider>
+          <ErrorBoundary>
           <BrowserRouter>
             <Suspense
               fallback={(
@@ -55,7 +57,8 @@ export default function AppRouter() {
             </Suspense>
           </BrowserRouter>
         </ErrorBoundary>
-      </ToastProvider>
+      </WalletProvider>
+    </ToastProvider>
     </QueryClientProvider>
   );
 }

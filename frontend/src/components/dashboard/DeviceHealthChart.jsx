@@ -7,14 +7,14 @@ import useDevices from '../../hooks/useDevices';
 export default function DeviceHealthChart() {
   const { data: devices = [] } = useDevices();
 
-  const total = devices.length || 1;
+  const total = devices.length;
   const healthyCount = devices.filter((d) => d.status === 'active' || d.status === 'settled').length;
   const monitoringCount = devices.filter((d) => d.status === 'monitoring' || d.status === 'pending').length;
   const offlineCount = devices.filter((d) => d.status === 'offline' || d.status === 'failed').length;
 
-  const healthyPct = Math.round((healthyCount / total) * 100) || 72;
-  const monitoringPct = Math.round((monitoringCount / total) * 100) || 18;
-  const offlinePct = Math.round((offlineCount / total) * 100) || 10;
+  const healthyPct = total > 0 ? Math.round((healthyCount / total) * 100) : 100;
+  const monitoringPct = total > 0 ? Math.round((monitoringCount / total) * 100) : 0;
+  const offlinePct = total > 0 ? Math.round((offlineCount / total) * 100) : 0;
 
   const chartData = [
     { name: 'Healthy', value: healthyPct, color: '#0F766E' },

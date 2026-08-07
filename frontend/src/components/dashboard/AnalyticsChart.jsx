@@ -40,18 +40,18 @@ export default function AnalyticsChart() {
     volume: p.tps / 100,
     target: p.burst / 100,
   })) || [
-    { month: 'Mon', volume: 62, target: 78 },
-    { month: 'Tue', volume: 68, target: 81 },
-    { month: 'Wed', volume: 74, target: 84 },
-    { month: 'Thu', volume: 82, target: 91 },
-    { month: 'Fri', volume: 79, target: 87 },
-    { month: 'Sat', volume: 85, target: 94 },
-    { month: 'Sun', volume: 82, target: 92 },
+    { month: 'Mon', volume: 0, target: 0 },
+    { month: 'Tue', volume: 0, target: 0 },
+    { month: 'Wed', volume: 0, target: 0 },
+    { month: 'Thu', volume: 0, target: 0 },
+    { month: 'Fri', volume: 0, target: 0 },
+    { month: 'Sat', volume: 0, target: 0 },
+    { month: 'Sun', volume: 0, target: 0 },
   ];
 
   const insightItems = [
-    { label: 'Settlement throughput', value: analyticsData?.throughputTps || '8.2k tx/min' },
-    { label: 'Success rate', value: analyticsData?.successRate || '99.98%' },
+    { label: 'Settlement throughput', value: analyticsData?.throughputTps || '0 tx/min' },
+    { label: 'Success rate', value: analyticsData?.successRate || '100.0%' },
     { label: 'Average latency', value: analyticsData?.averageFinalityMs || '482 ms' },
   ];
 

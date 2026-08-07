@@ -13,7 +13,7 @@ export default function LiveNetworkTable() {
     region: dev.region || 'Europe West',
     status: dev.status,
     latency: dev.latency || '412 ms',
-    volume: dev.volume || '128 tx',
+    volume: dev.volume || '0 tx',
   }));
 
   return (
@@ -69,9 +69,8 @@ export default function LiveNetworkTable() {
         </div>
 
         {/* Desktop View: Table (>= md) */}
-        <div className="hidden md:block overflow-hidden rounded-[16px] border border-[#E2E8F0]">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-[#E2E8F0] text-left">
+        <div className="hidden md:block overflow-x-auto rounded-[16px] border border-[#E2E8F0]">
+          <table className="min-w-full divide-y divide-[#E2E8F0] text-left">
               <thead className="bg-[#F8FAFC]">
                 <tr>
                   {['Device', 'Region', 'Status', 'Latency', 'Volume'].map((heading) => (
@@ -104,8 +103,7 @@ export default function LiveNetworkTable() {
               </tbody>
             </table>
           </div>
-        </div>
-      </Card>
-    </motion.div>
+        </Card>
+      </motion.div>
   );
 }

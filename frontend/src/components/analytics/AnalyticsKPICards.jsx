@@ -2,39 +2,42 @@ import { motion } from 'framer-motion';
 import { Activity, ShieldCheck, Clock, Cpu } from 'lucide-react';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
-
-const defaultKPIs = [
-  {
-    title: 'Network Throughput',
-    value: '8.2k tx/min',
-    change: { label: '+6.4%', tone: 'success' },
-    icon: Activity,
-    tone: 'primary',
-  },
-  {
-    title: 'Settlement Success',
-    value: '99.98%',
-    change: { label: 'Stable', tone: 'primary' },
-    icon: ShieldCheck,
-    tone: 'neutral',
-  },
-  {
-    title: 'Average Finality',
-    value: '482ms',
-    change: { label: 'Optimal', tone: 'success' },
-    icon: Clock,
-    tone: 'warning',
-  },
-  {
-    title: 'Connected Devices',
-    value: '1,284',
-    change: { label: '+42', tone: 'success' },
-    icon: Cpu,
-    tone: 'success',
-  },
-];
+import useAnalytics from '../../hooks/useAnalytics';
 
 export default function AnalyticsKPICards() {
+  const { data: metrics } = useAnalytics();
+
+  const kpis = [
+    {
+      title: 'Network Throughput',
+      value: metrics?.throughputTps || '0 tx/min',
+      change: { label: metrics?.throughputGrowth || '0.0%', tone: 'neutral' },
+      icon: Activity,
+      tone: 'primary',
+    },
+    {
+      title: 'Settlement Success',
+      value: metrics?.successRate || '100.0%',
+      change: { label: 'Stable', tone: 'primary' },
+      icon: ShieldCheck,
+      tone: 'neutral',
+    },
+    {
+      title: 'Average Finality',
+      value: metrics?.averageFinalityMs || '482ms',
+      change: { label: 'Optimal', tone: 'success' },
+      icon: Clock,
+      tone: 'warning',
+    },
+    {
+      title: 'Connected Devices',
+      value: metrics?.connectedDevicesCount ? String(metrics.connectedDevicesCount) : '6',
+      change: { label: 'Active', tone: 'success' },
+      icon: Cpu,
+      tone: 'success',
+    },
+  ];
+
   const tones = {
     primary: 'bg-[#EAF8F6] text-[#0F766E] border-[#CBE9E3]',
     neutral: 'bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]',
@@ -44,7 +47,7 @@ export default function AnalyticsKPICards() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
-      {defaultKPIs.map((kpi) => {
+      {kpis.map((kpi) => {
         const Icon = kpi.icon;
         return (
           <motion.div

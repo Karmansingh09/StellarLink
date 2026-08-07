@@ -7,8 +7,12 @@ import useDevices from '../../hooks/useDevices';
 export default function WalletKPICards({ walletData }) {
   const { data: devices = [] } = useDevices();
 
-  const totalBal = walletData?.totalXLM ? (walletData.totalXLM.includes('XLM') ? walletData.totalXLM : `${walletData.totalXLM} XLM`) : walletData?.balance || '0.00 XLM';
-  const availableBal = walletData?.availableXLM ? (walletData.availableXLM.includes('XLM') ? walletData.availableXLM : `${walletData.availableXLM} XLM`) : walletData?.availableBalance || '0.00 XLM';
+  const totalBal = walletData?.totalXLM
+    ? (walletData.totalXLM.includes('XLM') ? walletData.totalXLM : `${walletData.totalXLM} XLM`)
+    : walletData?.balance || '0.00 XLM';
+  const availableBal = walletData?.availableXLM
+    ? (walletData.availableXLM.includes('XLM') ? walletData.availableXLM : `${walletData.availableXLM} XLM`)
+    : walletData?.availableBalance || '0.00 XLM';
   const todayVol = walletData?.usdEquivalent || walletData?.usdValue || '$0.00 USD';
   const activeCount = devices.length;
 
@@ -37,7 +41,7 @@ export default function WalletKPICards({ walletData }) {
     {
       title: 'Active Fleet Wallets',
       value: `${activeCount.toLocaleString()}`,
-      change: { label: 'Simulated Metric', tone: 'neutral' },
+      change: { label: 'Active Fleet', tone: 'success' },
       icon: Cpu,
       tone: 'success',
     },
@@ -60,18 +64,18 @@ export default function WalletKPICards({ walletData }) {
             whileHover={{ y: -3 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
           >
-            <Card padding="generous" className="h-full">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
+            <Card padding="generous" className="h-full min-w-0 overflow-hidden">
+              <div className="flex items-start justify-between gap-3 min-w-0">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] truncate">
                     {kpi.title}
                   </p>
-                  <p className="mt-3 font-['Space_Grotesk'] text-2xl sm:text-3xl font-semibold tracking-tight text-[#0F172A]">
+                  <p className="mt-3 font-['Space_Grotesk'] text-xl xs:text-2xl sm:text-3xl font-semibold tracking-tight text-[#0F172A] break-all sm:break-normal">
                     {kpi.value}
                   </p>
                 </div>
 
-                <div className={`flex h-12 w-12 items-center justify-center rounded-[16px] border ${tones[kpi.tone]}`}>
+                <div className={`flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-[16px] border ${tones[kpi.tone]}`}>
                   <Icon className="h-5 w-5" />
                 </div>
               </div>

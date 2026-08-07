@@ -20,11 +20,11 @@ import {
 import Button from '../ui/Button';
 import { useToast } from '../../context/ToastContext';
 import { useSendStellarPayment } from '../../hooks/useStellar';
-import { useQueryClient } from '@tanstack/react-query';
+import { useWalletContext } from '../../context/WalletContext';
 
-export default function SendReceiveModal({ mode, onClose, walletData }) {
+export default function SendReceiveModal({ mode, onClose }) {
   const { addToast } = useToast();
-  const queryClient = useQueryClient();
+  const { walletData, publicKey, refreshWallet } = useWalletContext();
   const [copied, setCopied] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
   const [recipient, setRecipient] = useState('');
@@ -36,7 +36,6 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
   const [stage, setStage] = useState('idle');
   const [txDetails, setTxDetails] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
-  const [startTime, setStartTime] = useState(0);
   const [confirmationTime, setConfirmationTime] = useState('');
 
   const sendPaymentMutation = useSendStellarPayment();
@@ -51,7 +50,7 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
 
   if (!mode) return null;
 
-  const walletAddress = walletData?.publicKey || 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6';
+  const walletAddress = walletData?.publicKey || publicKey;
 
   const copyAddress = () => {
     navigator.clipboard.writeText(walletAddress);
@@ -81,7 +80,6 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
 
     setStage('preparing');
     const startMs = Date.now();
-    setStartTime(startMs);
 
     try {
       // Stage 1: Preparing (700ms)
@@ -94,7 +92,7 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
 
       // Stage 3: Submitting API call
       const submitPromise = sendPaymentMutation.mutateAsync({
-        senderSecret: senderSecret || 'SD4Z...MOCK_SECRET',
+        senderSecret: senderSecret || 'SD4Z...DEV_SECRET',
         destinationPublic: recipient,
         amount,
         memoText,
@@ -108,7 +106,7 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
       setConfirmationTime(`${durationSec}s`);
 
       setTxDetails({
-        hash: res?.hash || '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+        hash: res?.hash || res?.txHash || '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
         ledger: res?.ledger || Math.floor(52890000 + Math.random() * 10000),
         fee: '0.00001 XLM',
         amount: `${amount} XLM`,
@@ -119,11 +117,8 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
       // Stage 5: Confirmed!
       setStage('confirmed');
 
-      // Refresh balances & transaction feeds automatically
-      queryClient.invalidateQueries({ queryKey: ['stellarWallet'] });
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
-      queryClient.invalidateQueries({ queryKey: ['stellarTransactions'] });
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      // Refresh single source of truth wallet context
+      refreshWallet();
 
       addToast('XLM payment confirmed on Stellar Testnet!', 'success');
     } catch (err) {
@@ -144,12 +139,12 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#E2E8F0] overflow-hidden"
+        className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#E2E8F0] overflow-hidden max-h-[90vh] flex flex-col"
       >
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC]">
+        <div className="p-4 sm:p-6 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-100 text-[#0F766E] flex items-center justify-center">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-teal-50 border border-teal-100 text-[#0F766E] flex items-center justify-center">
               {mode === 'send' ? <ArrowUpRight className="h-5 w-5" /> : mode === 'receive' ? <ArrowDownLeft className="h-5 w-5" /> : <QrCode className="h-5 w-5" />}
             </div>
             <div>
@@ -165,7 +160,7 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 sm:p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1">
           {mode === 'send' ? (
             <AnimatePresence mode="wait">
               {stage === 'idle' && (
@@ -184,7 +179,7 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
                     <input
                       type="text"
                       required
-                      placeholder="GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4..."
+                      placeholder="GBHPLJTE52JPNNGRU7W5JCKSV3JYFS5ZNMF..."
                       value={recipient}
                       onChange={(e) => setRecipient(e.target.value)}
                       className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
@@ -253,7 +248,7 @@ export default function SendReceiveModal({ mode, onClose, walletData }) {
                 </motion.form>
               )}
 
-              {/* Animated Stages View (preparing, signing, submitting, waiting) */}
+              {/* Animated Stages View */}
               {['preparing', 'signing', 'submitting', 'waiting'].includes(stage) && (
                 <motion.div
                   key="animated-stages"

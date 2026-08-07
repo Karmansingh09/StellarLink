@@ -7,22 +7,22 @@ import useTransactions from '../../hooks/useTransactions';
 export default function TransactionKPIs() {
   const { data: transactions = [] } = useTransactions();
 
-  const totalTxCount = transactions.length || 6;
+  const totalTxCount = transactions.length;
   const completedCount = transactions.filter((t) => t.status === 'completed' || t.status === 'settled').length;
-  const successPct = Math.round((completedCount / (totalTxCount || 1)) * 100) || 99.98;
+  const successPct = totalTxCount > 0 ? Math.round((completedCount / totalTxCount) * 100) : 100;
 
   const metrics = [
     {
       title: 'Total Transactions',
       value: `${totalTxCount} Ledger Txs`,
-      change: { label: '+12%', tone: 'success' },
+      change: { label: 'Live Ledger', tone: 'success' },
       icon: Activity,
       tone: 'primary',
     },
     {
       title: 'Settlement Volume',
-      value: '$48.2M',
-      change: { label: '+8.4%', tone: 'success' },
+      value: '$0.00',
+      change: { label: '0.0%', tone: 'neutral' },
       icon: DollarSign,
       tone: 'neutral',
     },
@@ -65,7 +65,7 @@ export default function TransactionKPIs() {
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
                     {metric.title}
                   </p>
-                  <p className="mt-3 font-['Space_Grotesk'] text-2xl sm:text-3xl font-semibold tracking-tight text-[#0F172A]">
+                  <p className="mt-3 font-[#Space_Grotesk] text-2xl sm:text-3xl font-semibold tracking-tight text-[#0F172A]">
                     {metric.value}
                   </p>
                 </div>

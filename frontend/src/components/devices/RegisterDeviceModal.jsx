@@ -47,15 +47,15 @@ export default function RegisterDeviceModal({ isOpen, onClose, onRegister }) {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#E2E8F0] overflow-hidden">
+      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#E2E8F0] overflow-hidden max-h-[90vh] flex flex-col">
         {/* Modal Header */}
-        <div className="p-6 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC]">
+        <div className="p-4 sm:p-6 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-100 text-[#0F766E] flex items-center justify-center">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-teal-50 border border-teal-100 text-[#0F766E] flex items-center justify-center">
               <Cpu className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-[#0F172A]">Provision New M2M Endpoint</h3>
+              <h3 className="text-base sm:text-lg font-bold text-[#0F172A]">Provision New M2M Endpoint</h3>
               <p className="text-xs text-[#64748B]">Register hardware terminal and auto-create Stellar wallet.</p>
             </div>
           </div>
@@ -69,7 +69,7 @@ export default function RegisterDeviceModal({ isOpen, onClose, onRegister }) {
         </div>
 
         {/* Modal Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
               Device Name / Identifier

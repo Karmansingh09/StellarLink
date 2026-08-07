@@ -15,11 +15,9 @@ import WalletRightSidebar from '../../components/wallet/WalletRightSidebar';
 import SendReceiveModal from '../../components/wallet/SendReceiveModal';
 import { CardSkeleton } from '../../components/ui/Skeleton';
 import { useToast } from '../../context/ToastContext';
-import { useStellarWallet, useCreateWallet, useFundWallet } from '../../hooks/useStellar';
-import freighterService from '../../services/wallet/freighterService';
+import { useCreateWallet, useFundWallet } from '../../hooks/useStellar';
+import { useWalletContext } from '../../context/WalletContext';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
-
-const defaultTestnetPublicKey = 'GD6WTVMWBX227SYP5T5GZ2H4P5V2K3L4M5N6P7Q8R9S0T1U2V3W4X5Y6';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -41,29 +39,37 @@ export default function Wallet() {
   useDocumentTitle('Wallet Management', 'Manage Stellar wallets, balances, assets, and machine-to-machine payments securely.');
   const { addToast } = useToast();
   const [modalMode, setModalMode] = useState(null); // 'send' | 'receive' | 'qr' | null
-  const [activePublicKey, setActivePublicKey] = useState(defaultTestnetPublicKey);
-  const [activeSecretKey, setActiveSecretKey] = useState('');
-  const [showSecret, setShowSecret] = useState(false);
 
-  // Freighter Extension State
-  const [isFreighterConnected, setIsFreighterConnected] = useState(false);
-  const [freighterAddress, setFreighterAddress] = useState('');
-  const [isConnectingFreighter, setIsConnectingFreighter] = useState(false);
+  // Single Source of Truth WalletContext
+  const {
+    walletData,
+    publicKey: activePublicKey,
+    loading: isLoading,
+    refreshWallet,
+    connectWallet,
+    disconnectWallet,
+    isFreighterConnected,
+    freighterAddress,
+    isConnectingFreighter,
+    activeSecretKey,
+    showSecret,
+    setShowSecret,
+  } = useWalletContext();
 
-  const { data: walletData, isLoading, refetch } = useStellarWallet(activePublicKey);
   const createWalletMutation = useCreateWallet();
   const fundWalletMutation = useFundWallet();
 
+  console.log('[Wallet Page Render] Props & Context:', {
+    activePublicKey,
+    balance: walletData?.balance,
+    unfunded: walletData?.unfunded,
+    isLoading,
+  });
+
   const handleConnectFreighter = async () => {
-    setIsConnectingFreighter(true);
     try {
-      const result = await freighterService.connect();
-      setFreighterAddress(result.publicKey);
-      setIsFreighterConnected(true);
-      setActivePublicKey(result.publicKey);
-      setActiveSecretKey(''); // Clear dev secret key when using Freighter
+      const result = await connectWallet();
       addToast(`Freighter connected: ${result.publicKey.substring(0, 6)}...${result.publicKey.substring(result.publicKey.length - 4)}`, 'success');
-      refetch();
     } catch (err) {
       if (err.message?.includes('https://www.freighter.app/')) {
         addToast(
@@ -83,26 +89,17 @@ export default function Wallet() {
       } else {
         addToast(err.message || 'Failed to connect to Freighter Wallet', 'error');
       }
-    } finally {
-      setIsConnectingFreighter(false);
     }
   };
 
-  const handleDisconnectFreighter = () => {
-    setIsFreighterConnected(false);
-    setFreighterAddress('');
-    setActivePublicKey(defaultTestnetPublicKey);
+  const handleDisconnectFreighter = async () => {
+    await disconnectWallet();
     addToast('Disconnected from Freighter Wallet. Switched to default Testnet account.', 'info');
-    refetch();
   };
 
   const handleGenerateWallet = async () => {
     try {
-      const newWallet = await createWalletMutation.mutateAsync();
-      setIsFreighterConnected(false);
-      setFreighterAddress('');
-      setActivePublicKey(newWallet.publicKey);
-      setActiveSecretKey(newWallet.secretKey);
+      await createWalletMutation.mutateAsync();
       addToast('New Stellar Testnet keypair generated!', 'success');
     } catch (err) {
       addToast(err.message || 'Keypair generation failed', 'error');
@@ -113,7 +110,7 @@ export default function Wallet() {
     try {
       await fundWalletMutation.mutateAsync(activePublicKey);
       addToast('Account funded with 10,000 Testnet XLM via Friendbot!', 'success');
-      refetch();
+      refreshWallet();
     } catch (err) {
       addToast(err.message || 'Friendbot funding failed', 'error');
     }
@@ -142,7 +139,7 @@ export default function Wallet() {
                   </Badge>
                 )}
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-                  Testnet SDK v12.4
+                  Testnet Horizon RPC
                 </span>
               </div>
 
@@ -160,7 +157,7 @@ export default function Wallet() {
               <Button
                 variant="outline"
                 size="md"
-                onClick={() => refetch()}
+                onClick={() => refreshWallet()}
                 className="gap-2 min-h-[44px]"
               >
                 <RefreshCw className="h-4 w-4" />
@@ -205,18 +202,20 @@ export default function Wallet() {
 
           {/* Freighter Connected Info Banner */}
           {isFreighterConnected && (
-            <div className="mt-3 p-4 rounded-2xl border border-emerald-300 bg-emerald-50 text-xs font-mono text-emerald-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
-              <div className="space-y-1">
+            <div className="mt-3 p-4 rounded-2xl border border-emerald-300 bg-emerald-50 text-xs font-mono text-emerald-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs min-w-0">
+              <div className="space-y-1 min-w-0 flex-1">
                 <p className="font-bold flex items-center gap-1.5 text-emerald-800 text-sm font-sans">
-                  <WalletIcon className="h-4 w-4 text-emerald-600" /> Connected via Freighter Browser Extension
+                  <WalletIcon className="h-4 w-4 text-emerald-600 shrink-0" /> Connected via Freighter Browser Extension
                 </p>
-                <p><strong className="text-[#0F172A]">Active Address:</strong> {freighterAddress}</p>
+                <p className="break-all font-mono text-xs text-emerald-950">
+                  <strong className="text-[#0F172A] font-sans font-semibold">Active Address:</strong> {freighterAddress}
+                </p>
               </div>
               <a
                 href={`https://stellar.expert/explorer/testnet/account/${freighterAddress}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline shrink-0 self-start sm:self-auto"
               >
                 View on Stellar Expert <ExternalLink className="h-3.5 w-3.5" />
               </a>
@@ -225,18 +224,18 @@ export default function Wallet() {
 
           {/* Dev Mode Keypair Info Banner if generated */}
           {!isFreighterConnected && activeSecretKey && (
-            <div className="mt-3 p-4 rounded-2xl border border-[#CBE9E3] bg-[#EAF8F6] text-xs font-mono text-[#0F766E] space-y-1">
-              <p className="font-semibold flex items-center gap-1.5">
-                <Key className="h-4 w-4" /> Dev Mode Stellar Testnet Keypair Generated:
+            <div className="mt-3 p-4 rounded-2xl border border-[#CBE9E3] bg-[#EAF8F6] text-xs font-mono text-[#0F766E] space-y-1 min-w-0">
+              <p className="font-semibold flex items-center gap-1.5 font-sans">
+                <Key className="h-4 w-4 shrink-0" /> Dev Mode Stellar Testnet Keypair Generated:
               </p>
-              <p><strong className="text-[#0F172A]">Public:</strong> {activePublicKey}</p>
-              <p className="flex items-center gap-2">
-                <strong className="text-[#0F172A]">Secret:</strong>
-                {showSecret ? activeSecretKey : '•••••••••••••••••••••••••••••••••••••••••••••••••••••••• font-mono'}
+              <p className="break-all"><strong className="text-[#0F172A] font-sans">Public:</strong> {activePublicKey}</p>
+              <p className="flex flex-wrap items-center gap-2 break-all">
+                <strong className="text-[#0F172A] font-sans">Secret:</strong>
+                <span>{showSecret ? activeSecretKey : '••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}</span>
                 <button
                   type="button"
                   onClick={() => setShowSecret(!showSecret)}
-                  className="underline cursor-pointer text-[#0F766E] font-sans font-semibold ml-2"
+                  className="underline cursor-pointer text-[#0F766E] font-sans font-semibold"
                 >
                   {showSecret ? 'Hide Secret' : 'Reveal Secret'}
                 </button>
@@ -276,7 +275,7 @@ export default function Wallet() {
 
             {/* Right Audit Sidebar (4 cols) */}
             <div className="lg:col-span-4">
-              <WalletRightSidebar />
+              <WalletRightSidebar walletData={walletData} />
             </div>
           </div>
         </Container>
