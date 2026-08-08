@@ -49,6 +49,20 @@ By combining low-latency Stellar Horizon RPC APIs with Soroban smart contracts, 
 - **Settlement Manager (`settlement_manager`)**: On-chain batch settlement creation and execution history.
 - **Device Permissions (`device_permissions`)**: Role-based access control (RBAC), authorization grants, and revocation for machine terminals.
 
+## Deployed Smart Contracts (Stellar Testnet)
+
+- Device Registry
+  CCAOQSK25VUZUJOG6CDWHWKCZUDC3Q5Y6L6VDBAVF6OYPDM6PDY2DKET
+
+- Device Permissions
+  CCCW2NOIUYK33WIDCR3AG5J7J6PEZ24EFP532CNN7X3SEGMJ3SQHUWLL
+
+- Payment Escrow
+  CBDSY6EOD3H2ROFFNFZGBQ5F3PV4NEM3ZTUYRRHGV2PL65LA4SPBFZDV
+
+- Settlement Manager
+  CBOHOTLZTV5LF2VWP3YJ5WCPKA2WIINIV7SCHCRSRAB6Q234ONCZHXHT
+
 ---
 
 ## Screenshots

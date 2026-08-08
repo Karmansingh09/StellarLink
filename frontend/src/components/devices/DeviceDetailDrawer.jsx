@@ -6,6 +6,7 @@ import Badge from '../ui/Badge';
 import StatusBadge from '../dashboard/StatusBadge';
 import ConfirmModal from '../ui/ConfirmModal';
 import { useToast } from '../../context/ToastContext';
+import { SOROBAN_CONTRACTS } from '../../config/contracts';
 
 export default function DeviceDetailDrawer({ device, onClose }) {
   const { addToast } = useToast();
@@ -13,6 +14,8 @@ export default function DeviceDetailDrawer({ device, onClose }) {
   const [isConfirmRekeyOpen, setIsConfirmRekeyOpen] = useState(false);
 
   if (!device) return null;
+
+  const registryId = device.contractId || SOROBAN_CONTRACTS.deviceRegistry;
 
   const copyKey = () => {
     navigator.clipboard.writeText(device.wallet);
@@ -111,7 +114,7 @@ export default function DeviceDetailDrawer({ device, onClose }) {
                   </Badge>
                 </div>
                 <p className="text-xs text-[#64748B] leading-relaxed">
-                  Authorized for autonomous micro-settlements on contract ID <span className="font-mono text-[#0F766E]">C...984A</span> with zero human intervention.
+                  Authorized for autonomous micro-settlements on contract ID <span className="font-mono text-[#0F766E] font-semibold">{registryId.substring(0, 8)}...{registryId.substring(registryId.length - 4)}</span> with zero human intervention.
                 </p>
               </div>
             </div>

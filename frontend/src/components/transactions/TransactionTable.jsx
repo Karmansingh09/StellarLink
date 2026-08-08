@@ -4,6 +4,7 @@ import StatusBadge from '../dashboard/StatusBadge';
 import TransactionCard from './TransactionCard';
 import EmptyState from '../ui/EmptyState';
 import { useToast } from '../../context/ToastContext';
+import { SOROBAN_CONTRACTS } from '../../config/contracts';
 
 export default function TransactionTable({ transactions, onViewDetails, onRefresh }) {
   const { addToast } = useToast();
@@ -102,7 +103,7 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
             </thead>
             <tbody className="divide-y divide-[#E2E8F0] bg-white">
               {paginatedTransactions.map((tx) => {
-                const contractId = tx.contractId || 'CC7X3M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O';
+                const contractId = tx.contractId || SOROBAN_CONTRACTS.deviceRegistry;
                 return (
                   <tr
                     key={tx.txId}

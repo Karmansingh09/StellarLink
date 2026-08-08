@@ -7,7 +7,7 @@ export default function WalletRightSidebar({ walletData }) {
   const { data: devices = [] } = useDevices();
 
   const sidebarItems = [
-    { label: 'Connected Contracts', value: '0 Soroban Contracts', icon: FileCode, status: 'Active', badgeVariant: 'primary' },
+    { label: 'Connected Contracts', value: '4 Soroban Contracts', icon: FileCode, status: 'Active', badgeVariant: 'primary' },
     { label: 'Contract Escrow Locked', value: walletData?.escrowLocked || '0.00 XLM', icon: Lock, status: 'Stellar Vault', badgeVariant: 'neutral' },
     { label: 'Security Status', value: 'Ed25519 Enclave', icon: ShieldCheck, status: 'Verified', badgeVariant: 'success' },
     { label: 'Connected Devices', value: `${devices.length} Endpoints`, icon: Cpu, status: 'Live RPC', badgeVariant: 'success' },

@@ -6,7 +6,7 @@ pub struct SettlementManagerContract;
 
 #[contractimpl]
 impl SettlementManagerContract {
-    pub fn create_settlement(env: Env, settlement_id: String, device_id: String, amount: i128) -> bool {
+    pub fn create_settlement(env: Env, settlement_id: String, _device_id: String, amount: i128) -> bool {
         env.storage().instance().set(&settlement_id, &amount);
         true
     }

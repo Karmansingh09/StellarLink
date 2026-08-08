@@ -5,6 +5,7 @@ import StatusBadge from '../dashboard/StatusBadge';
 import Badge from '../ui/Badge';
 import EmptyState from '../ui/EmptyState';
 import { useToast } from '../../context/ToastContext';
+import { SOROBAN_CONTRACTS } from '../../config/contracts';
 
 export default function DeviceTable({ devices, onSelectDevice, onResetFilters }) {
   const [copiedKey, setCopiedKey] = useState(null);
@@ -86,7 +87,7 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
               const healthScore = device.health || (device.status === 'active' ? 98 : device.status === 'monitoring' ? 85 : device.status === 'pending' ? 70 : 0);
               const heartbeat = device.heartbeat || '12s ago';
               const battery = device.battery || '94%';
-              const contractId = 'CC7X3M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O';
+              const contractId = device.contractId || SOROBAN_CONTRACTS.deviceRegistry;
 
               return (
                 <div
@@ -169,7 +170,7 @@ export default function DeviceTable({ devices, onSelectDevice, onResetFilters })
               <tbody className="divide-y divide-[#E2E8F0] bg-white">
                 {paginatedDevices.map((device) => {
                   const healthScore = device.health || (device.status === 'active' ? 98 : device.status === 'monitoring' ? 85 : device.status === 'pending' ? 70 : 0);
-                  const contractId = 'CC7X3M4P2L1K5J6H8G9F0D3S2A1Q9W8E7R6T5Y4U3I2O';
+                  const contractId = device.contractId || SOROBAN_CONTRACTS.deviceRegistry;
 
                   return (
                     <tr

@@ -4,7 +4,7 @@ import OverviewCard from './OverviewCard';
 const defaultCards = [
   {
     title: 'Soroban Active Contracts',
-    value: '0 Contracts',
+    value: '4 Contracts',
     change: { label: 'Active', tone: 'success', description: 'Device & Escrow WASM' },
     icon: FileCode,
     tone: 'primary',
