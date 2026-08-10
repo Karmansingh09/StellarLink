@@ -392,21 +392,6 @@ npm start
 
 ---
 
-## 🏆 Hackathon Submission Checklist
-
-- [x] **Frontend Deployed**: Production Vite React build live on Vercel
-- [x] **Backend Deployed**: Node.js Express API service live on Render
-- [x] **Smart Contracts Deployed**: 4 Soroban Rust WASM contracts deployed on Stellar Testnet
-- [x] **Demo Video**: Complete video walkthrough hosted on Google Drive
-- [x] **Documentation**: Comprehensive architecture, payment flows, and setup guides
-- [x] **Screenshots**: High-resolution gallery covering all application pages and responsive views
-- [x] **Architecture Diagram**: GitHub-compatible Mermaid flowcharts and sequence diagrams
-- [x] **API Documentation**: Detailed endpoint routes, methods, and descriptions
-- [x] **Environment Variables**: Managed via `.env` and `.env.example` across services
-- [x] **README Updated**: Professional, fully hyperlinked repository documentation
-
----
-
 ## 📷 Project Gallery
 
 ### Landing Page
