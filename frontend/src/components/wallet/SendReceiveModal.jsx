@@ -24,7 +24,7 @@ import { useWalletContext } from '../../context/WalletContext';
 
 export default function SendReceiveModal({ mode, onClose }) {
   const { addToast } = useToast();
-  const { walletData, publicKey, refreshWallet } = useWalletContext();
+  const { walletData, publicKey, refreshWallet, isFreighterConnected } = useWalletContext();
   const [copied, setCopied] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
   const [recipient, setRecipient] = useState('');
@@ -219,15 +219,22 @@ export default function SendReceiveModal({ mode, onClose }) {
 
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-1.5">
-                      Sender Secret Key (S...) - Dev Mode
+                      {isFreighterConnected ? 'Signing Authority' : 'Sender Secret Key (S...) - Dev Mode'}
                     </label>
-                    <input
-                      type="password"
-                      placeholder="S..."
-                      value={senderSecret}
-                      onChange={(e) => setSenderSecret(e.target.value)}
-                      className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
-                    />
+                    {isFreighterConnected ? (
+                      <div className="h-12 w-full rounded-2xl border border-emerald-200 bg-emerald-50 px-4 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
+                        <span>Connected via Freighter Browser Extension</span>
+                      </div>
+                    ) : (
+                      <input
+                        type="password"
+                        placeholder="S..."
+                        value={senderSecret}
+                        onChange={(e) => setSenderSecret(e.target.value)}
+                        className="h-12 w-full rounded-2xl border border-[#D9E2E1] bg-white px-4 text-xs font-mono text-[#0F172A] outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
+                      />
+                    )}
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-between text-xs text-[#0F766E]">
