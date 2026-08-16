@@ -56,7 +56,7 @@ export const fetchTransactionHistory = async (publicKey) => {
     return txRecords.records.map((tx) => ({
       id: tx.id,
       hash: tx.hash,
-      ledger: tx.ledger_attr,
+      ledger: tx.ledger,
       createdAt: tx.created_at,
       sourceAccount: tx.source_account,
       feePaid: `${(parseInt(tx.fee_charged) / 10000000).toFixed(5)} XLM`,
