@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import walletService from '../services/api/walletService';
 import freighterService from '../services/wallet/freighterService';
@@ -26,6 +26,40 @@ export function WalletProvider({ children }) {
   });
 
   const [isConnectingFreighter, setIsConnectingFreighter] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const syncFreighterState = async () => {
+      if (localStorage.getItem('stellarlink_freighter_connected') === 'true') {
+        const isAllowed = await freighterService.checkAllowed();
+        if (isAllowed) {
+          try {
+            const { getAddress } = await import('@stellar/freighter-api');
+            const res = await getAddress();
+            const addr = res?.address || res;
+            if (isMounted && addr && typeof addr === 'string' && addr.startsWith('G')) {
+              setFreighterAddress(addr);
+              setIsFreighterConnected(true);
+              setActivePublicKey(addr);
+              localStorage.setItem('stellarlink_freighter_address', addr);
+              localStorage.setItem('stellarlink_active_public_key', addr);
+            }
+          } catch (e) {
+            console.warn('[WalletContext] Failed to retrieve address from connected Freighter:', e.message);
+          }
+        } else if (isMounted) {
+          setIsFreighterConnected(false);
+          setFreighterAddress('');
+          localStorage.removeItem('stellarlink_freighter_connected');
+          localStorage.removeItem('stellarlink_freighter_address');
+        }
+      }
+    };
+    syncFreighterState();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Single Source of Truth TanStack Query for Wallet Data
   const {
