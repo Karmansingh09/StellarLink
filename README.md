@@ -392,6 +392,33 @@ npm start
 
 ---
 
+## CI/CD & Deployment
+
+StellarLink employs a production-grade CI/CD pipeline and automated multi-layer deployment architecture across GitHub Actions, Vercel, Render, and the Stellar Testnet.
+
+### ⚙️ GitHub Actions CI Pipelines
+
+Automated GitHub Actions workflows validate every commit and pull request on `main`:
+
+- **Smart Contract CI (`.github/workflows/contracts-ci.yml`)**: Sets up the Rust toolchain with `wasm32-unknown-unknown` target, compiles all 4 Soroban smart contracts (`device_registry`, `device_permissions`, `payment_escrow`, `settlement_manager`) into WebAssembly binaries, and executes `cargo test --workspace` unit tests.
+- **Frontend CI (`.github/workflows/frontend-ci.yml`)**: Sets up Node.js 20, installs dependencies, and runs `npm run build` to validate the production Vite React build.
+- **Backend CI (`.github/workflows/backend-ci.yml`)**: Sets up Node.js 20, installs Express dependencies, and performs syntax checking (`node --check src/server.js`) without requiring production secrets.
+
+### 🚀 Production Deployments
+
+- **Frontend Deployment (Vercel)**: Live single-page application built via Vite and deployed on Vercel at [https://stellar-link-sigma.vercel.app](https://stellar-link-sigma.vercel.app). Managed via [`vercel.json`](vercel.json).
+- **Backend Service (Render)**: Production Express REST API service deployed on Render at [https://stellarlink.onrender.com](https://stellarlink.onrender.com) with dynamic `PORT` assignment and automatic health check endpoint at [https://stellarlink.onrender.com/api/health](https://stellarlink.onrender.com/api/health). Managed via [`render.yaml`](render.yaml).
+- **Smart Contracts (Stellar Testnet)**: Compiled Rust WASM contracts deployed directly to the Stellar Testnet using the Soroban CLI.
+
+### 🔗 Deployment & Walkthrough Links
+
+- **Frontend Application**: [https://stellar-link-sigma.vercel.app](https://stellar-link-sigma.vercel.app)
+- **Backend API**: [https://stellarlink.onrender.com](https://stellarlink.onrender.com)
+- **Backend Health Check**: [https://stellarlink.onrender.com/api/health](https://stellarlink.onrender.com/api/health)
+- **Google Drive Video Walkthrough**: [https://drive.google.com/file/d/19WzGRW4FGKgz04kvsnYSF75EcZlWxceF/view?usp=sharing](https://drive.google.com/file/d/19WzGRW4FGKgz04kvsnYSF75EcZlWxceF/view?usp=sharing)
+
+---
+
 ## 📷 Project Gallery
 
 ### Landing Page
