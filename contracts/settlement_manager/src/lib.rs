@@ -19,3 +19,23 @@ impl SettlementManagerContract {
         false
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use soroban_sdk::String;
+
+    #[test]
+    fn test_settlement_manager() {
+        let env = Env::default();
+        let contract_id = env.register_contract(None, SettlementManagerContract);
+        let client = SettlementManagerContractClient::new(&env, &contract_id);
+
+        let stl_id = String::from_str(&env, "STL-5001");
+        let dev_id = String::from_str(&env, "DEV-1001");
+
+        assert!(client.create_settlement(&stl_id, &dev_id, &2500));
+        assert!(client.execute_settlement(&stl_id));
+        assert!(!client.execute_settlement(&stl_id));
+    }
+}

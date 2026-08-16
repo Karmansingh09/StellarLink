@@ -24,3 +24,27 @@ impl DeviceRegistryContract {
         true
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use soroban_sdk::String;
+
+    #[test]
+    fn test_device_registry() {
+        let env = Env::default();
+        let contract_id = env.register_contract(None, DeviceRegistryContract);
+        let client = DeviceRegistryContractClient::new(&env, &contract_id);
+
+        let dev_id = String::from_str(&env, "DEV-1001");
+        let owner = String::from_str(&env, "G12345");
+        let meta = String::from_str(&env, "EV_Charger");
+
+        assert!(client.register_device(&dev_id, &owner, &meta));
+
+        let new_meta = String::from_str(&env, "EV_Charger_V2");
+        assert!(client.update_metadata(&dev_id, &new_meta));
+
+        assert!(client.set_device_status(&dev_id, &true));
+    }
+}
