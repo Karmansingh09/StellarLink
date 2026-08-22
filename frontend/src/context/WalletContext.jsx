@@ -40,9 +40,12 @@ export function WalletProvider({ children }) {
             if (isMounted && addr && typeof addr === 'string' && addr.startsWith('G')) {
               setFreighterAddress(addr);
               setIsFreighterConnected(true);
-              setActivePublicKey(addr);
+              const currentActive = localStorage.getItem('stellarlink_active_public_key');
+              if (!currentActive || currentActive === DEFAULT_TESTNET_PUBLIC_KEY) {
+                setActivePublicKey(addr);
+                localStorage.setItem('stellarlink_active_public_key', addr);
+              }
               localStorage.setItem('stellarlink_freighter_address', addr);
-              localStorage.setItem('stellarlink_active_public_key', addr);
             }
           } catch (e) {
             console.warn('[WalletContext] Failed to retrieve address from connected Freighter:', e.message);
@@ -144,6 +147,7 @@ export function WalletProvider({ children }) {
 
     queryClient.invalidateQueries({ queryKey: ['wallet'] });
     queryClient.invalidateQueries({ queryKey: ['stellarWallet'] });
+    queryClient.invalidateQueries({ queryKey: ['analyticsMetrics'] });
   };
 
   const value = {
