@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bell, Search, ArrowUpRight } from 'lucide-react';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import Logo from '../ui/Logo';
 import { useLocation, Link } from 'react-router-dom';
+import { exportReport } from '../../utils/exportReport';
+import { useToast } from '../../context/ToastContext';
+import { useWalletContext } from '../../context/WalletContext';
 
 const pageLabels = {
   '/dashboard': 'Executive Dashboard',
@@ -16,10 +20,21 @@ const pageLabels = {
 
 export default function Topbar({ navItems }) {
   const location = useLocation();
+  const { addToast } = useToast();
+  const { walletData } = useWalletContext();
   const activeItem = navItems.find((item) =>
     item.end ? location.pathname === item.href : location.pathname.startsWith(item.href)
   );
   const title = activeItem ? pageLabels[activeItem.href] ?? activeItem.label : 'Executive Dashboard';
+
+  const handleExportReport = () => {
+    try {
+      exportReport({ walletData });
+      addToast('StellarLink executive CSV report downloaded successfully', 'success');
+    } catch (err) {
+      addToast('Failed to export CSV report: ' + err.message, 'error');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-[#E2E8F0] bg-white shadow-xs">
@@ -82,7 +97,7 @@ export default function Topbar({ navItems }) {
           </label>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <Button variant="outline" size="md" className="hidden sm:inline-flex">
+            <Button variant="outline" size="md" className="hidden sm:inline-flex" onClick={handleExportReport}>
               Export report
               <ArrowUpRight className="h-4 w-4" />
             </Button>
