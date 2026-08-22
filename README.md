@@ -97,6 +97,33 @@ The following Soroban Rust WASM smart contracts are deployed and live on the **S
 
 ---
 
+## 📋 User Onboarding & Level 5 Feedback Mechanism
+
+StellarLink incorporates a functional user onboarding and feedback collection loop satisfying Stellar New Moon Contest Level 5 criteria:
+
+### Onboarding Flow & Fields
+1. **Pilot Request Modal**: Accessible via the "Start a Pilot" buttons across the application.
+2. **Captured Data Fields**:
+   - **Full Name**: User / Enterprise Operator Name
+   - **Work Email**: Organization Contact Email
+   - **Stellar Testnet Address**: `G...` Public Key
+   - **Product Rating**: 1 to 5 Star Rating
+   - **Requirements / Feedback**: Machine-to-machine payment requirements & feedback
+3. **Data Export & Storage**:
+   - Submissions are recorded to `localStorage` and available for API fetch via `GET /api/feedback`.
+   - Direct CSV export is available via `GET /api/feedback/export` or downloadable from [`docs/user_feedback_export.csv`](docs/user_feedback_export.csv).
+
+### Sample Exported Dataset
+- **Exported Dataset File**: [`docs/user_feedback_export.csv`](docs/user_feedback_export.csv)
+
+### Continuous Improvement Loop
+User feedback collected through the onboarding modal directly informs StellarLink's engineering roadmap:
+- **Soroban Multi-sig Escrows**: Requested by pilot operators, implemented in Soroban payment escrow contract tests.
+- **Freighter Auto-Reconnection**: Added window focus listeners for automatic account change detection (`fix: improve freighter wallet connection and account switching`).
+- **CSV Data Exporters**: Added executive CSV reporting across topbar and transaction streams (`fix: connect topbar export report action to CSV exporter`).
+
+---
+
 ## 📸 Application Screenshots
 
 | Dashboard Control Center | Landing Page |
