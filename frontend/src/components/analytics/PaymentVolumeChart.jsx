@@ -10,6 +10,11 @@ export default function PaymentVolumeChart({ metrics: metricsProp }) {
   const chartData = metrics?.paymentVolume || [];
   const hasData = chartData.length > 0 && chartData.some((d) => d.volume > 0);
 
+  const formatYTick = (val) => {
+    if (val >= 1000) return `${(val / 1000).toFixed(1)}k`;
+    return val;
+  };
+
   return (
     <Card padding="generous" className="h-full min-w-0">
       <CardHeader className="mb-2">
@@ -29,11 +34,14 @@ export default function PaymentVolumeChart({ metrics: metricsProp }) {
           />
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
               <XAxis dataKey="day" stroke="#64748B" fontSize={11} tickLine={false} />
-              <YAxis stroke="#64748B" fontSize={11} tickLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }} />
+              <YAxis stroke="#64748B" fontSize={11} tickLine={false} tickFormatter={formatYTick} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }}
+                formatter={(val) => [`${typeof val === 'number' ? val.toLocaleString() : val} XLM`, 'Payment Volume']}
+              />
               <Bar dataKey="volume" fill="#0F766E" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
