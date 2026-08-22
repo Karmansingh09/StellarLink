@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Cpu, ShieldCheck, Zap, Globe, Layers, ArrowRight, ExternalLink, Database, Key } from 'lucide-react';
 import Button from '../ui/Button';
@@ -5,7 +6,15 @@ import Badge from '../ui/Badge';
 import { SOROBAN_CONTRACTS } from '../../config/contracts';
 
 export default function ArchitectureModal({ isOpen, onClose }) {
-  if (!isOpen) return null;
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const flowSteps = [
     { title: '1. IoT Device Telemetry', desc: 'Edge hardware signs usage payloads with device keypair', icon: Cpu },
@@ -16,7 +25,13 @@ export default function ArchitectureModal({ isOpen, onClose }) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose?.();
+          }}
+        >
         <motion.div
           initial={{ opacity: 0, scale: 0.96, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -100,13 +115,17 @@ export default function ArchitectureModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <div className="flex items-center justify-end border-t border-[#E2E8F0] pt-4">
+          <div className="flex items-center justify-between border-t border-[#E2E8F0] pt-4">
+            <Badge variant="success" dot size="sm">
+              All 4 Contracts Live & Verified
+            </Badge>
             <Button variant="primary" size="md" onClick={onClose}>
               Close Architecture View
             </Button>
           </div>
         </motion.div>
       </div>
+      )}
     </AnimatePresence>
   );
 }

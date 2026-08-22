@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, ShieldCheck, Star, CheckCircle, Wallet, Mail, User, MessageSquare } from 'lucide-react';
 import Button from '../ui/Button';
@@ -18,7 +18,15 @@ export default function PilotOnboardingModal({ isOpen, onClose }) {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const validate = () => {
     const errs = {};
@@ -65,7 +73,13 @@ export default function PilotOnboardingModal({ isOpen, onClose }) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose?.();
+          }}
+        >
         <motion.div
           initial={{ opacity: 0, scale: 0.96, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -227,6 +241,7 @@ export default function PilotOnboardingModal({ isOpen, onClose }) {
           )}
         </motion.div>
       </div>
+      )}
     </AnimatePresence>
   );
 }

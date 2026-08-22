@@ -12,7 +12,7 @@ export default function Navbar({ onOpenDocs, onOpenPilot }) {
     { name: 'Infrastructure', href: '#infrastructure' },
     { name: 'Developers', href: '#developers' },
     { name: 'Pricing', href: '#pricing' },
-    { name: 'Documentation', href: '#documentation' },
+    { name: 'Documentation', href: '#documentation', onClick: onOpenDocs },
   ];
 
   return (
@@ -24,13 +24,24 @@ export default function Navbar({ onOpenDocs, onOpenPilot }) {
 
         <nav className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="text-sm font-medium text-[#475569] transition-colors duration-150 hover:text-[#0F172A]"
-            >
-              {link.name}
-            </a>
+            link.onClick ? (
+              <button
+                key={link.name}
+                type="button"
+                onClick={link.onClick}
+                className="text-sm font-medium text-[#475569] transition-colors duration-150 hover:text-[#0F172A] cursor-pointer"
+              >
+                {link.name}
+              </button>
+            ) : (
+              <a
+                key={link.name}
+                href={link.href}
+                className="text-sm font-medium text-[#475569] transition-colors duration-150 hover:text-[#0F172A]"
+              >
+                {link.name}
+              </a>
+            )
           ))}
         </nav>
 
@@ -60,14 +71,28 @@ export default function Navbar({ onOpenDocs, onOpenPilot }) {
         <div className="border-t border-[#E2E8F0] bg-white px-4 pb-6 pt-4 md:hidden">
           <nav className="flex flex-col gap-2">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-2xl px-3 py-2 text-base font-medium text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#0F172A]"
-              >
-                {link.name}
-              </a>
+              link.onClick ? (
+                <button
+                  key={link.name}
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    link.onClick();
+                  }}
+                  className="rounded-2xl px-3 py-2 text-left text-base font-medium text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#0F172A] cursor-pointer"
+                >
+                  {link.name}
+                </button>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-2xl px-3 py-2 text-base font-medium text-[#475569] transition-colors hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+                >
+                  {link.name}
+                </a>
+              )
             ))}
           </nav>
 

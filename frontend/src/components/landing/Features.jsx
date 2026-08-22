@@ -30,6 +30,7 @@ export default function Features() {
 
   return (
     <Section spacing="xl" bg="white" id="platform">
+      <div id="developers" className="scroll-mt-24" />
       <Container size="full">
         {/* Section Header */}
         <div className="mb-12 md:mb-16">

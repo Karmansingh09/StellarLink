@@ -9,6 +9,7 @@ import Card from '../ui/Card';
 export default function EnterpriseCTA({ onOpenPilot, onOpenArch }) {
   return (
     <Section spacing="xl" bg="slate" id="contact">
+      <div id="pricing" className="scroll-mt-24" />
       <Container size="full">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
