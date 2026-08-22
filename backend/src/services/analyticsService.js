@@ -73,7 +73,6 @@ export const getAnalyticsMetricsService = async (params = {}) => {
 
   // Query Horizon RPC payment operations strictly for target connected account & device wallets
   let rawPayments = [];
-  let rawTransactions = [];
   const targetAccounts = [];
   if (publicKey && typeof publicKey === 'string' && publicKey.startsWith('G')) {
     targetAccounts.push(publicKey);
@@ -96,15 +95,6 @@ export const getAnalyticsMetricsService = async (params = {}) => {
       }
     } catch (err) {
       // Unfunded accounts return 404 on Horizon; catch silently
-    }
-
-    try {
-      const tRes = await server.transactions().forAccount(acc).order('desc').limit(50).call();
-      if (tRes.records) {
-        rawTransactions.push(...tRes.records);
-      }
-    } catch (err) {
-      // Catch unfunded account 404 silently
     }
   }
 
@@ -139,16 +129,9 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     return amt > 0;
   });
 
-  // Calculate Success Rate strictly from Horizon transaction records for target accounts
-  const filteredTxs = rawTransactions.filter((tx) => {
-    if (!tx.created_at) return false;
-    const t = new Date(tx.created_at).getTime();
-    return now - t <= msLimit;
-  });
-
-  const totalAttemptedTxs = filteredTxs.length;
-  const successfulTxs = filteredTxs.filter((tx) => tx.successful === true).length;
-  const successRate = totalAttemptedTxs > 0 ? `${((successfulTxs / totalAttemptedTxs) * 100).toFixed(1)}%` : 'N/A';
+  // Historical failed transaction submission attempts are not available in standard Horizon account datasets.
+  // Returning 'N/A' to prevent false or misleading 100% success rate assumptions.
+  const successRate = 'N/A';
 
   // Calculate Period Growth by comparing current window vs previous window of equal duration
   const prevPeriodPayments = uniquePayments.filter((p) => {
@@ -243,7 +226,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     throughputTps,
     throughputGrowth,
     successRate,
-    averageFinalityMs: 'N/A', // Payment-specific finality latency not persisted in backend DB
+    averageFinalityMs: 'N/A', // Payment-specific submission latency not stored in DB
     ledgerCloseCadenceMs,
     connectedDevicesCount: devices.length,
     latestLedgerSequence: ledgerSeq,

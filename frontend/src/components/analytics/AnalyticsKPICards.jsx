@@ -18,7 +18,7 @@ export default function AnalyticsKPICards() {
     {
       title: 'Settlement Success',
       value: isLoading ? '...' : (metrics?.successRate || 'N/A'),
-      change: { label: 'Horizon Txs', tone: 'primary' },
+      change: { label: 'Horizon Query', tone: 'neutral' },
       icon: ShieldCheck,
       tone: 'neutral',
     },
