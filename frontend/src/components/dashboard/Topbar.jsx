@@ -25,6 +25,13 @@ export default function Topbar({ navItems }) {
   const { walletData } = useWalletContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+
+  const notifications = [
+    { id: 1, title: 'Soroban Escrow Settled', desc: '0.50 XLM auto-settled for EV Charging Station #01', time: '2m ago', type: 'success' },
+    { id: 2, title: 'Testnet Ledger Finalized', desc: 'Ledger sequence verified with instant consensus', time: '10m ago', type: 'info' },
+    { id: 3, title: 'Freighter Sync Active', desc: 'Wallet address synced with SDF Testnet Horizon', time: '1h ago', type: 'success' },
+  ];
 
   const activeItem = navItems.find((item) =>
     item.end ? location.pathname === item.href : location.pathname.startsWith(item.href)
@@ -153,7 +160,7 @@ export default function Topbar({ navItems }) {
             )}
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 relative">
             <Button variant="outline" size="md" className="hidden sm:inline-flex" onClick={handleExportReport}>
               Export report
               <ArrowUpRight className="h-4 w-4" />
@@ -163,12 +170,33 @@ export default function Topbar({ navItems }) {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               type="button"
+              onClick={() => setNotifOpen((prev) => !prev)}
               className="relative inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] transition-colors hover:border-[#CBE9E3] hover:text-[#0F766E] shrink-0"
               aria-label="Notifications"
             >
               <Bell className="h-4 w-4" />
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#0F766E]" />
             </motion.button>
+
+            {notifOpen && (
+              <div className="absolute right-0 top-14 z-50 w-80 rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-2xl space-y-3">
+                <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
+                  <p className="text-xs font-bold font-['Space_Grotesk'] text-[#0F172A]">Activity & Notifications</p>
+                  <Badge variant="primary" size="sm">3 Live</Badge>
+                </div>
+                <div className="space-y-2">
+                  {notifications.map((n) => (
+                    <div key={n.id} className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-2.5 text-xs space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-[#0F172A]">{n.title}</span>
+                        <span className="text-[10px] text-[#64748B]">{n.time}</span>
+                      </div>
+                      <p className="text-[#64748B] text-[11px] leading-4">{n.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 shrink-0">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F766E] text-sm font-semibold text-white shrink-0">
