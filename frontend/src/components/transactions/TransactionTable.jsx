@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
-import { Copy, Check, ExternalLink, ArrowUpDown, ChevronLeft, ChevronRight, FileCode } from 'lucide-react';
+import { Copy, Check, ExternalLink, ArrowUpDown, ChevronLeft, ChevronRight, FileCode, Layers, Activity, Sparkles } from 'lucide-react';
 import StatusBadge from '../dashboard/StatusBadge';
 import TransactionCard from './TransactionCard';
-import EmptyState from '../ui/EmptyState';
+import Button from '../ui/Button';
+import Badge from '../ui/Badge';
 import { useToast } from '../../context/ToastContext';
 import { SOROBAN_CONTRACTS } from '../../config/contracts';
 
@@ -53,12 +54,35 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
 
   if (!transactions || transactions.length === 0) {
     return (
-      <EmptyState
-        title="No transactions found"
-        description="No financial ledger entries match your filter or search criteria."
-        onAction={onRefresh}
-        actionText="Reset Filters"
-      />
+      <div className="flex flex-col items-center justify-center p-8 sm:p-14 text-center border border-[#E2E8F0] rounded-[20px] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] space-y-5">
+        <div className="relative flex items-center justify-center">
+          <div className="absolute h-16 w-16 rounded-full bg-teal-100/60 animate-ping" />
+          <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 border border-teal-200/80 text-[#0F766E] shadow-2xs">
+            <Layers className="h-7 w-7" />
+          </div>
+        </div>
+
+        <div className="max-w-md space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <Badge variant="primary" dot size="sm">
+              Live Horizon RPC Channel
+            </Badge>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold font-['Space_Grotesk'] text-[#0F172A]">
+            No Transactions Found
+          </h3>
+          <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            No financial settlement entries match your current search or filter criteria. The Stellar Testnet ledger stream is active and listening for incoming payments.
+          </p>
+        </div>
+
+        {onRefresh && (
+          <Button variant="outline" size="sm" onClick={onRefresh} className="rounded-xl font-semibold shadow-2xs">
+            <Sparkles className="h-3.5 w-3.5 mr-1.5 text-[#0F766E]" />
+            Reset Filters
+          </Button>
+        )}
+      </div>
     );
   }
 
