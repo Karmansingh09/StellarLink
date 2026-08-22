@@ -13,6 +13,8 @@ import RecentActivityPanel from '../../components/transactions/RecentActivityPan
 import TransactionAnalytics from '../../components/transactions/TransactionAnalytics';
 import TransactionDetailModal from '../../components/transactions/TransactionDetailModal';
 import useTransactions from '../../hooks/useTransactions';
+import { exportReport } from '../../utils/exportReport';
+import { useToast } from '../../context/ToastContext';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -31,6 +33,7 @@ const itemVariants = {
 };
 
 export default function Transactions() {
+  const { addToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [deviceFilter, setDeviceFilter] = useState('all');
@@ -77,7 +80,15 @@ export default function Transactions() {
               </div>
             </div>
 
-            <Button variant="outline" size="md" className="gap-2 self-start lg:self-auto min-h-[44px]">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => {
+                exportReport({ transactions });
+                addToast('StellarLink transaction ledger CSV exported', 'success');
+              }}
+              className="gap-2 self-start lg:self-auto min-h-[44px]"
+            >
               <Download className="h-4 w-4" />
               <span>Export Ledger CSV</span>
             </Button>
