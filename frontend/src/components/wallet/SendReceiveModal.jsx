@@ -76,7 +76,18 @@ export default function SendReceiveModal({ mode, onClose }) {
 
   const handleSendSubmit = async (e) => {
     e.preventDefault();
-    if (!recipient || !amount) return;
+    const cleanRecipient = recipient.trim();
+    const numAmount = parseFloat(amount);
+
+    if (!cleanRecipient || !cleanRecipient.startsWith('G') || cleanRecipient.length !== 56) {
+      addToast('Destination must be a valid 56-character Stellar public key starting with G', 'error');
+      return;
+    }
+
+    if (isNaN(numAmount) || numAmount <= 0) {
+      addToast('Amount must be greater than 0 XLM', 'error');
+      return;
+    }
 
     setStage('preparing');
     const startMs = Date.now();
