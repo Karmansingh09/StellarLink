@@ -12,8 +12,22 @@ export default function PaymentQuickActions({ onOpenReceive, onOpenSend, onToggl
     setIsExporting(true);
     setTimeout(() => {
       setIsExporting(false);
-      addToast('Encrypted Master Vault keystore file exported', 'success');
-    }, 700);
+      const data = {
+        app: 'StellarLink Enterprise Control Plane',
+        environment: 'Stellar Testnet',
+        exportDate: new Date().toISOString(),
+        networkPassphrase: 'Test SDF Network ; September 2015',
+        horizonUrl: 'https://horizon-testnet.stellar.org',
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `stellarlink_vault_config_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      addToast('StellarLink public vault configuration JSON exported', 'success');
+    }, 500);
   };
 
   return (
