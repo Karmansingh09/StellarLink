@@ -92,34 +92,37 @@ export default function Topbar({ navItems }) {
       </div>
 
       {/* Main Topbar Content (Desktop & Tablet) */}
-      <div className="hidden lg:flex flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8 lg:py-4 xl:flex-row xl:items-center xl:justify-between bg-white">
-        <div className="space-y-1 sm:space-y-2 min-w-0">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
+      <div className="hidden lg:flex items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8 lg:py-4 bg-white min-w-0">
+        {/* Left Title & Subtitle */}
+        <div className="space-y-1 min-w-0 flex-1">
+          <div className="flex items-center gap-2.5">
+            <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] whitespace-nowrap">
               StellarLink Control Plane
             </p>
-            <Badge variant="success" dot size="sm">
+            <Badge variant="success" dot size="sm" className="whitespace-nowrap">
               Live network
             </Badge>
           </div>
 
-          <div className="flex items-center gap-3 min-w-0">
-            <h1 className="font-['Space_Grotesk'] text-xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl truncate">
+          <div className="flex items-baseline gap-3 min-w-0">
+            <h1 className="font-['Space_Grotesk'] text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-[#0F172A] shrink-0 whitespace-nowrap">
               {title}
             </h1>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#CBD5E1] shrink-0" />
-            <p className="max-w-2xl text-xs sm:text-sm leading-6 text-[#64748B] truncate">
+            <span className="hidden xl:inline-block h-1.5 w-1.5 rounded-full bg-[#CBD5E1] shrink-0 self-center" />
+            <p className="hidden xl:block text-xs lg:text-sm text-[#64748B] truncate max-w-xl">
               Monitor settlement health, network throughput, and operational readiness across the StellarLink estate.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 min-w-0">
-          <div className="relative hidden w-full min-w-0 max-w-xs items-center xl:flex">
-            <Search className="pointer-events-none absolute left-4 h-4 w-4 text-[#94A3B8]" />
+        {/* Right Controls & Actions */}
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Quick Search */}
+          <div className="relative hidden 2xl:flex w-64 items-center">
+            <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-[#94A3B8]" />
             <input
               type="search"
-              placeholder="Search devices, wallets, or txs..."
+              placeholder="Search devices, txs..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -127,7 +130,7 @@ export default function Topbar({ navItems }) {
               }}
               onKeyDown={handleSearchSubmit}
               onFocus={() => setSearchOpen(Boolean(searchQuery.trim()))}
-              className="h-11 w-full rounded-[14px] border border-[#D9E2E1] bg-white pl-11 pr-4 text-sm text-[#0F172A] outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
+              className="h-10 w-full rounded-[14px] border border-[#D9E2E1] bg-white pl-10 pr-4 text-xs text-[#0F172A] outline-none transition-colors placeholder:text-[#94A3B8] focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/15"
             />
             {searchOpen && (
               <div className="absolute top-12 left-0 right-0 z-50 rounded-2xl border border-[#E2E8F0] bg-white p-2 shadow-xl space-y-1">
@@ -160,12 +163,14 @@ export default function Topbar({ navItems }) {
             )}
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0 relative">
-            <Button variant="outline" size="md" className="hidden sm:inline-flex" onClick={handleExportReport}>
-              Export report
-              <ArrowUpRight className="h-4 w-4" />
-            </Button>
+          {/* Export Report Button */}
+          <Button variant="outline" size="md" onClick={handleExportReport} className="gap-2 shrink-0">
+            <span>Export report</span>
+            <ArrowUpRight className="h-4 w-4" />
+          </Button>
 
+          {/* Notifications Button */}
+          <div className="relative">
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -197,15 +202,16 @@ export default function Topbar({ navItems }) {
                 </div>
               </div>
             )}
+          </div>
 
-            <div className="flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 shrink-0">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F766E] text-sm font-semibold text-white shrink-0">
-                SL
-              </div>
-              <div>
-                <p className="text-sm font-medium text-[#0F172A]">StellarLink Ops</p>
-                <p className="text-xs text-[#64748B]">Executive workspace</p>
-              </div>
+          {/* User Workspace Profile */}
+          <div className="flex items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 shrink-0">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F766E] text-sm font-semibold text-white shrink-0">
+              SL
+            </div>
+            <div className="hidden sm:block">
+              <p className="text-sm font-medium text-[#0F172A]">StellarLink Ops</p>
+              <p className="text-xs text-[#64748B]">Executive workspace</p>
             </div>
           </div>
         </div>
