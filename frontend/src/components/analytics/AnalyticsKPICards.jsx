@@ -9,23 +9,23 @@ export default function AnalyticsKPICards() {
 
   const kpis = [
     {
-      title: 'Network Throughput',
-      value: isLoading ? '...' : (metrics?.throughputTps || '0 tx/min'),
-      change: { label: 'Stellar Testnet', tone: 'success' },
+      title: 'Total Transactions',
+      value: isLoading ? '...' : (metrics?.throughputTps || '0 tx'),
+      change: { label: metrics?.throughputGrowth ? `Growth ${metrics.throughputGrowth}` : 'Stellar Testnet', tone: 'success' },
       icon: Activity,
       tone: 'primary',
     },
     {
       title: 'Settlement Success',
-      value: isLoading ? '...' : (metrics?.successRate || '100.0%'),
-      change: { label: 'Stellar Core', tone: 'primary' },
+      value: isLoading ? '...' : (metrics?.successRate || 'N/A'),
+      change: { label: 'Stellar Horizon', tone: 'primary' },
       icon: ShieldCheck,
       tone: 'neutral',
     },
     {
       title: 'Average Finality',
       value: isLoading ? '...' : (metrics?.averageFinalityMs || 'N/A'),
-      change: { label: 'Ledger Finality', tone: 'warning' },
+      change: { label: 'Ledger Close Time', tone: 'warning' },
       icon: Clock,
       tone: 'warning',
     },

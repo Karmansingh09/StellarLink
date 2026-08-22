@@ -16,7 +16,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     devices = devices.filter((d) => d.type === deviceType);
   }
 
-  // Calculate real device status health breakdown
+  // Calculate real device status health breakdown from registered device fleet
   const statusCounts = {
     active: 0,
     settled: 0,
@@ -46,7 +46,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
   ];
 
   // Calculate real average ledger close finality from Stellar Testnet Horizon RPC
-  let avgFinalityMs = 480;
+  let avgFinalityMs = 'N/A';
   let ledgerSeq = 0;
   try {
     const latestLedgers = await server.ledgers().order('desc').limit(10).call();
@@ -64,7 +64,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
         }
       }
       if (count > 0) {
-        avgFinalityMs = Math.round(totalDiff / count);
+        avgFinalityMs = `${Math.round(totalDiff / count)}ms`;
       }
     }
   } catch (horizonError) {
@@ -110,13 +110,13 @@ export const getAnalyticsMetricsService = async (params = {}) => {
 
   // Filter by date range window if specified
   const now = Date.now();
-  let msLimit = Infinity;
+  let msLimit = 30 * 24 * 60 * 60 * 1000;
   if (dateRange === 'today') msLimit = 24 * 60 * 60 * 1000;
   else if (dateRange === '7d') msLimit = 7 * 24 * 60 * 60 * 1000;
   else if (dateRange === '30d') msLimit = 30 * 24 * 60 * 60 * 1000;
   else if (dateRange === '90d') msLimit = 90 * 24 * 60 * 60 * 1000;
 
-  // Restrict strictly to payment operations with valid numeric amounts
+  // Filter out non-payment types and Friendbot initial funding operations
   const userM2MPayments = uniquePayments.filter((p) => {
     if (!p.created_at) return false;
     const t = new Date(p.created_at).getTime();
@@ -129,7 +129,28 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     return amt > 0;
   });
 
-  const totalTxCount = userM2MPayments.length;
+  // Calculate Success Rate from actual Horizon operation success indicators
+  const totalHorizonOps = userM2MPayments.length;
+  const successfulOpsCount = userM2MPayments.filter((p) => p.transaction_successful !== false).length;
+  const successRate = totalHorizonOps > 0 ? `${((successfulOpsCount / totalHorizonOps) * 100).toFixed(1)}%` : 'N/A';
+
+  // Calculate Period Growth by comparing current window vs previous window of equal duration
+  const prevPeriodPayments = uniquePayments.filter((p) => {
+    if (!p.created_at) return false;
+    const t = new Date(p.created_at).getTime();
+    const age = now - t;
+    return age > msLimit && age <= msLimit * 2;
+  });
+
+  const currCount = userM2MPayments.length;
+  const prevCount = prevPeriodPayments.length;
+  let throughputGrowth = 'N/A';
+  if (prevCount > 0) {
+    const growthVal = ((currCount - prevCount) / prevCount) * 100;
+    throughputGrowth = `${growthVal >= 0 ? '+' : ''}${growthVal.toFixed(1)}%`;
+  } else if (currCount === 0) {
+    throughputGrowth = '0.0%';
+  }
 
   // Generate 7-day chronological day names ending today
   const dayNamesShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -158,7 +179,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     }
   });
 
-  const paymentVolume = totalTxCount === 0 ? [] : timeSeriesDays.map((day) => ({
+  const paymentVolume = currCount === 0 ? [] : timeSeriesDays.map((day) => ({
     day,
     volume: parseFloat(dayVolumeMap[day].toFixed(2)),
   }));
@@ -176,12 +197,12 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     }
   });
 
-  const settlementTrends = totalTxCount === 0 ? [] : weekSeries.map((week) => ({
+  const settlementTrends = currCount === 0 ? [] : weekSeries.map((week) => ({
     week,
     volume: parseFloat(weekVolumeMap[week].toFixed(2)),
   }));
 
-  // Aggregate Daily Transaction Throughput (Performance) per day without artificial multipliers
+  // Aggregate Daily Transaction Volume per day without artificial multipliers
   const dayPerfMap = {};
   timeSeriesDays.forEach((day) => {
     dayPerfMap[day] = 0;
@@ -195,18 +216,18 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     }
   });
 
-  const performance = totalTxCount === 0 ? [] : timeSeriesDays.map((day) => ({
+  const performance = currCount === 0 ? [] : timeSeriesDays.map((day) => ({
     day,
     txCount: dayPerfMap[day],
   }));
 
-  const throughputTps = totalTxCount > 0 ? `${totalTxCount} tx` : '0 tx';
+  const throughputTps = currCount > 0 ? `${currCount} tx` : '0 tx';
 
   return {
     throughputTps,
-    throughputGrowth: totalTxCount > 0 ? '+100.0%' : '0.0%',
-    successRate: '100.0%',
-    averageFinalityMs: `${avgFinalityMs}ms`,
+    throughputGrowth,
+    successRate,
+    averageFinalityMs: avgFinalityMs,
     connectedDevicesCount: devices.length,
     latestLedgerSequence: ledgerSeq,
     deviceHealth,
