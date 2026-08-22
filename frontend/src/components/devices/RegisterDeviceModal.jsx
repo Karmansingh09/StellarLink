@@ -17,7 +17,16 @@ export default function RegisterDeviceModal({ isOpen, onClose, onRegister }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) return;
+    if (!formData.name.trim()) {
+      addToast('Device Name / Identifier is required', 'error');
+      return;
+    }
+
+    const funding = parseFloat(formData.initialFunding);
+    if (isNaN(funding) || funding <= 0) {
+      addToast('Initial funding must be greater than 0 XLM', 'error');
+      return;
+    }
 
     setIsSubmitting(true);
 
