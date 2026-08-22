@@ -108,11 +108,11 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
                   <tr
                     key={tx.txId}
                     onClick={() => onViewDetails(tx)}
-                    className="cursor-pointer transition-colors hover:bg-[#FAF8FF]"
+                    className="group cursor-pointer transition-all duration-150 hover:bg-[#F0FDF4]/60"
                   >
                     {/* Transaction ID */}
                     <td className="px-4 py-4 sm:px-6">
-                      <div className="flex items-center gap-1.5 font-mono text-xs font-semibold text-[#0F766E]">
+                      <div className="flex items-center gap-1.5 font-mono text-xs font-semibold text-[#0F766E] group-hover:text-[#115E59]">
                         <span>{tx.txId}</span>
                         <button
                           type="button"
@@ -120,11 +120,11 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
                             e.stopPropagation();
                             copyText(tx.txId, `tx-${tx.txId}`, 'Transaction ID');
                           }}
-                          className="text-[#64748B] hover:text-[#0F766E] p-1"
+                          className="text-[#64748B] hover:text-[#0F766E] p-1 transition-colors"
                           title="Copy Transaction ID"
                         >
                           {copiedKey === `tx-${tx.txId}` ? (
-                            <Check className="h-3.5 w-3.5 text-emerald-600" />
+                            <Check className="h-3.5 w-3.5 text-emerald-600 animate-in fade-in" />
                           ) : (
                             <Copy className="h-3.5 w-3.5" />
                           )}
@@ -136,7 +136,7 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
                     <td className="px-4 py-4 sm:px-6">
                       <div className="flex items-center gap-1.5">
                         <FileCode className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                        <span className="font-mono text-xs text-[#0F172A] bg-teal-50 border border-teal-100 px-2 py-0.5 rounded">
+                        <span className="font-mono text-xs text-[#0F172A] bg-teal-50/80 border border-teal-200/60 px-2 py-0.5 rounded-lg shadow-2xs">
                           {contractId.substring(0, 8)}...{contractId.substring(contractId.length - 4)}
                         </span>
                       </div>
@@ -149,7 +149,9 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
 
                     {/* Amount */}
                     <td className="px-4 py-4 font-mono text-sm font-bold text-[#0F172A] sm:px-6">
-                      {tx.amount}
+                      <span className={tx.amount.startsWith('+') ? 'text-emerald-700' : 'text-[#0F172A]'}>
+                        {tx.amount}
+                      </span>
                     </td>
 
                     {/* Status */}
@@ -158,7 +160,7 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
                     </td>
 
                     {/* Settlement Time */}
-                    <td className="px-4 py-4 text-xs text-[#64748B] sm:px-6">
+                    <td className="px-4 py-4 text-xs font-mono text-[#64748B] sm:px-6">
                       {tx.timestamp}
                     </td>
 
@@ -171,7 +173,7 @@ export default function TransactionTable({ transactions, onViewDetails, onRefres
                             e.stopPropagation();
                             onViewDetails(tx);
                           }}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F766E] hover:text-[#115E59] bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-xl transition-colors"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F766E] hover:text-[#115E59] bg-teal-50 hover:bg-teal-100/80 border border-teal-200/80 px-2.5 py-1 rounded-xl transition-all shadow-2xs"
                         >
                           View
                           <ExternalLink className="h-3 w-3" />
