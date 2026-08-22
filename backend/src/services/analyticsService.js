@@ -45,8 +45,8 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     { name: 'Offline', value: offlineCount, color: '#EF4444' },
   ];
 
-  // Calculate real average ledger close finality from Stellar Testnet Horizon RPC
-  let avgFinalityMs = 'N/A';
+  // Query Stellar Testnet Horizon RPC for latest closed ledgers
+  let ledgerCloseCadenceMs = 'N/A';
   let ledgerSeq = 0;
   try {
     const latestLedgers = await server.ledgers().order('desc').limit(10).call();
@@ -64,15 +64,16 @@ export const getAnalyticsMetricsService = async (params = {}) => {
         }
       }
       if (count > 0) {
-        avgFinalityMs = `${Math.round(totalDiff / count)}ms`;
+        ledgerCloseCadenceMs = `${Math.round(totalDiff / count)}ms`;
       }
     }
   } catch (horizonError) {
-    console.warn('[AnalyticsService] Horizon ledger finality query error:', horizonError.message);
+    console.warn('[AnalyticsService] Horizon ledger query error:', horizonError.message);
   }
 
   // Query Horizon RPC payment operations strictly for target connected account & device wallets
   let rawPayments = [];
+  let rawTransactions = [];
   const targetAccounts = [];
   if (publicKey && typeof publicKey === 'string' && publicKey.startsWith('G')) {
     targetAccounts.push(publicKey);
@@ -95,6 +96,15 @@ export const getAnalyticsMetricsService = async (params = {}) => {
       }
     } catch (err) {
       // Unfunded accounts return 404 on Horizon; catch silently
+    }
+
+    try {
+      const tRes = await server.transactions().forAccount(acc).order('desc').limit(50).call();
+      if (tRes.records) {
+        rawTransactions.push(...tRes.records);
+      }
+    } catch (err) {
+      // Catch unfunded account 404 silently
     }
   }
 
@@ -129,10 +139,16 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     return amt > 0;
   });
 
-  // Calculate Success Rate from actual Horizon operation success indicators
-  const totalHorizonOps = userM2MPayments.length;
-  const successfulOpsCount = userM2MPayments.filter((p) => p.transaction_successful !== false).length;
-  const successRate = totalHorizonOps > 0 ? `${((successfulOpsCount / totalHorizonOps) * 100).toFixed(1)}%` : 'N/A';
+  // Calculate Success Rate strictly from Horizon transaction records for target accounts
+  const filteredTxs = rawTransactions.filter((tx) => {
+    if (!tx.created_at) return false;
+    const t = new Date(tx.created_at).getTime();
+    return now - t <= msLimit;
+  });
+
+  const totalAttemptedTxs = filteredTxs.length;
+  const successfulTxs = filteredTxs.filter((tx) => tx.successful === true).length;
+  const successRate = totalAttemptedTxs > 0 ? `${((successfulTxs / totalAttemptedTxs) * 100).toFixed(1)}%` : 'N/A';
 
   // Calculate Period Growth by comparing current window vs previous window of equal duration
   const prevPeriodPayments = uniquePayments.filter((p) => {
@@ -227,7 +243,8 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     throughputTps,
     throughputGrowth,
     successRate,
-    averageFinalityMs: avgFinalityMs,
+    averageFinalityMs: 'N/A', // Payment-specific finality latency not persisted in backend DB
+    ledgerCloseCadenceMs,
     connectedDevicesCount: devices.length,
     latestLedgerSequence: ledgerSeq,
     deviceHealth,
