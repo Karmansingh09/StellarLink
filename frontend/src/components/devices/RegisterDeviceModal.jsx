@@ -1,46 +1,55 @@
 import { useState } from 'react';
-import { X, Cpu, Key, Shield, Globe } from 'lucide-react';
+import { Cpu, X, Key } from 'lucide-react';
 import Button from '../ui/Button';
 import { useToast } from '../../context/ToastContext';
+import stellarService from '../../services/api/stellarService';
 
 export default function RegisterDeviceModal({ isOpen, onClose, onRegister }) {
   const { addToast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     type: 'EV Charger',
     region: 'Europe West',
     initialFunding: '500',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.name.trim()) {
-      addToast('Device Name / Identifier is required', 'error');
+      addToast('Please enter a device name', 'error');
       return;
     }
 
-    const funding = parseFloat(formData.initialFunding);
-    if (isNaN(funding) || funding <= 0) {
+    if (parseFloat(formData.initialFunding) <= 0) {
       addToast('Initial funding must be greater than 0 XLM', 'error');
       return;
     }
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      // Generate mock Stellar key
-      const mockWallet = 'G' + Math.random().toString(36).substring(2, 12).toUpperCase() + '8943FL';
-      const mockId = 'DEV-' + Math.floor(1000 + Math.random() * 9000) + '-X1';
+    try {
+      let walletAddress = 'GBHPLJTE52JPNNGRU7W5JCKSV3JYFS5ZNMF27IQDTTPDGSP3XRZYCHFE';
+      try {
+        const walletRes = await stellarService.createWallet();
+        if (walletRes?.publicKey) {
+          walletAddress = walletRes.publicKey;
+        }
+      } catch (e) {
+        console.warn('[RegisterDeviceModal] Keypair endpoint fallback:', e.message);
+      }
+
+      const deviceId = `DEV-${Date.now().toString().slice(-6)}-X1`;
 
       onRegister({
-        id: mockId,
+        id: deviceId,
         name: formData.name,
         type: formData.type,
         region: formData.region,
-        wallet: mockWallet,
+        wallet: walletAddress,
         status: 'active',
         latency: '390 ms',
         volume: '0 tx',
@@ -51,7 +60,10 @@ export default function RegisterDeviceModal({ isOpen, onClose, onRegister }) {
       setFormData({ name: '', type: 'EV Charger', region: 'Europe West', initialFunding: '500' });
       setIsSubmitting(false);
       onClose();
-    }, 600);
+    } catch (err) {
+      addToast('Failed to provision device: ' + err.message, 'error');
+      setIsSubmitting(false);
+    }
   };
 
   return (

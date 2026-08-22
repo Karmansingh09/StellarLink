@@ -117,8 +117,8 @@ export default function SendReceiveModal({ mode, onClose }) {
       setConfirmationTime(`${durationSec}s`);
 
       setTxDetails({
-        hash: res?.hash || res?.txHash || '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-        ledger: res?.ledger || Math.floor(52890000 + Math.random() * 10000),
+        hash: res?.hash || res?.txHash || 'Pending consensus',
+        ledger: res?.ledger || 'Latest',
         fee: '0.00001 XLM',
         amount: `${amount} XLM`,
         recipient,

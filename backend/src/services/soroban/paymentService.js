@@ -4,7 +4,7 @@ const settlementsList = [];
 
 export const createSettlementOnChain = async ({ deviceId, amount, asset = 'XLM' }) => {
   const newSettlement = {
-    settlementId: `STL-${Math.floor(100000 + Math.random() * 900000)}`,
+    settlementId: `STL-${Date.now().toString().slice(-6)}`,
     contractId: CONTRACT_ADDRESSES.settlementManager,
     deviceId: deviceId || 'DEV-9842-X1',
     deviceName: 'EV Charging Node 04',

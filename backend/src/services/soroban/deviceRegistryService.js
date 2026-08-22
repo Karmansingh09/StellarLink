@@ -4,7 +4,7 @@ const registeredOnChainDevices = new Map();
 
 export const registerDeviceOnChain = async ({ deviceId, name, type, region, ownerWallet }) => {
   const record = {
-    deviceId: deviceId || `DEV-${Math.floor(1000 + Math.random() * 9000)}-X1`,
+    deviceId: deviceId || `DEV-${Date.now().toString().slice(-6)}-X1`,
     name: name || 'EV Charger Node',
     type: type || 'EV Charger',
     region: region || 'Europe West',
