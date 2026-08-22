@@ -59,23 +59,26 @@ export default function TransactionKPIs() {
             whileHover={{ y: -3 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
           >
-            <Card padding="generous" className="h-full">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-                    {metric.title}
-                  </p>
-                  <p className="mt-3 font-[#Space_Grotesk] text-2xl sm:text-3xl font-semibold tracking-tight text-[#0F172A]">
-                    {metric.value}
-                  </p>
-                </div>
-
-                <div className={`flex h-12 w-12 items-center justify-center rounded-[16px] border ${tones[metric.tone]}`}>
-                  <Icon className="h-5 w-5" />
+            <Card padding="generous" className="h-full flex flex-col justify-between min-w-0">
+              {/* Header Row: Title & Icon */}
+              <div className="flex items-center justify-between gap-2 min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B] whitespace-nowrap">
+                  {metric.title}
+                </p>
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] border ${tones[metric.tone]}`}>
+                  <Icon className="h-4 w-4" />
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center gap-2">
+              {/* Value Row: Clean Numeric Display */}
+              <div className="mt-3 min-w-0">
+                <p className="font-['Space_Grotesk'] text-xl xs:text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A] whitespace-nowrap overflow-hidden text-ellipsis">
+                  {metric.value}
+                </p>
+              </div>
+
+              {/* Footer Row: Status Badge */}
+              <div className="mt-3.5 flex items-center gap-2">
                 <Badge variant={metric.change.tone} dot size="sm">
                   {metric.change.label}
                 </Badge>

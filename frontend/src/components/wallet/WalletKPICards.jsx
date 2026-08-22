@@ -64,23 +64,26 @@ export default function WalletKPICards({ walletData }) {
             whileHover={{ y: -3 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
           >
-            <Card padding="generous" className="h-full min-w-0 overflow-hidden">
-              <div className="flex items-start justify-between gap-3 min-w-0">
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#64748B] truncate">
-                    {kpi.title}
-                  </p>
-                  <p className="mt-3 font-['Space_Grotesk'] text-xl xs:text-2xl sm:text-3xl font-semibold tracking-tight text-[#0F172A] break-all sm:break-normal">
-                    {kpi.value}
-                  </p>
-                </div>
-
-                <div className={`flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-[16px] border ${tones[kpi.tone]}`}>
-                  <Icon className="h-5 w-5" />
+            <Card padding="generous" className="h-full flex flex-col justify-between min-w-0">
+              {/* Header Row: Title & Icon */}
+              <div className="flex items-center justify-between gap-2 min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B] whitespace-nowrap">
+                  {kpi.title}
+                </p>
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] border ${tones[kpi.tone]}`}>
+                  <Icon className="h-4 w-4" />
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center gap-2">
+              {/* Value Row: Clean Numeric Display */}
+              <div className="mt-3 min-w-0">
+                <p className="font-['Space_Grotesk'] text-xl xs:text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A] whitespace-nowrap overflow-hidden text-ellipsis">
+                  {kpi.value}
+                </p>
+              </div>
+
+              {/* Footer Row: Status Badge */}
+              <div className="mt-3.5 flex items-center gap-2">
                 <Badge variant={kpi.change.tone} dot size="sm">
                   {kpi.change.label}
                 </Badge>
