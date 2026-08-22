@@ -53,7 +53,7 @@ export default function IndustrySolutions() {
   ];
 
   return (
-    <Section spacing="xl" bg="white" id="industries">
+    <Section spacing="xl" bg="white" id="infrastructure">
       <Container size="full">
         <div className="mb-12 md:mb-16">
           <motion.div
