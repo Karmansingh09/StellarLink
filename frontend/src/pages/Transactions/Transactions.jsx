@@ -128,12 +128,17 @@ export default function Transactions() {
             <div className="lg:col-span-8">
               <Card padding="generous" className="h-full">
                 <CardHeader className="mb-4">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base sm:text-lg font-semibold text-[#0F172A]">
-                      Ledger Stream ({transactions.length})
-                    </CardTitle>
-                    <Badge variant="primary" dot size="sm">
-                      Live Stream
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <CardTitle className="text-base sm:text-lg font-semibold text-[#0F172A]">
+                        Ledger Stream ({transactions.length})
+                      </CardTitle>
+                      <p className="text-xs text-[#64748B] mt-0.5">
+                        Real-time Horizon RPC payment telemetry stream
+                      </p>
+                    </div>
+                    <Badge variant={transactions.length > 0 ? 'success' : 'primary'} dot size="sm" className="w-fit">
+                      {transactions.length > 0 ? 'Live Stream Active' : 'Listening on Testnet'}
                     </Badge>
                   </div>
                 </CardHeader>
