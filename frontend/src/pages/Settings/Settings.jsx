@@ -38,8 +38,14 @@ const defaultState = {
 
 export default function Settings() {
   const { addToast } = useToast();
-  const [settings, setSettings] = useState(defaultState);
-  const [initialSettings, setInitialSettings] = useState(defaultState);
+  const [settings, setSettings] = useState(() => {
+    const saved = localStorage.getItem('stellarlink_settings');
+    return saved ? JSON.parse(saved) : defaultState;
+  });
+  const [initialSettings, setInitialSettings] = useState(() => {
+    const saved = localStorage.getItem('stellarlink_settings');
+    return saved ? JSON.parse(saved) : defaultState;
+  });
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [errors, setErrors] = useState({});
@@ -69,13 +75,15 @@ export default function Settings() {
 
     setIsSaving(true);
     setTimeout(() => {
+      localStorage.setItem('stellarlink_settings', JSON.stringify(settings));
       setIsSaving(false);
       setInitialSettings(settings);
       addToast('Stellar RPC & Network configuration saved', 'success');
-    }, 700);
+    }, 500);
   };
 
   const handleResetDefaults = () => {
+    localStorage.removeItem('stellarlink_settings');
     setSettings(defaultState);
     setInitialSettings(defaultState);
     setErrors({});
