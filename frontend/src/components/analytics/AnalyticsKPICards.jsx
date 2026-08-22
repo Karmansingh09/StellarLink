@@ -5,34 +5,34 @@ import Badge from '../ui/Badge';
 import useAnalytics from '../../hooks/useAnalytics';
 
 export default function AnalyticsKPICards() {
-  const { data: metrics } = useAnalytics();
+  const { data: metrics, isLoading } = useAnalytics();
 
   const kpis = [
     {
       title: 'Network Throughput',
-      value: metrics?.throughputTps || '0 tx/min',
-      change: { label: metrics?.throughputGrowth || '0.0%', tone: 'neutral' },
+      value: isLoading ? '...' : (metrics?.throughputTps || '0 tx/min'),
+      change: { label: 'Stellar Testnet', tone: 'success' },
       icon: Activity,
       tone: 'primary',
     },
     {
       title: 'Settlement Success',
-      value: metrics?.successRate || '100.0%',
-      change: { label: 'Stable', tone: 'primary' },
+      value: isLoading ? '...' : (metrics?.successRate || '100.0%'),
+      change: { label: 'Stellar Core', tone: 'primary' },
       icon: ShieldCheck,
       tone: 'neutral',
     },
     {
       title: 'Average Finality',
-      value: metrics?.averageFinalityMs || '482ms',
-      change: { label: 'Optimal', tone: 'success' },
+      value: isLoading ? '...' : (metrics?.averageFinalityMs || 'N/A'),
+      change: { label: 'Ledger Finality', tone: 'warning' },
       icon: Clock,
       tone: 'warning',
     },
     {
       title: 'Connected Devices',
-      value: metrics?.connectedDevicesCount ? String(metrics.connectedDevicesCount) : '6',
-      change: { label: 'Active', tone: 'success' },
+      value: isLoading ? '...' : (metrics?.connectedDevicesCount !== undefined ? String(metrics.connectedDevicesCount) : '0'),
+      change: { label: 'Registered Fleet', tone: 'success' },
       icon: Cpu,
       tone: 'success',
     },
