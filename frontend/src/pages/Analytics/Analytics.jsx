@@ -14,6 +14,7 @@ import LiveTelemetryFeed from '../../components/analytics/LiveTelemetryFeed';
 import SystemHealthCards from '../../components/analytics/SystemHealthCards';
 import AutomatedInsights from '../../components/analytics/AutomatedInsights';
 import useAnalytics from '../../hooks/useAnalytics';
+import { useWalletContext } from '../../context/WalletContext';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -32,11 +33,19 @@ const itemVariants = {
 };
 
 export default function Analytics() {
+  const { walletData, publicKey } = useWalletContext();
+  const activeKey = walletData?.publicKey || publicKey;
+
   const [dateRange, setDateRange] = useState('30d');
   const [deviceType, setDeviceType] = useState('all');
   const [network, setNetwork] = useState('all');
 
-  const { data: analyticsData, isLoading, refetch } = useAnalytics({ dateRange, deviceType, network });
+  const { data: analyticsData, refetch } = useAnalytics({
+    publicKey: activeKey,
+    dateRange,
+    deviceType,
+    network,
+  });
 
   const handleReset = () => {
     setDateRange('30d');
