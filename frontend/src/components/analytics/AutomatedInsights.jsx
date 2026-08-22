@@ -20,7 +20,7 @@ export default function AutomatedInsights() {
     },
     {
       title: 'Stellar Testnet Sync',
-      text: `Ledger sequence ${metrics?.latestLedgerSequence ? `#${metrics.latestLedgerSequence}` : 'active'} connected with sub-second ledger finality (${metrics?.averageFinalityMs || 'N/A'}).`,
+      text: `Ledger sequence ${metrics?.latestLedgerSequence ? `#${metrics.latestLedgerSequence}` : 'active'} connected via Horizon RPC (Ledger close cadence: ${metrics?.ledgerCloseCadenceMs || 'N/A'}).`,
       icon: Globe,
       highlight: 'Testnet Horizon',
     },
