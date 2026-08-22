@@ -24,13 +24,16 @@ const iconMap = {
   Settings,
 };
 
-const quickStats = [
-  { label: 'Network uptime', value: '99.98%' },
-  { label: 'Live endpoints', value: '128' },
-  { label: 'Settlement SLA', value: '< 500ms' },
-];
+import useDevices from '../../hooks/useDevices';
 
 export default function Sidebar({ navItems }) {
+  const { data: devices = [] } = useDevices();
+
+  const dynamicQuickStats = [
+    { label: 'Stellar Network', value: 'Testnet Horizon' },
+    { label: 'Registered Fleet', value: `${devices.length} Nodes` },
+    { label: 'Soroban Protocol', value: 'Protocol 21' },
+  ];
   return (
     <>
       {/* Desktop Sidebar (lg:flex) */}
@@ -114,7 +117,7 @@ export default function Sidebar({ navItems }) {
             </div>
 
             <div className="mt-4 space-y-3 border-t border-[#E2E8F0] pt-4">
-              {quickStats.map((stat) => (
+              {dynamicQuickStats.map((stat) => (
                 <div key={stat.label} className="flex items-center justify-between text-sm">
                   <span className="text-[#64748B] text-xs">{stat.label}</span>
                   <span className="font-semibold text-[#0F172A] text-xs">{stat.value}</span>

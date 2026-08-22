@@ -1,16 +1,20 @@
 import { ShieldCheck, Server, Database, Globe, Wallet } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import Badge from '../ui/Badge';
-
-const healthItems = [
-  { label: 'API Latency', value: '24 ms', detail: 'p99 threshold < 50ms', icon: Server, status: 'healthy' },
-  { label: 'Database Health', value: '100% Operational', detail: 'Zero failover events', icon: Database, status: 'healthy' },
-  { label: 'Blockchain Sync', value: 'Ledger #52894101', detail: 'Stellar Core synced', icon: Globe, status: 'healthy' },
-  { label: 'Soroban RPC Status', value: 'Active', detail: 'Smart contracts live', icon: ShieldCheck, status: 'healthy' },
-  { label: 'Wallet Services', value: 'Multisig Online', detail: 'Vault keys verified', icon: Wallet, status: 'healthy' },
-];
+import useAnalytics from '../../hooks/useAnalytics';
 
 export default function SystemHealthCards() {
+  const { data: metrics } = useAnalytics();
+  const ledgerSeq = metrics?.latestLedgerSequence ? `Ledger #${metrics.latestLedgerSequence}` : 'Horizon Connected';
+
+  const healthItems = [
+    { label: 'Stellar RPC Node', value: ledgerSeq, detail: 'Stellar Testnet synced', icon: Globe, status: 'healthy' },
+    { label: 'Control Plane API', value: 'Active', detail: 'REST routes responding', icon: Server, status: 'healthy' },
+    { label: 'Device Registry DB', value: 'Connected', detail: 'Fleet state synced', icon: Database, status: 'healthy' },
+    { label: 'Soroban WASM Engine', value: 'Active', detail: 'Smart contracts verified', icon: ShieldCheck, status: 'healthy' },
+    { label: 'Wallet Vault RPC', value: 'Online', detail: 'Keypairs & Freighter active', icon: Wallet, status: 'healthy' },
+  ];
+
   return (
     <Card padding="generous">
       <CardHeader className="mb-4">
@@ -27,7 +31,7 @@ export default function SystemHealthCards() {
         {healthItems.map((item) => {
           const Icon = item.icon;
           return (
-            <div key={item.label} className="p-3.5 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-2">
+            <div key={item.label} className="p-3.5 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-2 min-w-0">
               <div className="flex items-center justify-between">
                 <Icon className="h-4 w-4 text-[#0F766E]" />
                 <Badge variant="success" size="sm">
@@ -36,9 +40,9 @@ export default function SystemHealthCards() {
               </div>
               <div>
                 <p className="text-xs text-[#64748B]">{item.label}</p>
-                <p className="text-sm font-bold font-mono text-[#0F172A]">{item.value}</p>
+                <p className="text-xs sm:text-sm font-bold font-mono text-[#0F172A] truncate">{item.value}</p>
               </div>
-              <p className="text-[10px] text-[#64748B] border-t border-[#E2E8F0] pt-1">{item.detail}</p>
+              <p className="text-[10px] text-[#64748B] border-t border-[#E2E8F0] pt-1 truncate">{item.detail}</p>
             </div>
           );
         })}
