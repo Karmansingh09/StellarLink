@@ -22,11 +22,13 @@ import { useToast } from '../../context/ToastContext';
 import { useSendStellarPayment } from '../../hooks/useStellar';
 import { useWalletContext } from '../../context/WalletContext';
 import freighterService from '../../services/wallet/freighterService';
+import { useQueryClient } from '@tanstack/react-query';
 import stellarService from '../../services/api/stellarService';
 
 export default function SendReceiveModal({ mode, onClose }) {
+  const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const { walletData, publicKey, refreshWallet, isFreighterConnected } = useWalletContext();
+  const { walletData, publicKey, refreshWallet, isFreighterConnected, setDevKeypair } = useWalletContext();
   const [copied, setCopied] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
   const [recipient, setRecipient] = useState('');
@@ -147,7 +149,18 @@ export default function SendReceiveModal({ mode, onClose }) {
       });
 
       setStage('confirmed');
+      if (!isFreighterConnected && senderSecret.trim()) {
+        const secret = senderSecret.trim();
+        if (secret.startsWith('S')) {
+          const derivedKey = res?.sourcePublicKey || res?.publicKey;
+          if (derivedKey) {
+            setDevKeypair(derivedKey, secret);
+          }
+        }
+      }
       refreshWallet();
+      queryClient.invalidateQueries({ queryKey: ['analyticsMetrics'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarTransactions'] });
       addToast('XLM payment confirmed on Stellar Testnet!', 'success');
     } catch (err) {
       console.error('[SendReceiveModal] Payment execution error:', err);
