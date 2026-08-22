@@ -109,14 +109,14 @@ export default function Analytics() {
       {/* Automated AI Insights */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
-          <AutomatedInsights />
+          <AutomatedInsights metrics={analyticsData} />
         </Container>
       </motion.section>
 
       {/* Large Line Chart: Network Performance */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
-          <NetworkPerformanceChart />
+          <NetworkPerformanceChart metrics={analyticsData} />
         </Container>
       </motion.section>
 
@@ -124,8 +124,8 @@ export default function Analytics() {
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <SettlementTrendsChart />
-            <PaymentVolumeChart />
+            <SettlementTrendsChart metrics={analyticsData} />
+            <PaymentVolumeChart metrics={analyticsData} />
             <DeviceHealthDonutChart />
           </div>
         </Container>
@@ -155,7 +155,7 @@ export default function Analytics() {
       {/* System Infrastructure Health */}
       <motion.section variants={itemVariants}>
         <Container size="full" className="px-0">
-          <SystemHealthCards />
+          <SystemHealthCards metrics={analyticsData} />
         </Container>
       </motion.section>
     </motion.div>
