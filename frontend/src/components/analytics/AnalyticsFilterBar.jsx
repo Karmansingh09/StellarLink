@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Calendar, Cpu, Globe, Download, RefreshCw } from 'lucide-react';
+import { Calendar, Cpu, Globe, Download, RefreshCw, Clock } from 'lucide-react';
 import Button from '../ui/Button';
+import Badge from '../ui/Badge';
 import { useToast } from '../../context/ToastContext';
-
 import { exportReport } from '../../utils/exportReport';
 
 export default function AnalyticsFilterBar({
@@ -13,6 +13,7 @@ export default function AnalyticsFilterBar({
   network,
   onNetworkChange,
   onRefresh,
+  lastUpdated,
 }) {
   const { addToast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
@@ -30,9 +31,13 @@ export default function AnalyticsFilterBar({
   const handleRefreshClick = () => {
     setIsSpinning(true);
     onRefresh();
-    addToast('Analytics telemetry dataset refreshed', 'info');
+    addToast('Refetched live Stellar Testnet telemetry', 'info');
     setTimeout(() => setIsSpinning(false), 600);
   };
+
+  const formattedTime = lastUpdated
+    ? new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   return (
     <div className="flex flex-col gap-3 rounded-[20px] border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-5 lg:flex-row lg:items-center lg:justify-between min-w-0">
@@ -79,18 +84,28 @@ export default function AnalyticsFilterBar({
           >
             <option value="all">All Networks</option>
             <option value="mainnet">Stellar Mainnet</option>
-            <option value="testnet">Testnet</option>
+            <option value="testnet">Stellar Testnet Horizon</option>
             <option value="soroban">Soroban RPC</option>
           </select>
+        </div>
+
+        {/* Last Refreshed Indicator */}
+        <div className="hidden xl:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 border border-[#E2E8F0] text-[11px] font-mono text-[#64748B]">
+          <Clock className="h-3.5 w-3.5 text-[#0F766E]" />
+          <span>Synced {formattedTime}</span>
         </div>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-2.5 self-start sm:self-auto shrink-0">
+        <Badge variant="primary" dot size="sm" className="hidden md:inline-flex">
+          Horizon RPC Live
+        </Badge>
+
         <button
           type="button"
           onClick={handleRefreshClick}
           className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#D9E2E1] bg-white text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F766E] transition-colors cursor-pointer shrink-0"
-          title="Refresh Analytics"
+          title="Refetch Horizon Telemetry"
         >
           <RefreshCw className={`h-4 w-4 ${isSpinning ? 'animate-spin text-[#0F766E]' : ''}`} />
         </button>

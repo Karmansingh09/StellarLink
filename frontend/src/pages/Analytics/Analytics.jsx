@@ -92,6 +92,7 @@ export default function Analytics() {
             network={network}
             onNetworkChange={setNetwork}
             onRefresh={handleReset}
+            lastUpdated={analyticsData?.latestLedgerSequence ? Date.now() : null}
           />
         </Container>
       </motion.section>
