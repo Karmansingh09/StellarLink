@@ -6,25 +6,31 @@ import IndustrySolutions from '../../components/landing/IndustrySolutions';
 import EnterpriseCTA from '../../components/landing/EnterpriseCTA';
 import Footer from '../../components/landing/Footer';
 import DocumentationModal from '../../components/landing/DocumentationModal';
+import PilotOnboardingModal from '../../components/landing/PilotOnboardingModal';
 
 export default function Landing({ onOpenDocs, onOpenPilot, onOpenArch }) {
   const [docsOpen, setDocsOpen] = useState(false);
+  const [pilotOpen, setPilotOpen] = useState(false);
 
   const handleOpenDocs = onOpenDocs || (() => setDocsOpen(true));
   const handleCloseDocs = () => setDocsOpen(false);
 
+  const handleOpenPilot = onOpenPilot || (() => setPilotOpen(true));
+  const handleClosePilot = () => setPilotOpen(false);
+
   return (
     <div className="min-h-screen bg-transparent text-[#0F172A]">
-      <Navbar onOpenDocs={handleOpenDocs} onOpenPilot={onOpenPilot} />
+      <Navbar onOpenDocs={handleOpenDocs} onOpenPilot={handleOpenPilot} />
       <main>
         <Hero onOpenDocs={handleOpenDocs} />
         <Features />
         <IndustrySolutions />
-        <EnterpriseCTA onOpenPilot={onOpenPilot} onOpenArch={onOpenArch} />
+        <EnterpriseCTA onOpenPilot={handleOpenPilot} onOpenArch={onOpenArch} />
       </main>
       <Footer onOpenDocs={handleOpenDocs} onOpenArch={onOpenArch} />
 
       <DocumentationModal isOpen={docsOpen} onClose={handleCloseDocs} />
+      <PilotOnboardingModal isOpen={pilotOpen} onClose={handleClosePilot} />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import Heading from '../ui/Heading';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 
-export default function EnterpriseCTA() {
+export default function EnterpriseCTA({ onOpenPilot, onOpenArch }) {
   return (
     <Section spacing="xl" bg="slate" id="contact">
       <Container size="full">
@@ -34,12 +34,12 @@ export default function EnterpriseCTA() {
 
                   <div className="flex flex-col gap-3 sm:flex-row">
                     <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-                      <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
+                      <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right" onClick={onOpenPilot}>
                         Start a Pilot
                       </Button>
                     </motion.div>
                     <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-                      <Button variant="outline" size="lg">
+                      <Button variant="outline" size="lg" onClick={onOpenArch}>
                         View Architecture
                       </Button>
                     </motion.div>
