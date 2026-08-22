@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 import {
   AreaChart,
   Area,
@@ -13,109 +13,174 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { TrendingUp, PieChart as PieIcon, BarChart2 } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
+import useTransactions from '../../hooks/useTransactions';
 
-const volumeLineData = [
-  { day: 'Mon', volume: 1420 },
-  { day: 'Tue', volume: 1890 },
-  { day: 'Wed', volume: 2400 },
-  { day: 'Thu', volume: 3100 },
-  { day: 'Fri', volume: 2800 },
-  { day: 'Sat', volume: 3600 },
-  { day: 'Sun', volume: 4200 },
-];
-
-const distributionDonutData = [
-  { name: 'EV Charging', value: 45, color: '#0F766E' },
-  { name: 'Fleet Robotics', value: 30, color: '#14B8A6' },
-  { name: 'Microgrid', value: 15, color: '#F59E0B' },
-  { name: 'Sensors', value: 10, color: '#64748B' },
-];
-
-const hourlyBarData = [
-  { hour: '02:00', txs: 340 },
-  { hour: '06:00', txs: 620 },
-  { hour: '10:00', txs: 1450 },
-  { hour: '14:00', txs: 1890 },
-  { hour: '18:00', txs: 1210 },
-  { hour: '22:00', txs: 780 },
-];
+const DEVICE_COLORS = ['#0F766E', '#14B8A6', '#F59E0B', '#64748B', '#6366F1', '#EC4899'];
 
 export default function TransactionAnalytics() {
+  const { data: transactions = [] } = useTransactions();
+  const hasData = Array.isArray(transactions) && transactions.length > 0;
+
+  // 1. Dynamic Volume Data (grouped by transaction index/label)
+  const volumeLineData = useMemo(() => {
+    if (!hasData) return [];
+    const grouped = {};
+    transactions.forEach((tx, idx) => {
+      const rawAmt = typeof tx.amount === 'string' ? tx.amount : '';
+      const num = parseFloat(rawAmt.replace(/[^0-9.]/g, '')) || 0;
+      const label = tx.timestamp ? String(tx.timestamp).split(' ')[0] : `Tx ${idx + 1}`;
+      grouped[label] = (grouped[label] || 0) + num;
+    });
+    return Object.keys(grouped).map((label) => ({
+      day: label,
+      volume: grouped[label],
+    }));
+  }, [transactions, hasData]);
+
+  // 2. Dynamic Distribution Data (grouped by device)
+  const distributionDonutData = useMemo(() => {
+    if (!hasData) return [];
+    const counts = {};
+    let total = 0;
+    transactions.forEach((tx) => {
+      const device = tx.device || 'Unassigned Device';
+      counts[device] = (counts[device] || 0) + 1;
+      total += 1;
+    });
+    return Object.keys(counts).map((device, idx) => ({
+      name: device,
+      value: Math.round((counts[device] / total) * 100),
+      color: DEVICE_COLORS[idx % DEVICE_COLORS.length],
+    }));
+  }, [transactions, hasData]);
+
+  // 3. Dynamic Hourly Activity Data (grouped by timestamp hour)
+  const hourlyBarData = useMemo(() => {
+    if (!hasData) return [];
+    const hoursMap = {};
+    transactions.forEach((tx) => {
+      let hourLabel = '12:00';
+      if (tx.timestamp && typeof tx.timestamp === 'string') {
+        const parts = tx.timestamp.match(/(\d{1,2}):\d{2}/);
+        if (parts && parts[1]) {
+          hourLabel = `${parts[1].padStart(2, '0')}:00`;
+        } else {
+          hourLabel = tx.timestamp.slice(0, 5);
+        }
+      }
+      hoursMap[hourLabel] = (hoursMap[hourLabel] || 0) + 1;
+    });
+    return Object.keys(hoursMap).map((h) => ({
+      hour: h,
+      txs: hoursMap[h],
+    }));
+  }, [transactions, hasData]);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* 1. Transaction Volume (Line / Area Chart) */}
-      <Card padding="generous" className="h-full">
+      <Card padding="generous" className="h-full min-w-0">
         <CardHeader className="mb-2">
           <CardTitle className="text-base font-semibold text-[#0F172A]">Transaction Volume</CardTitle>
-          <CardDescription className="text-xs">Weekly settlement throughput (XLM)</CardDescription>
+          <CardDescription className="text-xs">Settlement volume calculated from real Horizon transactions</CardDescription>
         </CardHeader>
         <div className="h-48 sm:h-56 w-full pt-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={volumeLineData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-              <defs>
-                <linearGradient id="txVolGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#0F766E" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#0F766E" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="day" stroke="#64748B" fontSize={11} tickLine={false} />
-              <YAxis stroke="#64748B" fontSize={11} tickLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }} />
-              <Area type="monotone" dataKey="volume" stroke="#0F766E" strokeWidth={2} fillOpacity={1} fill="url(#txVolGrad)" />
-            </AreaChart>
-          </ResponsiveContainer>
+          {!hasData ? (
+            <div className="flex flex-col items-center justify-center h-full p-4 text-center border border-dashed border-[#E2E8F0] rounded-xl bg-[#F8FAFC] space-y-2">
+              <TrendingUp className="h-6 w-6 text-[#94A3B8]" />
+              <p className="text-xs font-semibold text-[#0F172A]">No Volume Data</p>
+              <p className="text-[11px] text-[#64748B]">Awaiting transaction activity. Charts will populate when settlements are recorded.</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={volumeLineData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="txVolGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0F766E" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#0F766E" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                <XAxis dataKey="day" stroke="#64748B" fontSize={11} tickLine={false} />
+                <YAxis stroke="#64748B" fontSize={11} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }}
+                  formatter={(val) => [`${typeof val === 'number' ? val.toLocaleString() : val} XLM`, 'Volume']}
+                />
+                <Area type="monotone" dataKey="volume" stroke="#0F766E" strokeWidth={2} fillOpacity={1} fill="url(#txVolGrad)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </Card>
 
       {/* 2. Settlement Distribution (Donut Chart) */}
-      <Card padding="generous" className="h-full">
+      <Card padding="generous" className="h-full min-w-0">
         <CardHeader className="mb-2">
           <CardTitle className="text-base font-semibold text-[#0F172A]">Settlement Distribution</CardTitle>
-          <CardDescription className="text-xs">Volume share by device hardware category</CardDescription>
+          <CardDescription className="text-xs">Device distribution derived from active transactions</CardDescription>
         </CardHeader>
         <div className="h-48 sm:h-56 w-full flex items-center justify-center relative">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={distributionDonutData}
-                dataKey="value"
-                innerRadius={50}
-                outerRadius={75}
-                paddingAngle={3}
-                stroke="none"
-              >
-                {distributionDonutData.map((entry) => (
-                  <Cell key={entry.name} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-xl font-bold font-['Space_Grotesk'] text-[#0F172A]">100%</span>
-            <span className="text-[10px] text-[#64748B]">Soroban SLA</span>
-          </div>
+          {!hasData ? (
+            <div className="flex flex-col items-center justify-center h-full w-full p-4 text-center border border-dashed border-[#E2E8F0] rounded-xl bg-[#F8FAFC] space-y-2">
+              <PieIcon className="h-6 w-6 text-[#94A3B8]" />
+              <p className="text-xs font-semibold text-[#0F172A]">No Distribution Data</p>
+              <p className="text-[11px] text-[#64748B]">Awaiting transaction activity to compute device shares.</p>
+            </div>
+          ) : (
+            <>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={distributionDonutData}
+                    dataKey="value"
+                    innerRadius={50}
+                    outerRadius={75}
+                    paddingAngle={3}
+                    stroke="none"
+                  >
+                    {distributionDonutData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-xl font-bold font-['Space_Grotesk'] text-[#0F172A]">{transactions.length}</span>
+                <span className="text-[10px] text-[#64748B]">Total Txs</span>
+              </div>
+            </>
+          )}
         </div>
       </Card>
 
       {/* 3. Hourly Activity (Bar Chart) */}
-      <Card padding="generous" className="h-full">
+      <Card padding="generous" className="h-full min-w-0">
         <CardHeader className="mb-2">
           <CardTitle className="text-base font-semibold text-[#0F172A]">Hourly Activity</CardTitle>
-          <CardDescription className="text-xs">Peak transaction load distribution</CardDescription>
+          <CardDescription className="text-xs">Transaction count aggregated by settlement timestamp</CardDescription>
         </CardHeader>
         <div className="h-48 sm:h-56 w-full pt-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={hourlyBarData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="hour" stroke="#64748B" fontSize={11} tickLine={false} />
-              <YAxis stroke="#64748B" fontSize={11} tickLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }} />
-              <Bar dataKey="txs" fill="#0F766E" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {!hasData ? (
+            <div className="flex flex-col items-center justify-center h-full p-4 text-center border border-dashed border-[#E2E8F0] rounded-xl bg-[#F8FAFC] space-y-2">
+              <BarChart2 className="h-6 w-6 text-[#94A3B8]" />
+              <p className="text-xs font-semibold text-[#0F172A]">No Hourly Data</p>
+              <p className="text-[11px] text-[#64748B]">Awaiting transaction activity to chart hourly load.</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={hourlyBarData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                <XAxis dataKey="hour" stroke="#64748B" fontSize={11} tickLine={false} />
+                <YAxis stroke="#64748B" fontSize={11} tickLine={false} />
+                <Tooltip contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }} />
+                <Bar dataKey="txs" fill="#0F766E" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </Card>
     </div>
