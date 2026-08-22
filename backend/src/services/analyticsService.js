@@ -122,10 +122,15 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     const t = new Date(p.created_at).getTime();
     if (now - t > msLimit) return false;
 
-    const isPaymentOp = ['payment', 'path_payment_strict_send', 'path_payment_strict_receive'].includes(p.type);
+    const isPaymentOp = ['payment', 'path_payment_strict_send', 'path_payment_strict_receive', 'create_account'].includes(p.type);
     if (!isPaymentOp) return false;
 
-    const amt = parseFloat(p.amount || 0);
+    const amt = parseFloat(p.amount || p.starting_balance || 0);
+
+    // Exclude Friendbot 10,000 XLM initial reserve funding
+    const isFriendbot = (p.funder && p.funder === 'GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR') || amt >= 10000;
+    if (isFriendbot) return false;
+
     return amt > 0;
   });
 
@@ -170,7 +175,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
   });
 
   userM2MPayments.forEach((p) => {
-    const amt = parseFloat(p.amount || 0);
+    const amt = parseFloat(p.amount || p.starting_balance || 0);
     const dt = new Date(p.created_at);
     const dayName = dayNamesShort[dt.getDay()];
     if (dayVolumeMap[dayName] !== undefined) {
@@ -188,7 +193,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
   const weekVolumeMap = { W1: 0, W2: 0, W3: 0, W4: 0 };
 
   userM2MPayments.forEach((p) => {
-    const amt = parseFloat(p.amount || 0);
+    const amt = parseFloat(p.amount || p.starting_balance || 0);
     const dt = new Date(p.created_at);
     const weekNum = `W${Math.min(4, Math.ceil(dt.getDate() / 7))}`;
     if (weekVolumeMap[weekNum] !== undefined) {
