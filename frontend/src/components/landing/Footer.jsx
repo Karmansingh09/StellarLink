@@ -3,10 +3,10 @@ import { ArrowUpRight, Globe, ShieldCheck } from 'lucide-react';
 import Container from '../ui/Container';
 import Logo from '../ui/Logo';
 
-export default function Footer() {
+export default function Footer({ onOpenDocs, onOpenArch }) {
   const links = [
     { label: 'Platform', href: '#platform' },
-    { label: 'Industries', href: '#industries' },
+    { label: 'Infrastructure', href: '#infrastructure' },
     { label: 'Contact', href: '#contact' },
   ];
 
@@ -31,10 +31,14 @@ export default function Footer() {
                 <Globe className="h-4 w-4 text-[#0F766E]" />
                 Stellar network
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#E2E8F0] bg-white px-3 py-1">
+              <button
+                type="button"
+                onClick={onOpenArch}
+                className="inline-flex items-center gap-2 rounded-full border border-[#E2E8F0] bg-white px-3 py-1 hover:border-[#0F766E]/40 hover:text-[#0F766E] transition-colors"
+              >
                 <ShieldCheck className="h-4 w-4 text-[#0F766E]" />
-                Enterprise security
-              </span>
+                View Architecture
+              </button>
             </div>
           </motion.div>
 
