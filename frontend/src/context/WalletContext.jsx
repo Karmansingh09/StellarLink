@@ -56,8 +56,15 @@ export function WalletProvider({ children }) {
       }
     };
     syncFreighterState();
+
+    const handleFocus = () => {
+      syncFreighterState();
+    };
+    window.addEventListener('focus', handleFocus);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('focus', handleFocus);
     };
   }, []);
 
