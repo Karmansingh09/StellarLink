@@ -6,7 +6,16 @@ export const stellarService = {
   },
 
   fundWallet: async (publicKey) => {
-    return await apiClient.post('/stellar/fund-wallet', { publicKey });
+    try {
+      return await apiClient.post('/stellar/fund-wallet', { publicKey });
+    } catch (err) {
+      console.warn('[stellarService] Backend fund-wallet failed, invoking SDF Friendbot directly:', err.message);
+      const res = await fetch(`https://friendbot.stellar.org?addr=${encodeURIComponent(publicKey)}`);
+      if (!res.ok) {
+        throw new Error('Friendbot funding request failed. Address may already be funded or rate limited.');
+      }
+      return await res.json();
+    }
   },
 
   getBalance: async (publicKey) => {
