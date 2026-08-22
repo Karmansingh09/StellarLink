@@ -4,9 +4,10 @@ import Badge from '../ui/Badge';
 import useDevices from '../../hooks/useDevices';
 import useAnalytics from '../../hooks/useAnalytics';
 
-export default function AutomatedInsights() {
+export default function AutomatedInsights({ metrics: metricsProp }) {
   const { data: devices = [] } = useDevices();
-  const { data: metrics } = useAnalytics();
+  const { data: metricsFromHook } = useAnalytics();
+  const metrics = metricsProp || metricsFromHook;
 
   const totalCount = devices.length;
   const activeCount = devices.filter((d) => ['active', 'settled', 'monitoring'].includes((d.status || '').toLowerCase())).length;

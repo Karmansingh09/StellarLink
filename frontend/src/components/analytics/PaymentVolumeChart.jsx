@@ -4,8 +4,9 @@ import EmptyState from '../ui/EmptyState';
 import { DollarSign } from 'lucide-react';
 import useAnalytics from '../../hooks/useAnalytics';
 
-export default function PaymentVolumeChart() {
-  const { data: metrics, isLoading } = useAnalytics();
+export default function PaymentVolumeChart({ metrics: metricsProp }) {
+  const { data: metricsFromHook, isLoading } = useAnalytics();
+  const metrics = metricsProp || metricsFromHook;
   const chartData = metrics?.paymentVolume || [];
   const hasData = chartData.length > 0 && chartData.some((d) => d.volume > 0);
 
@@ -16,7 +17,7 @@ export default function PaymentVolumeChart() {
         <CardDescription className="text-xs">Daily payment totals (XLM)</CardDescription>
       </CardHeader>
       <div className="h-56 sm:h-64 w-full pt-2">
-        {isLoading ? (
+        {isLoading && !metrics ? (
           <div className="flex h-full items-center justify-center text-xs text-[#64748B]">
             Loading payment volume...
           </div>

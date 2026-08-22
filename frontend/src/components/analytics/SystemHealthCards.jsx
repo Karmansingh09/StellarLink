@@ -3,8 +3,9 @@ import Card, { CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import Badge from '../ui/Badge';
 import useAnalytics from '../../hooks/useAnalytics';
 
-export default function SystemHealthCards() {
-  const { data: metrics } = useAnalytics();
+export default function SystemHealthCards({ metrics: metricsProp }) {
+  const { data: metricsFromHook } = useAnalytics();
+  const metrics = metricsProp || metricsFromHook;
   const ledgerSeq = metrics?.latestLedgerSequence ? `Ledger #${metrics.latestLedgerSequence}` : 'Horizon Connected';
 
   const healthItems = [
