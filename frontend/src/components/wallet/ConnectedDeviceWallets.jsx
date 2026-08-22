@@ -23,12 +23,12 @@ export default function ConnectedDeviceWallets() {
   return (
     <Card padding="generous">
       <CardHeader className="mb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <CardTitle className="text-base sm:text-lg font-semibold text-[#0F172A]">Connected Device Wallets</CardTitle>
             <CardDescription className="text-xs sm:text-sm">Machine endpoint wallets authorized for Soroban micro-settlements</CardDescription>
           </div>
-          <Badge variant="neutral" size="sm">
+          <Badge variant="neutral" size="sm" className="whitespace-nowrap shrink-0">
             Enterprise Fleet
           </Badge>
         </div>
@@ -41,33 +41,41 @@ export default function ConnectedDeviceWallets() {
             <motion.div
               key={dw.name}
               whileHover={{ y: -2 }}
-              className="p-4 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-3"
+              className="p-4 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-3 min-w-0"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-[#E2E8F0] text-[#0F766E]">
+              {/* Header Row: Icon, Device Type, and Status Badge */}
+              <div className="flex items-center justify-between gap-2 min-w-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white border border-[#E2E8F0] text-[#0F766E] shrink-0">
                     <Icon className="h-4 w-4" />
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#0F172A] truncate max-w-[130px]">{dw.name}</p>
-                    <p className="text-[10px] text-[#64748B]">{dw.type}</p>
-                  </div>
+                  <span className="text-[11px] font-semibold text-[#64748B] truncate">{dw.type}</span>
                 </div>
-                <StatusBadge status={dw.status}>{dw.status}</StatusBadge>
+                <StatusBadge status={dw.status} className="shrink-0 text-[10px] py-0.5 px-2">
+                  {dw.status}
+                </StatusBadge>
               </div>
 
-              <div className="pt-2 border-t border-[#E2E8F0] space-y-1 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-[#64748B]">Wallet Address</span>
-                  <span className="font-mono text-[#0F172A]">{dw.wallet}</span>
+              {/* Device Name Row: Dedicated line to prevent horizontal squeezing */}
+              <div className="min-w-0 pt-0.5">
+                <p className="text-xs sm:text-sm font-bold text-[#0F172A] truncate" title={dw.name}>
+                  {dw.name}
+                </p>
+              </div>
+
+              {/* Wallet Details Table */}
+              <div className="pt-2 border-t border-[#E2E8F0] space-y-1.5 text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[#64748B] shrink-0">Wallet Address</span>
+                  <span className="font-mono text-[#0F172A] truncate">{dw.wallet}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[#64748B]">Balance</span>
-                  <span className="font-mono font-bold text-[#0F766E]">{dw.balance}</span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[#64748B] shrink-0">Balance</span>
+                  <span className="font-mono font-bold text-[#0F766E] shrink-0">{dw.balance}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[#64748B]">Last Sync</span>
-                  <span className="text-[#64748B]">{dw.lastSync}</span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[#64748B] shrink-0">Last Sync</span>
+                  <span className="text-[#64748B] shrink-0">{dw.lastSync}</span>
                 </div>
               </div>
             </motion.div>
