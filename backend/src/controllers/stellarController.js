@@ -1,5 +1,10 @@
 import { generateWallet, fundWalletWithFriendbot, getWalletDetails } from '../services/stellar/walletService.js';
-import { submitXLMPayment, fetchTransactionHistory } from '../services/stellar/transactionService.js';
+import {
+  submitXLMPayment,
+  fetchTransactionHistory,
+  buildPaymentXdrService,
+  submitSignedXdrService,
+} from '../services/stellar/transactionService.js';
 import { getNetworkHealth } from '../services/stellar/networkService.js';
 
 export const createWallet = async (req, res) => {
@@ -31,6 +36,26 @@ export const getBalance = async (req, res) => {
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const buildPaymentXdr = async (req, res) => {
+  try {
+    const { sourcePublicKey, destinationPublic, amount, memoText } = req.body;
+    const data = await buildPaymentXdrService({ sourcePublicKey, destinationPublic, amount, memoText });
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+};
+
+export const submitSignedXdr = async (req, res) => {
+  try {
+    const { signedXdr } = req.body;
+    const data = await submitSignedXdrService({ signedXdr });
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
   }
 };
 
