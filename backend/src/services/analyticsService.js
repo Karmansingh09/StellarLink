@@ -71,7 +71,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     console.warn('[AnalyticsService] Horizon ledger finality query error:', horizonError.message);
   }
 
-  // Query Horizon RPC payment operations for actual metrics aggregation
+  // Query Horizon RPC payment operations strictly for target connected account & device wallets
   let rawPayments = [];
   const targetAccounts = [];
   if (publicKey && typeof publicKey === 'string' && publicKey.startsWith('G')) {
@@ -87,7 +87,6 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     targetAccounts.push('GBHPLJTE52JPNNGRU7W5JCKSV3JYFS5ZNMF27IQDTTPDGSP3XRZYCHFE');
   }
 
-  // Fetch account-specific and system-wide Horizon payments
   for (const acc of targetAccounts) {
     try {
       const pRes = await server.payments().forAccount(acc).order('desc').limit(50).call();
@@ -97,15 +96,6 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     } catch (err) {
       // Unfunded accounts return 404 on Horizon; catch silently
     }
-  }
-
-  try {
-    const sysPayments = await server.payments().order('desc').limit(50).call();
-    if (sysPayments.records) {
-      rawPayments.push(...sysPayments.records);
-    }
-  } catch (err) {
-    console.warn('[AnalyticsService] System payments fetch warning:', err.message);
   }
 
   // Deduplicate payment operations by id
@@ -126,19 +116,17 @@ export const getAnalyticsMetricsService = async (params = {}) => {
   else if (dateRange === '30d') msLimit = 30 * 24 * 60 * 60 * 1000;
   else if (dateRange === '90d') msLimit = 90 * 24 * 60 * 60 * 1000;
 
-  // Filter out non-payment types and Friendbot initial 10,000 XLM funding operations
+  // Restrict strictly to payment operations with valid numeric amounts
   const userM2MPayments = uniquePayments.filter((p) => {
     if (!p.created_at) return false;
     const t = new Date(p.created_at).getTime();
     if (now - t > msLimit) return false;
 
-    const isPaymentOp = ['payment', 'create_account', 'path_payment_strict_send', 'path_payment_strict_receive'].includes(p.type);
+    const isPaymentOp = ['payment', 'path_payment_strict_send', 'path_payment_strict_receive'].includes(p.type);
     if (!isPaymentOp) return false;
 
-    const amt = parseFloat(p.amount || p.starting_balance || 0);
-    const isFriendbot = p.funder === 'GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR' || amt >= 10000;
-
-    return !isFriendbot && amt > 0;
+    const amt = parseFloat(p.amount || 0);
+    return amt > 0;
   });
 
   const totalTxCount = userM2MPayments.length;
@@ -148,7 +136,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
   const timeSeriesDays = [];
   const todayDate = new Date();
 
-  const numDaysInSeries = dateRange === 'today' ? 1 : dateRange === '7d' ? 7 : 7;
+  const numDaysInSeries = dateRange === 'today' ? 1 : 7;
   for (let i = numDaysInSeries - 1; i >= 0; i--) {
     const d = new Date(todayDate);
     d.setDate(todayDate.getDate() - i);
@@ -162,7 +150,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
   });
 
   userM2MPayments.forEach((p) => {
-    const amt = parseFloat(p.amount || p.starting_balance || 0);
+    const amt = parseFloat(p.amount || 0);
     const dt = new Date(p.created_at);
     const dayName = dayNamesShort[dt.getDay()];
     if (dayVolumeMap[dayName] !== undefined) {
@@ -180,7 +168,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
   const weekVolumeMap = { W1: 0, W2: 0, W3: 0, W4: 0 };
 
   userM2MPayments.forEach((p) => {
-    const amt = parseFloat(p.amount || p.starting_balance || 0);
+    const amt = parseFloat(p.amount || 0);
     const dt = new Date(p.created_at);
     const weekNum = `W${Math.min(4, Math.ceil(dt.getDate() / 7))}`;
     if (weekVolumeMap[weekNum] !== undefined) {
@@ -193,7 +181,7 @@ export const getAnalyticsMetricsService = async (params = {}) => {
     volume: parseFloat(weekVolumeMap[week].toFixed(2)),
   }));
 
-  // Aggregate Daily Throughput (Performance) per day in timeSeriesDays
+  // Aggregate Daily Transaction Throughput (Performance) per day without artificial multipliers
   const dayPerfMap = {};
   timeSeriesDays.forEach((day) => {
     dayPerfMap[day] = 0;
@@ -209,11 +197,10 @@ export const getAnalyticsMetricsService = async (params = {}) => {
 
   const performance = totalTxCount === 0 ? [] : timeSeriesDays.map((day) => ({
     day,
-    tps: dayPerfMap[day] * 2,
-    burst: dayPerfMap[day] * 3,
+    txCount: dayPerfMap[day],
   }));
 
-  const throughputTps = totalTxCount > 0 ? `${totalTxCount} tx/min` : '0 tx/min';
+  const throughputTps = totalTxCount > 0 ? `${totalTxCount} tx` : '0 tx';
 
   return {
     throughputTps,
