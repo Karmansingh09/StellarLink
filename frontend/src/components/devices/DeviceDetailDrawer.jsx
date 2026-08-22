@@ -95,6 +95,16 @@ export default function DeviceDetailDrawer({ device, onClose }) {
                   <span className="text-[#64748B]">Current Balance</span>
                   <span className="font-mono font-bold text-[#0F766E]">{device.balance}</span>
                 </div>
+                <div className="pt-2">
+                  <a
+                    href={`https://stellar.expert/explorer/testnet/account/${device.wallet}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F766E] hover:underline"
+                  >
+                    View Account on Stellar Expert
+                  </a>
+                </div>
               </div>
             </div>
 
