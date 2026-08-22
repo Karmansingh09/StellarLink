@@ -149,12 +149,12 @@ export default function SendReceiveModal({ mode, onClose }) {
       });
 
       setStage('confirmed');
-      if (!isFreighterConnected && senderSecret.trim()) {
+      if (senderSecret.trim()) {
         const secret = senderSecret.trim();
         if (secret.startsWith('S')) {
-          const derivedKey = res?.sourcePublicKey || res?.publicKey;
-          if (derivedKey) {
-            setDevKeypair(derivedKey, secret);
+          const senderPubKey = res?.sourcePublicKey || res?.publicKey || res?.data?.sourcePublicKey || res?.data?.publicKey;
+          if (senderPubKey && senderPubKey.startsWith('G')) {
+            setDevKeypair(senderPubKey, secret);
           }
         }
       }
