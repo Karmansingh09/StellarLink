@@ -1,8 +1,8 @@
 import apiClient from './apiClient';
 
 export const analyticsService = {
-  getMetrics: async () => {
-    return await apiClient.get('/analytics');
+  getMetrics: async (params = {}) => {
+    return await apiClient.get('/analytics', { params });
   },
 };
 
