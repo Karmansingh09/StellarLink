@@ -267,11 +267,14 @@ export default function SendReceiveModal({ mode, onClose }) {
                     )}
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-between text-xs text-[#0F766E]">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4" />
-                      <span>Network Fee: 0.00001 XLM • Testnet Instant Settlement</span>
+                  <div className="p-3.5 rounded-2xl bg-teal-50 border border-teal-100 space-y-1 text-xs text-[#0F766E]">
+                    <div className="flex items-center gap-2 font-semibold">
+                      <ShieldCheck className="h-4 w-4 shrink-0" />
+                      <span>Network Fee: 0.00001 XLM • Stellar Testnet Horizon RPC</span>
                     </div>
+                    <p className="text-[11px] text-[#0F766E]/80 pl-6 leading-tight">
+                      Standard XLM payments execute via Horizon RPC. Soroban contract RPC status warnings in Freighter do not block native transactions.
+                    </p>
                   </div>
 
                   <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-end gap-3">
