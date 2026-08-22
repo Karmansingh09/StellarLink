@@ -3,6 +3,8 @@ import { Calendar, Cpu, Globe, Download, RefreshCw } from 'lucide-react';
 import Button from '../ui/Button';
 import { useToast } from '../../context/ToastContext';
 
+import { exportReport } from '../../utils/exportReport';
+
 export default function AnalyticsFilterBar({
   dateRange,
   onDateChange,
@@ -19,9 +21,10 @@ export default function AnalyticsFilterBar({
   const handleExport = () => {
     setIsExporting(true);
     setTimeout(() => {
+      exportReport({});
       setIsExporting(false);
-      addToast('Executive Analytics report exported (PDF & CSV)', 'success');
-    }, 800);
+      addToast('Executive Analytics telemetry CSV exported', 'success');
+    }, 500);
   };
 
   const handleRefreshClick = () => {
