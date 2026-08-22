@@ -4,7 +4,7 @@ import { Menu, X } from 'lucide-react';
 import Logo from '../ui/Logo';
 import Button from '../ui/Button';
 
-export default function Navbar() {
+export default function Navbar({ onOpenDocs, onOpenPilot }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -35,7 +35,7 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="outline" size="md">
+          <Button variant="outline" size="md" onClick={onOpenDocs}>
             Read Docs
           </Button>
           <Link to="/dashboard">
@@ -72,7 +72,7 @@ export default function Navbar() {
           </nav>
 
           <div className="mt-4 grid gap-3">
-            <Button variant="outline" size="md" fullWidth>
+            <Button variant="outline" size="md" fullWidth onClick={() => { setMobileMenuOpen(false); onOpenDocs?.(); }}>
               Read Docs
             </Button>
             <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>

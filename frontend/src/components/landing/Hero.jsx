@@ -6,7 +6,7 @@ import Card from '../ui/Card';
 import Heading from '../ui/Heading';
 import Container from '../ui/Container';
 
-export default function Hero() {
+export default function Hero({ onOpenDocs }) {
   const trustBadges = [
     { name: 'Built on Stellar', icon: Globe },
     { name: 'Soroban Ready', icon: Cpu },
@@ -48,7 +48,7 @@ export default function Hero() {
                   Launch Platform
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" icon={BookOpen} iconPosition="left">
+              <Button variant="outline" size="lg" icon={BookOpen} iconPosition="left" onClick={onOpenDocs}>
                 Read Documentation
               </Button>
             </div>
