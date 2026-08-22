@@ -12,6 +12,11 @@ export default function NetworkPerformanceChart({ metrics: metricsProp }) {
 
   const hasData = chartData.length > 0 && chartData.some((d) => (d.txCount || 0) > 0);
 
+  const formatYTick = (val) => {
+    if (val >= 1000) return `${(val / 1000).toFixed(1)}k`;
+    return val;
+  };
+
   return (
     <Card padding="generous" className="min-w-0">
       <CardHeader className="mb-4">
@@ -41,7 +46,7 @@ export default function NetworkPerformanceChart({ metrics: metricsProp }) {
           />
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="tpsGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#0F766E" stopOpacity={0.25} />
@@ -50,10 +55,10 @@ export default function NetworkPerformanceChart({ metrics: metricsProp }) {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
               <XAxis dataKey="day" stroke="#64748B" fontSize={11} tickLine={false} />
-              <YAxis stroke="#64748B" fontSize={11} tickLine={false} />
+              <YAxis stroke="#64748B" fontSize={11} tickLine={false} tickFormatter={formatYTick} />
               <Tooltip
                 contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }}
-                formatter={(value) => [`${value} tx`, 'Transactions']}
+                formatter={(value) => [`${typeof value === 'number' ? value.toLocaleString() : value} tx`, 'Transactions']}
               />
               <Area type="monotone" dataKey="txCount" stroke="#0F766E" strokeWidth={2.5} fillOpacity={1} fill="url(#tpsGrad)" />
             </AreaChart>
