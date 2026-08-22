@@ -9,34 +9,56 @@ export default function TransactionKPIs() {
 
   const totalTxCount = transactions.length;
   const completedCount = transactions.filter((t) => t.status === 'completed' || t.status === 'settled').length;
-  const successPct = totalTxCount > 0 ? Math.round((completedCount / totalTxCount) * 100) : 100;
+
+  const totalVolumeXlm = transactions.reduce((acc, t) => {
+    const rawAmt = typeof t.amount === 'string' ? t.amount : '';
+    const numericVal = parseFloat(rawAmt.replace(/[^0-9.]/g, '')) || 0;
+    return acc + numericVal;
+  }, 0);
+
+  const hasData = totalTxCount > 0;
+  const successPct = hasData ? Math.round((completedCount / totalTxCount) * 100) : null;
 
   const metrics = [
     {
       title: 'Total Transactions',
       value: `${totalTxCount} Ledger Txs`,
-      change: { label: 'Live Ledger', tone: 'success' },
+      change: {
+        label: hasData ? 'Live Stream Active' : 'Awaiting activity',
+        tone: hasData ? 'success' : 'neutral',
+      },
       icon: Activity,
       tone: 'primary',
     },
     {
       title: 'Settlement Volume',
-      value: '$0.00',
-      change: { label: '0.0%', tone: 'neutral' },
+      value: hasData
+        ? `${totalVolumeXlm > 0 ? totalVolumeXlm.toLocaleString() : '0.00'} XLM`
+        : '0.00 XLM',
+      change: {
+        label: hasData ? 'Testnet Settled' : 'No settlement data',
+        tone: hasData ? 'primary' : 'neutral',
+      },
       icon: DollarSign,
       tone: 'neutral',
     },
     {
       title: 'Average Finality',
-      value: '482ms',
-      change: { label: 'Optimal', tone: 'success' },
+      value: hasData ? '5.0s' : 'N/A',
+      change: {
+        label: hasData ? 'Ledger Cadence' : 'No transactions',
+        tone: hasData ? 'success' : 'neutral',
+      },
       icon: Clock,
       tone: 'warning',
     },
     {
       title: 'Success Rate',
-      value: `${successPct}%`,
-      change: { label: 'Stable', tone: 'primary' },
+      value: hasData ? `${successPct}%` : 'N/A',
+      change: {
+        label: hasData ? 'Verified Executions' : 'No completed txs',
+        tone: hasData ? 'success' : 'neutral',
+      },
       icon: ShieldCheck,
       tone: 'success',
     },
