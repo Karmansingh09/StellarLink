@@ -70,6 +70,8 @@ export function useSendStellarPayment() {
       queryClient.invalidateQueries({ queryKey: ['stellarWallet'] });
       queryClient.invalidateQueries({ queryKey: ['stellarTransactions'] });
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['analyticsMetrics'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
   });
 }

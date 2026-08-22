@@ -36,7 +36,7 @@ export default function Analytics() {
   const [deviceType, setDeviceType] = useState('all');
   const [network, setNetwork] = useState('all');
 
-  const { data: analyticsData, isLoading, refetch } = useAnalytics();
+  const { data: analyticsData, isLoading, refetch } = useAnalytics({ dateRange, deviceType, network });
 
   const handleReset = () => {
     setDateRange('30d');
