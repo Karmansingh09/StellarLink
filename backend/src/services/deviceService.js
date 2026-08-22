@@ -1,3 +1,5 @@
+import * as StellarSdk from '@stellar/stellar-sdk';
+
 const devicesData = [
   {
     id: 'DEV-9842-X1',
@@ -116,19 +118,20 @@ export const getDevicesService = async (query = {}) => {
 };
 
 export const registerDeviceService = async (deviceData) => {
-  const mockWallet = 'G' + Math.random().toString(36).substring(2, 12).toUpperCase() + '8943FL';
-  const mockId = 'DEV-' + Math.floor(1000 + Math.random() * 9000) + '-X1';
+  const generatedKeypair = StellarSdk.Keypair.random();
+  const validWallet = generatedKeypair.publicKey();
+  const deviceId = `DEV-${Date.now().toString().slice(-6)}-X1`;
 
   const newDevice = {
-    id: mockId,
+    id: deviceId,
     name: deviceData.name,
     type: deviceData.type || 'EV Charger',
     region: deviceData.region || 'Europe West',
-    wallet: mockWallet,
+    wallet: validWallet,
     status: 'active',
     battery: '100%',
     network: '5G LTE',
-    lastHeartbeat: '1s ago',
+    lastHeartbeat: 'Just now',
     latency: '390 ms',
     volume: '0 tx',
     balance: '0.00 XLM',
