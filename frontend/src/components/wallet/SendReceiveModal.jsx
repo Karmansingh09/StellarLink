@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { QRCodeSVG } from 'qrcode.react';
 import {
   X,
   ArrowUpRight,
@@ -28,7 +29,7 @@ import stellarService from '../../services/api/stellarService';
 export default function SendReceiveModal({ mode, onClose }) {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const { walletData, publicKey, refreshWallet, isFreighterConnected, setDevKeypair } = useWalletContext();
+  const { walletData, publicKey, refreshWallet, connectWallet, isFreighterConnected, setDevKeypair } = useWalletContext();
   const [copied, setCopied] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
   const [recipient, setRecipient] = useState('');
@@ -475,14 +476,17 @@ export default function SendReceiveModal({ mode, onClose }) {
                 </motion.div>
               )}
             </AnimatePresence>
-          ) : (
+          ) : walletAddress ? (
             <div className="text-center space-y-4">
               <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl inline-block shadow-xs">
-                <div className="w-48 h-48 bg-slate-900 rounded-xl flex items-center justify-center text-white font-mono text-xs text-center p-4">
-                  [ STELLAR TESTNET QR ]
-                  <br />
-                  {walletAddress.substring(0, 12)}...
-                </div>
+                <QRCodeSVG
+                  value={walletAddress}
+                  size={180}
+                  bgColor="#FFFFFF"
+                  fgColor="#0F172A"
+                  level="H"
+                  className="mx-auto rounded-lg"
+                />
               </div>
 
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-[#E2E8F0] font-mono text-xs text-[#0F172A]">
@@ -495,6 +499,34 @@ export default function SendReceiveModal({ mode, onClose }) {
               <Button variant="outline" size="md" onClick={onClose} className="w-full">
                 Close Dialog
               </Button>
+            </div>
+          ) : (
+            <div className="text-center space-y-4 py-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-600 mx-auto border border-amber-200">
+                <AlertCircle className="h-8 w-8" />
+              </div>
+              <div>
+                <h4 className="text-base font-bold text-[#0F172A]">No Wallet Connected</h4>
+                <p className="text-xs text-[#64748B] mt-1 max-w-xs mx-auto leading-relaxed">
+                  Connect your Freighter wallet or select an active keypair to display your QR code and receive payments.
+                </p>
+              </div>
+              <div className="pt-2 flex items-center justify-center gap-3">
+                <Button
+                  variant="primary"
+                  size="md"
+                  onClick={async () => {
+                    try {
+                      await connectWallet();
+                    } catch (e) {
+                      console.error('[SendReceiveModal] Connect Wallet Error:', e);
+                    }
+                  }}
+                  className="w-full"
+                >
+                  Connect Wallet
+                </Button>
+              </div>
             </div>
           )}
         </div>
