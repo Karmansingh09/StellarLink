@@ -10,6 +10,11 @@ export default function SettlementTrendsChart({ metrics: metricsProp }) {
   const chartData = metrics?.settlementTrends || [];
   const hasData = chartData.length > 0 && chartData.some((d) => d.volume > 0);
 
+  const formatYTick = (val) => {
+    if (val >= 1000) return `${(val / 1000).toFixed(1)}k`;
+    return val;
+  };
+
   return (
     <Card padding="generous" className="h-full min-w-0">
       <CardHeader className="mb-2">
@@ -29,7 +34,7 @@ export default function SettlementTrendsChart({ metrics: metricsProp }) {
           />
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="settlementTrendGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#0F766E" stopOpacity={0.25} />
@@ -38,8 +43,11 @@ export default function SettlementTrendsChart({ metrics: metricsProp }) {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
               <XAxis dataKey="week" stroke="#64748B" fontSize={11} tickLine={false} />
-              <YAxis stroke="#64748B" fontSize={11} tickLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }} />
+              <YAxis stroke="#64748B" fontSize={11} tickLine={false} tickFormatter={formatYTick} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#FFF', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '12px' }}
+                formatter={(val) => [`${typeof val === 'number' ? val.toLocaleString() : val} XLM`, 'Settlement Volume']}
+              />
               <Area type="monotone" dataKey="volume" stroke="#0F766E" strokeWidth={2.5} fillOpacity={1} fill="url(#settlementTrendGrad)" />
             </AreaChart>
           </ResponsiveContainer>
