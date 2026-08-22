@@ -81,17 +81,23 @@ export default function TransactionAnalytics() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* 1. Transaction Volume (Line / Area Chart) */}
-      <Card padding="generous" className="h-full min-w-0">
+      <Card padding="generous" className="h-full min-w-0 flex flex-col justify-between">
         <CardHeader className="mb-2">
           <CardTitle className="text-base font-semibold text-[#0F172A]">Transaction Volume</CardTitle>
           <CardDescription className="text-xs">Settlement volume calculated from real Horizon transactions</CardDescription>
         </CardHeader>
-        <div className="h-48 sm:h-56 w-full pt-2">
+        <div className="h-44 sm:h-52 w-full pt-2">
           {!hasData ? (
-            <div className="flex flex-col items-center justify-center h-full p-4 text-center border border-dashed border-[#E2E8F0] rounded-xl bg-[#F8FAFC] space-y-2">
-              <TrendingUp className="h-6 w-6 text-[#94A3B8]" />
-              <p className="text-xs font-semibold text-[#0F172A]">No Volume Data</p>
-              <p className="text-[11px] text-[#64748B]">Awaiting transaction activity. Charts will populate when settlements are recorded.</p>
+            <div className="flex flex-col items-center justify-center h-full p-4 text-center border border-[#E2E8F0] rounded-xl bg-[#F8FAFC]/80 shadow-2xs space-y-2.5">
+              <div className="h-9 w-9 rounded-xl bg-teal-50 border border-teal-100/80 flex items-center justify-center text-[#0F766E]">
+                <TrendingUp className="h-4.5 w-4.5" />
+              </div>
+              <div className="space-y-0.5 max-w-xs">
+                <p className="text-xs font-bold text-[#0F172A]">No Volume Data</p>
+                <p className="text-[11px] text-[#64748B] leading-relaxed">
+                  Volume trends will appear after settlements are recorded.
+                </p>
+              </div>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -117,17 +123,23 @@ export default function TransactionAnalytics() {
       </Card>
 
       {/* 2. Settlement Distribution (Donut Chart) */}
-      <Card padding="generous" className="h-full min-w-0">
+      <Card padding="generous" className="h-full min-w-0 flex flex-col justify-between">
         <CardHeader className="mb-2">
           <CardTitle className="text-base font-semibold text-[#0F172A]">Settlement Distribution</CardTitle>
           <CardDescription className="text-xs">Device distribution derived from active transactions</CardDescription>
         </CardHeader>
-        <div className="h-48 sm:h-56 w-full flex items-center justify-center relative">
+        <div className="h-44 sm:h-52 w-full flex items-center justify-center relative pt-2">
           {!hasData ? (
-            <div className="flex flex-col items-center justify-center h-full w-full p-4 text-center border border-dashed border-[#E2E8F0] rounded-xl bg-[#F8FAFC] space-y-2">
-              <PieIcon className="h-6 w-6 text-[#94A3B8]" />
-              <p className="text-xs font-semibold text-[#0F172A]">No Distribution Data</p>
-              <p className="text-[11px] text-[#64748B]">Awaiting transaction activity to compute device shares.</p>
+            <div className="flex flex-col items-center justify-center h-full w-full p-4 text-center border border-[#E2E8F0] rounded-xl bg-[#F8FAFC]/80 shadow-2xs space-y-2.5">
+              <div className="h-9 w-9 rounded-xl bg-teal-50 border border-teal-100/80 flex items-center justify-center text-[#0F766E]">
+                <PieIcon className="h-4.5 w-4.5" />
+              </div>
+              <div className="space-y-0.5 max-w-xs">
+                <p className="text-xs font-bold text-[#0F172A]">No Distribution Data</p>
+                <p className="text-[11px] text-[#64748B] leading-relaxed">
+                  Device settlement shares will appear with transaction activity.
+                </p>
+              </div>
             </div>
           ) : (
             <>
@@ -158,17 +170,23 @@ export default function TransactionAnalytics() {
       </Card>
 
       {/* 3. Hourly Activity (Bar Chart) */}
-      <Card padding="generous" className="h-full min-w-0">
+      <Card padding="generous" className="h-full min-w-0 flex flex-col justify-between">
         <CardHeader className="mb-2">
           <CardTitle className="text-base font-semibold text-[#0F172A]">Hourly Activity</CardTitle>
           <CardDescription className="text-xs">Transaction count aggregated by settlement timestamp</CardDescription>
         </CardHeader>
-        <div className="h-48 sm:h-56 w-full pt-2">
+        <div className="h-44 sm:h-52 w-full pt-2">
           {!hasData ? (
-            <div className="flex flex-col items-center justify-center h-full p-4 text-center border border-dashed border-[#E2E8F0] rounded-xl bg-[#F8FAFC] space-y-2">
-              <BarChart2 className="h-6 w-6 text-[#94A3B8]" />
-              <p className="text-xs font-semibold text-[#0F172A]">No Hourly Data</p>
-              <p className="text-[11px] text-[#64748B]">Awaiting transaction activity to chart hourly load.</p>
+            <div className="flex flex-col items-center justify-center h-full p-4 text-center border border-[#E2E8F0] rounded-xl bg-[#F8FAFC]/80 shadow-2xs space-y-2.5">
+              <div className="h-9 w-9 rounded-xl bg-teal-50 border border-teal-100/80 flex items-center justify-center text-[#0F766E]">
+                <BarChart2 className="h-4.5 w-4.5" />
+              </div>
+              <div className="space-y-0.5 max-w-xs">
+                <p className="text-xs font-bold text-[#0F172A]">No Hourly Data</p>
+                <p className="text-[11px] text-[#64748B] leading-relaxed">
+                  Hourly activity will populate when transactions are recorded.
+                </p>
+              </div>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
