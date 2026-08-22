@@ -21,6 +21,8 @@ import Button from '../ui/Button';
 import { useToast } from '../../context/ToastContext';
 import { useSendStellarPayment } from '../../hooks/useStellar';
 import { useWalletContext } from '../../context/WalletContext';
+import freighterService from '../../services/wallet/freighterService';
+import stellarService from '../../services/api/stellarService';
 
 export default function SendReceiveModal({ mode, onClose }) {
   const { addToast } = useToast();
@@ -68,9 +70,9 @@ export default function SendReceiveModal({ mode, onClose }) {
 
   const stagesList = [
     { key: 'preparing', label: 'Preparing Transaction...' },
-    { key: 'signing', label: 'Signing Transaction...' },
-    { key: 'submitting', label: 'Submitting to Stellar...' },
-    { key: 'waiting', label: 'Waiting for Confirmation...' },
+    { key: 'signing', label: 'Signing via Freighter...' },
+    { key: 'submitting', label: 'Submitting to Stellar Horizon...' },
+    { key: 'waiting', label: 'Waiting for Consensus...' },
     { key: 'confirmed', label: 'Transaction Confirmed' },
   ];
 
@@ -89,30 +91,49 @@ export default function SendReceiveModal({ mode, onClose }) {
       return;
     }
 
+    if (!isFreighterConnected && !senderSecret.trim()) {
+      addToast('Please enter your Stellar Secret Key (S...) or connect Freighter Wallet', 'error');
+      return;
+    }
+
     setStage('preparing');
     const startMs = Date.now();
 
     try {
-      // Stage 1: Preparing (700ms)
-      await new Promise((r) => setTimeout(r, 700));
-      setStage('signing');
+      let res;
+      if (isFreighterConnected) {
+        // 1. Build Unsigned Transaction XDR
+        const buildRes = await stellarService.buildPaymentXdr({
+          sourcePublicKey: walletAddress,
+          destinationPublic: cleanRecipient,
+          amount: String(amount),
+          memoText,
+        });
 
-      // Stage 2: Signing (800ms)
-      await new Promise((r) => setTimeout(r, 800));
-      setStage('submitting');
+        const { xdr, networkPassphrase } = buildRes.data || buildRes;
 
-      // Stage 3: Submitting API call
-      const submitPromise = sendPaymentMutation.mutateAsync({
-        senderSecret: senderSecret || 'SD4Z...DEV_SECRET',
-        destinationPublic: recipient,
-        amount,
-        memoText,
-      });
+        // 2. Prompt Freighter Extension to Sign
+        setStage('signing');
+        const signedXdr = await freighterService.signTransaction(xdr, networkPassphrase);
 
-      // Advance to Stage 4: Waiting for Horizon consensus
+        // 3. Submit Signed XDR to Horizon RPC
+        setStage('submitting');
+        const submitRes = await stellarService.submitSignedXdr({ signedXdr });
+        res = submitRes.data || submitRes;
+      } else {
+        // Dev Secret Key Mode
+        setStage('signing');
+        setStage('submitting');
+        const submitRes = await sendPaymentMutation.mutateAsync({
+          senderSecret: senderSecret.trim(),
+          destinationPublic: cleanRecipient,
+          amount: String(amount),
+          memoText,
+        });
+        res = submitRes.data || submitRes;
+      }
+
       setStage('waiting');
-      const res = await submitPromise;
-
       const durationSec = ((Date.now() - startMs) / 1000).toFixed(2);
       setConfirmationTime(`${durationSec}s`);
 
@@ -121,21 +142,19 @@ export default function SendReceiveModal({ mode, onClose }) {
         ledger: res?.ledger || 'Latest',
         fee: '0.00001 XLM',
         amount: `${amount} XLM`,
-        recipient,
+        recipient: cleanRecipient,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       });
 
-      // Stage 5: Confirmed!
       setStage('confirmed');
-
-      // Refresh single source of truth wallet context
       refreshWallet();
-
       addToast('XLM payment confirmed on Stellar Testnet!', 'success');
     } catch (err) {
-      setErrorMessage(err.message || 'Stellar transaction execution failed.');
+      console.error('[SendReceiveModal] Payment execution error:', err);
+      const friendlyMsg = err.message || 'Stellar transaction execution failed.';
+      setErrorMessage(friendlyMsg);
       setStage('error');
-      addToast(err.message || 'Transaction failed', 'error');
+      addToast(friendlyMsg, 'error');
     }
   };
 
@@ -424,7 +443,7 @@ export default function SendReceiveModal({ mode, onClose }) {
                     <h3 className="text-xl font-bold font-['Space_Grotesk'] text-[#0F172A]">
                       Transaction Failed
                     </h3>
-                    <p className="text-xs text-rose-600 mt-2 bg-rose-50 p-3 rounded-xl border border-rose-200 font-mono">
+                    <p className="text-xs text-rose-600 mt-2 bg-rose-50 p-3 rounded-xl border border-rose-200 font-mono text-left break-words">
                       {errorMessage}
                     </p>
                   </div>

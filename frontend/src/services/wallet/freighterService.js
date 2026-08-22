@@ -4,6 +4,7 @@ import {
   requestAccess,
   getAddress,
   getNetwork,
+  signTransaction,
 } from '@stellar/freighter-api';
 
 export const freighterService = {
@@ -73,6 +74,30 @@ export const freighterService = {
       return Boolean(allowed?.isAllowed || allowed);
     } catch {
       return false;
+    }
+  },
+
+  /**
+   * Sign transaction envelope XDR via Freighter Extension
+   */
+  signTransaction: async (transactionXdr, networkPassphrase) => {
+    try {
+      const res = await signTransaction({
+        transactionXdr,
+        networkPassphrase: networkPassphrase || 'Test SDF Network ; July 2015',
+        network: 'TESTNET',
+      });
+
+      const signedXdr = res?.signedTxXdr || res?.signedXdr || res?.signedTransaction || res;
+      if (!signedXdr || typeof signedXdr !== 'string') {
+        throw new Error('Freighter signing returned invalid transaction envelope XDR');
+      }
+      return signedXdr;
+    } catch (err) {
+      if (err?.message?.includes('User declined') || err?.message?.includes('rejected') || err?.message?.includes('User canceled')) {
+        throw new Error('Transaction signature request was declined in Freighter extension.');
+      }
+      throw new Error(err.message || 'Freighter signature failed.');
     }
   },
 };

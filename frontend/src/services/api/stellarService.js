@@ -22,6 +22,19 @@ export const stellarService = {
     return await apiClient.get('/wallet', { params: { publicKey } });
   },
 
+  buildPaymentXdr: async ({ sourcePublicKey, destinationPublic, amount, memoText }) => {
+    return await apiClient.post('/stellar/build-payment-xdr', {
+      sourcePublicKey,
+      destinationPublic,
+      amount,
+      memoText,
+    });
+  },
+
+  submitSignedXdr: async ({ signedXdr }) => {
+    return await apiClient.post('/stellar/submit-xdr', { signedXdr });
+  },
+
   sendPayment: async ({ senderSecret, destinationPublic, amount, memoText }) => {
     return await apiClient.post('/stellar/send-payment', {
       senderSecret,
